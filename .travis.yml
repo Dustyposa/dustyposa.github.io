@@ -3,9 +3,11 @@ language: node_js
 node_js:
   - 10 # use nodejs v10 LTS
 cache: npm
+install:
+  - cd blog && npm i
 branches:
   only:
-    - master # build master branch only
+    - writing # build master branch only
 script:
   - hexo generate # generate static files
 deploy:
