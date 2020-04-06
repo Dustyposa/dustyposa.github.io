@@ -10,7 +10,6 @@ branches:
     - writing # build master branch only
 script:
   - hexo generate # generate static files
-  - pwd && ls
 deploy:
   provider: pages
   skip-cleanup: true
