@@ -1202,28 +1202,28 @@ h6::before {
   }
 }
 
-.container {
-    max-width: 1360px;
-    font-size: 20px;
-}
+/*.container {*/
+/*    max-width: 1360px;*/
+/*    font-size: 20px;*/
+/*}*/
 
-.row {
-    font-size: 1.4rem;
-}
+/*.row {*/
+/*    font-size: 1.4rem;*/
+/*}*/
 
-.post-content {
-    max-width: 82rem;
-}
+/*.post-content {*/
+/*    max-width: 82rem;*/
+/*}*/
 
-.markdown-body {
-    font-size: 1.2rem;
-    line-height: 2rem;
-}
+/*.markdown-body {*/
+/*    font-size: 1.2rem;*/
+/*    line-height: 2rem;*/
+/*}*/
 
-.tocbot-list a {
-  font-size: 20px;
-}
-.index-header {
+/*.tocbot-list a {*/
+/*  font-size: 20px;*/
+/*}*/
+/*.index-header {*/
 
-  font-size: 2rem;
-}
+/*  font-size: 2rem;*/
+/*}*/
