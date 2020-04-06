@@ -10,11 +10,13 @@ branches:
     - writing # build master branch only
 script:
   - hexo generate # generate static files
+  - pwd && ls
 deploy:
   provider: pages
   skip-cleanup: true
   github-token: $GH_TOKEN
+  target-branch: master
   keep-history: true
   on:
-    branch: master
-  local-dir: public
+    branch: writing
+  local-dir: blog/public
