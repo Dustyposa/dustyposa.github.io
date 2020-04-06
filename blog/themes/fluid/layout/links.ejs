@@ -1,0 +1,29 @@
+<%
+page.layout = "links"
+page.title = theme.links.title || __('links.title')
+page.subtitle = theme.links.subtitle || __('links.subtitle')
+page.banner_img = theme.links.banner_img
+page.banner_img_height = theme.links.banner_img_height
+%>
+
+<div class="row links">
+  <% for(const each in theme.links.items) { %>
+    <% var props = theme.links.items[each] %>
+    <% if (!props) continue %>
+    <div class="card col-lg-4 col-md-6 col-sm-12">
+      <a href="<%= url_for(props[0]) %>" class="card-body" target="_blank" rel="noopener">
+        <div class="card-content">
+          <% if (props[2]) { %>
+            <div class="link-avatar my-auto">
+              <img src="<%= props[2] %>" alt="<%= each %>" />
+            </div>
+          <% } %>
+          <div class="link-text">
+            <div class="link-title"><%- each %></div>
+            <div class="link-intro"><%- props[1] %></div>
+          </div>
+        </div>
+      </a>
+    </div>
+  <% } %>
+</div>
