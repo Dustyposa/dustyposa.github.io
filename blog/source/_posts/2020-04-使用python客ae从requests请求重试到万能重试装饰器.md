@@ -1,5 +1,5 @@
 ---
-title: 使用python客æ从requests请求重试到万能重试装饰器
+title: 从requests请求重试到万能重试装饰器
 tags: [python,decorator]
 category: [advance]
 date: 2020-04-07 10:02:08
