@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="一些经验的记录。">
+  <meta name="author" content="Dusty Posa">
+  <meta name="keywords" content="python,python3,process,script">
+  <title>使用python客æ从requests请求重试到万能重试装饰器 - Posaのにわ</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">首页</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">归档</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">分类</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">标签</a>
+          </li>
+        
+          
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">关于</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <p class="mt-3 post-meta">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                  星期二, 四月 7日 2020, 10:02 上午
+                </p>
+              
+
+              <p class="mt-1">
+                
+                  
+                  <span class="post-meta">
+                    <i class="far fa-chart-bar"></i>
+                    5.1k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta">
+                      <i class="far fa-clock"></i>
+                      20 分钟
+                  </span>
+                
+
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5 z-depth-3" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <div class="markdown-body">
+              <h2 id="从requests请求重试到万能重试装饰器"><a href="#从requests请求重试到万能重试装饰器" class="headerlink" title="从requests请求重试到万能重试装饰器"></a>从requests请求重试到万能重试装饰器</h2><p>重试，在编写代码的过程中，是一个很常见的需求。<br>比如：</p>
+<ol>
+<li>请求重试（例如：超时）</li>
+<li>文件占用</li>
+<li>IO阻塞等待</li>
+</ol>
+<p>那么，我们如何编写重试的代码呢？<br>本文将从请求重试开始，带大家从简单的超时重试，最后编写到万能错误重试。</p>
+<blockquote>
+<p>主要涉及内容：</p>
+<ul>
+<li>requests adapter</li>
+<li>函数装饰器</li>
+<li>类装饰器</li>
+</ul>
+</blockquote>
+<p>话不多说，start！</p>
+<p><strong>因为我们需要从 <code>requests</code> 请求重试开始，为了方便测试请求，我们用 <code>flask</code> 编写一个简单的服务器，用于请求测试。</strong></p>
+<h2 id="准备请求服务器"><a href="#准备请求服务器" class="headerlink" title="准备请求服务器"></a>准备请求服务器</h2><p>服务器的功能比较简单，用来查看请求次数和观察是否重试成功，<code>flask_server.py</code>代码如下：</p>
+<pre><code class="python">from time import sleep
+
+from flask import Flask, jsonify, Response
+
+app: Flask = Flask(__name__)
+
+retry_count: int = 0  # 用于重试请求的计数
+
+
+@app.route(&quot;/api/retry&quot;, methods=[&quot;GET&quot;])
+def retry_api() -&gt; Response:
+    &quot;&quot;&quot;
+    延时 1s 的请求接口， 响应时间 &gt; 1s。
+    :return:
+    &quot;&quot;&quot;
+    global retry_count
+    retry_count += 1
+    print(f&quot;这是第{retry_count}次请求&quot;)
+    if retry_count &lt; 3:
+        sleep(1)
+    else:
+        retry_count = 0  # 计数清零
+    return jsonify({&quot;msg&quot;: &quot;已经三次了哦！&quot;})
+
+
+if __name__ == &#39;__main__&#39;:
+    app.run()
+</code></pre>
+<p>代码比较简单，由于没有找到好用的<code>flask</code>上下文来完成计数需求，这里为了简单操作，就直接应用了全局变量来计数（仅用于测试，未加锁），而没有使用<code>redis</code>数据库来计数了。</p>
+<p>编写好之后，我们运行代码即可。这样，我们用来测试重试的服务器就准备好了。</p>
+<p>接下来，我们先来看看一般的 <code>requests</code> 超时请求如何实现。</p>
+<h2 id="1-requests-请求重试（常见版本）"><a href="#1-requests-请求重试（常见版本）" class="headerlink" title="1.requests 请求重试（常见版本）"></a>1.<code>requests</code> 请求重试（常见版本）</h2><p>我们用 <code>try...except...</code> 语句捕捉<code>timeout</code>错误。进行循环重试即可。我们编写一个函数 <code>get_data</code>，<code>normal.py</code>代码如下：</p>
+<pre><code class="python">from typing import Dict, Any
+
+import requests
+
+BaseDictData = Dict[str, Any]
+
+
+def get_data(url: str, max_retry: int = 0, time_out: float = 3., **kwargs) -&gt; BaseDictData:
+    &quot;&quot;&quot;自动重试 timeout 错误 的方法&quot;&quot;&quot;
+    params: BaseDictData = kwargs.get(&quot;params&quot;, {})  # 不管你传了什么奇怪的东西， 我只收这个
+    headers: BaseDictData = kwargs.get(&quot;headers&quot;, {})  # 同上
+    for i in range(max_retry + 1):
+        &quot;&quot;&quot;进行最大重试次数的遍历&quot;&quot;&quot;
+        try:
+            response: requests.Response = requests.get(
+                url=url,
+                params=params,
+                headers=headers,
+                timeout=time_out,
+            )
+        except requests.ReadTimeout:
+            print(f&quot;第{i + 1}次请求失败，正在重试。&quot;)
+        else:
+            return response.json()  # 没有错误，直接返回
+
+    print(f&quot;{max_retry + 1} 次请求都失败了，返回空值，便于后续逻辑处理。。。&quot;)
+    return {}
+
+
+if __name__ == &#39;__main__&#39;:
+    print(get_data(&quot;http://localhost:5000/api/retry&quot;, max_retry=1, time_out=.01))
+</code></pre>
+<p>在该函数中，我们利用 <code>requests</code> 库本身的 <code>timeout</code> 参数进行错误捕捉。整体比较简单，设计逻辑即：</p>
+<pre><code class="mermaid">graph LR
+A[请求] -- 超时重试--&gt; A
+A --成功--&gt; B[处理成功后的数据]
+A--超过最大重试次数--&gt;C[返回空数据便于后续逻辑处理]</code></pre>
+<p>如果超时，那么就会引发错误，然后继续请求，用<code>for</code>循环来处理循环重试，更加简洁。</p>
+<p>超过最大次数，就返回空数据，成功，返回成功数据。</p>
+<p>代码段注意要点：<br><strong><code>try...except...</code></strong> 语句 </p>
+<pre><code class="python">try:
+    ...  # 需要捕捉异常的代码
+except xxx:
+    ...  # 发生异常处理逻辑
+else:
+    ...  # 如果 try 成功执行，就执行else，否则跳过else
+finally:
+    ...  # 一定会执行该语句块</code></pre>
+<p>我们在 <code>try</code> 语句块中只运行了一行代码，因为这次捕捉只针对这行代码可能会引起的错误，做到<strong>精确捕捉异常</strong>。</p>
+<p>如果 <code>try</code> 语句块中的代码太多的话（比如要做多件事情），错误调试和错误处理都比较麻烦，因为我们不知道是哪行引起的错误，需要加（<code>print</code>） 或者 （<code>debug</code>）来查看具体错误原因，并且不要担心使用<code>try...except...</code>语句，<code>python</code>中的异常处理代价是很小的，异常处理也是很常见的。</p>
+<p>而<code>else</code>语句块，就是正常逻辑的补充处理。</p>
+<p><strong>TIPS:</strong><br><strong>在 <code>for...in...:</code>语句中也有<code>else</code>语句块，对完成循环后进行补充。</strong></p>
+<details>
+  <summary><code>for...in...</code>示例</summary>  
+
+<p>比如，我们要循环检测一个列表<code>check_data: List[Union[int, str]] = [1, 2, 3, 4]</code>是否有字符串，如果有字符串我们就不进行后续处理，如过没有字符串，我们就调用 <code>handle_data</code> 函数。 </p>
+<p>为了满足上面的需求，通常，我们都会写一个 <code>tag/signal</code>来标注状态，例如下面的代码：</p>
+<pre><code class="python">has_string: bool = False
+for data in check_data:
+    if isinstance(data, str):
+        has_string = True
+        break
+
+if not has_string:
+    # 没有字符串的情况下
+    handle_data() </code></pre>
+<p>有了 <code>else</code> 我们就可以简化代码，如下：</p>
+<pre><code class="python">for data in check_data:
+    if isinstance(data, str):
+        break
+else:
+    # 没有字符串的情况下
+    handle_data() </code></pre>
+<p>这样逻辑就可以更清晰一些。另外， <code>while 循环</code>也支持 <code>else</code> 语句，这里就不重复演示了。</p>
+</details>
+
+
+
+<h4 id="查看效果。"><a href="#查看效果。" class="headerlink" title="查看效果。"></a>查看效果。</h4><p>我们调用 <code>print(get_data(&quot;http://localhost:5000/api/retry&quot;, max_retry=2, time_out=.01))</code><br>客户端结果:</p>
+<pre><code>第1次请求失败，正在重试。
+第2次请求失败，正在重试。
+{&#39;msg&#39;: &#39;已经三次了哦！&#39;}</code></pre><p>服务端结果：</p>
+<pre><code>这是第1次请求
+这是第2次请求
+这是第3次请求</code></pre><p>这里 <code>max_retry</code> 为最大<strong>重试</strong>次数，所以最大请求次数为<code>1+max_retry</code>。</p>
+<p>我们调用<code>print(get_data(&quot;http://localhost:5000/api/retry&quot;, max_retry=1, time_out=.01))</code><br>客户端结果:</p>
+<pre><code>第1次请求失败，正在重试。
+第2次请求失败，正在重试。
+2 次请求都失败了，返回空值，便于后续逻辑处理。。。
+{}</code></pre><p>服务端结果：</p>
+<pre><code>这是第1次请求
+这是第2次请求</code></pre><p>可以看出，整体效果也是符合预期的，没有多大问题。<br>接下来，我们利用<code>requests</code>自带的请求重试器。</p>
+<h2 id="2-requests-adapter-重试"><a href="#2-requests-adapter-重试" class="headerlink" title="2. requests adapter 重试"></a>2. <code>requests adapter</code> 重试</h2><p><code>requests</code> 有一个 <code>HTTPAdapter</code> 对象，看名字就有一种可以给 <code>requests</code>加特效的感觉。</p>
+<p>不过 <code>HTTPAdapter</code> 主要可以实现：</p>
+<blockquote>
+<p>创建连接池，（类似线程池，进程池，连接可服用）<br>限定连接池数量（避免连接数过多（线程过多））。<br>重试请求。</p>
+</blockquote>
+<p><code>requests_built.py</code>代码如下：</p>
+<pre><code class="python">import requests
+from requests.adapters import HTTPAdapter
+
+from normal import BaseDictData
+
+
+def get_data(url: str, max_retry: int = 0, time_out: float = 1., **kwargs) -&gt; BaseDictData:
+    &quot;&quot;&quot;
+    自动重试 timeout 错误 的方法, 用 requests 自带轮子完成！
+    :param url: 请求的 url
+    :param max_retry: 最大重试次数
+    :param time_out: 超时重试时间
+    :param kwargs: 可选命名参数
+    :return: BaseDictData
+    &quot;&quot;&quot;
+    session: requests.Session = kwargs.get(&quot;session&quot;, requests.Session())  # 获取session 或者新建 session
+    params: BaseDictData = kwargs.get(&quot;params&quot;, {})  # 不管你传了什么奇怪的东西， 我只收这个
+    headers: BaseDictData = kwargs.get(&quot;headers&quot;, {})  # 同上
+    adapter: HTTPAdapter = HTTPAdapter(max_retries=max_retry)  # 初始自带处理额外操作的适配器
+    session.mount(&quot;http://127.0.0.1&quot;, adapter=adapter)  # 给我们的 session 安装上 adapter, 第一个参数为主机，代表对于哪台主机的请求需要装上适配器
+    try:
+        response: requests.Response = session.get(
+            url,
+            params=params,
+            headers=headers,
+            timeout=time_out
+        )
+    except requests.ConnectTimeout:
+        print(f&quot;{max_retry + 1}次请求都失败了，即将返回空值，请耐心等待...&quot;)
+    else:
+        session.close()  # 关闭 session, 源码主要是清除所有装配器
+        return response.json()
+    return {}
+
+
+if __name__ == &#39;__main__&#39;:
+    res = get_data(&quot;http://127.0.0.1:5000/api/retry&quot;, 3)
+    print(res)</code></pre>
+<p>整体代码也比较简单，在常规请求之上，主要加了两行代码。就是给 <code>Session</code> 对象用 <code>mount</code> 方法给对于 <code>http://127.0.0.1</code>的主机请求加上了 <code>adapter</code>，该<code>adapter</code>对象增加了最大的重试次数。</p>
+<p>PS：</p>
+<ul>
+<li>我们也可以用 <code>http://</code> 来表示对于所有<code>http请求</code>的主机都装上<code>adapter</code></li>
+<li>我们也可以针对多个请求主机<pre><code class="python">session.mount(&quot;http://127.0.0.1&quot;, adapter=adapter)
+session.mount(&quot;https://github.com&quot;, adapter=adapter)</code></pre>
+运行结果（服务器端相似，之后的展示只展示客户端）:</li>
+</ul>
+<p><code>print(get_data(&quot;http://127.0.0.1:5000/api/retry&quot;, 2))</code></p>
+<p>客户端：</p>
+<pre><code>{&#39;msg&#39;: &#39;已经三次了哦！&#39;}</code></pre><p><code>print(get_data(&quot;http://127.0.0.1:5000/api/retry&quot;, 1))</code></p>
+<p>客户端：</p>
+<pre><code>2次请求都失败了，即将返回空值，请耐心等待...
+{}</code></pre><h2 id="3-构造请求重试装饰器"><a href="#3-构造请求重试装饰器" class="headerlink" title="3.构造请求重试装饰器"></a>3.构造请求重试装饰器</h2><p>通过前两个方法来看，我们知道主要的重试方式有两种：</p>
+<ol>
+<li>循环请求</li>
+<li><code>requests</code>自带的适配器</li>
+</ol>
+<p>但是呢，这两种，可复用性不太强，我们升级一下，用装饰器来试试。（当然，也有其他复用方法，比如创建重试专用对象，或者加入重试调度器）</p>
+<p>当然装饰器的写法，我们至少也可以写出两种版本。</p>
+<details>
+<summary>python装饰器原理速览</summary>
+
+ <p>统计函数运行时间的装饰器<code>derector.py</code>：</p>
+
+<pre><code class="python">import time
+
+
+def count_fun_time(func):
+    def wrapper(*arg, **kwargs):
+        start_time = time.time()
+        res = func(*arg, **kwargs)
+        print(f&quot;函数总共运行了{time.time() - start_time:.2f}s&quot;)
+        return res
+    return wrapper
+
+
+def my_function(time_wait: int = 3):
+    time.sleep(time_wait)
+    print(&quot;运行结束&quot;)
+
+
+my_function = count_fun_time(my_function)
+my_function()
+my_function(4)</code></pre>
+<p> 上面的代码示例为原始版本，就是利用函数的<strong>闭包特性(闭包函数)</strong>，在函数内部调用函数，同时进行其他操作即可。</p>
+<p>然后将<strong>新函数重新命名为原函数的名字</strong>。</p>
+<p> 运行结果如下：</p>
+<pre><code> 运行结束
+函数总共运行了3.00s
+运行结束
+函数总共运行了4.00s</code></pre><p> 当然，简便的python不会让你这样写，于是，语法糖便出现了。</p>
+<p> 我们的计算运行时间的装饰器函数 <code>count_fun_time</code>不变，</p>
+<p> 只需要在<code>my_funtion</code>上面加上糖<code>@count_fun_time</code> 即可。</p>
+<pre><code class="python">@count_fun_time
+def my_function(time_wait: int = 3):
+    time.sleep(time_wait)
+    print(&quot;运行结束&quot;)
+
+my_function()
+my_function(4)</code></pre>
+<p> 从上面的代码我们也可以，装饰器函数使用语法糖之后更加的<strong>优雅和易懂。</strong></p>
+<p> 但是在装饰器装饰元函数之后，元信息有所损坏(例如:<code>my_function.__name__</code>缺失)，需要进行改良（改良方法在下文中出现。）</p>
+</details>
+
+<h3 id="3-1-构造被装饰的函数get-data"><a href="#3-1-构造被装饰的函数get-data" class="headerlink" title="3.1 构造被装饰的函数get_data"></a>3.1 构造被装饰的函数<code>get_data</code></h3><p>既然是装饰器，那么我们先定义一个<strong>请求函数</strong>，当作被装饰的函数。</p>
+<p>代码如下：</p>
+<pre><code class="python">def get_data(url: str, time_out: float = 3., **kwargs) -&gt; BaseDictData:
+    &quot;&quot;&quot;
+    自动重试 timeout 错误 的方法, 用 requests 自带轮子完成！
+    :param url: 请求的 url
+    :param time_out: 超时重试时间
+    :param kwargs: 可选命名参数
+    :return: BaseDictData
+    &quot;&quot;&quot;
+    session: requests.Session = kwargs.get(&quot;session&quot;, requests.Session())  # 获取session 或者新建 session
+    params: BaseDictData = kwargs.get(&quot;params&quot;, {})  # 不管你传了什么奇怪的东西， 我只收这个
+    headers: BaseDictData = kwargs.get(&quot;headers&quot;, {})  # 同上
+    with session.get(url, params=params, headers=headers, timeout=time_out) as response:
+        return response.json()</code></pre>
+<p>代码很简单，为了通用性（因为有两种装饰器，循环和<code>adapter</code>)，我们选择使用 <code>Session对象</code>来做请求。</p>
+<p>好了，开始装饰器的正题。</p>
+<h3 id="3-1-循环重试装饰器"><a href="#3-1-循环重试装饰器" class="headerlink" title="3.1  循环重试装饰器"></a>3.1  循环重试装饰器</h3><p>首先，我们先构思一下，我们的装饰器要完成什么。</p>
+<p><code>get_data</code> 这个函数为内部函数，可能<code>timeout</code>，我们复用之前写的错误即可，然后捕捉该错误。</p>
+<p>接下来，如果运行函数出错，我们就进行循环重试。</p>
+<h4 id="3-1-1-基本循环重试装饰器"><a href="#3-1-1-基本循环重试装饰器" class="headerlink" title="3.1.1 基本循环重试装饰器"></a>3.1.1 基本循环重试装饰器</h4><p>整体代码如下：</p>
+<pre><code class="python">from functools import wraps
+
+def retry(func):
+    @wraps(func)  # 保留被装饰函数的元信息
+    def closure(*args, **kwargs) -&gt; BaseDictData:
+        for i in range(3):
+            try:
+                res = func(*args, **kwargs)
+            except (requests.ConnectTimeout, requests.ReadTimeout):
+                print(f&quot;第{i + 1}次重试。&quot;)
+            else:
+                return res
+        return {}
+    return closure
+
+@retry
+def get_data(...):
+    --skip--</code></pre>
+<p>这里我们利用 <code>@wraps</code> 保留元函数信息。这样我们就可以看到完整的被装饰后函数的信息。例如:<code>get_data.__name__， 函数签名，函数文档等</code>。</p>
+<p>运行结果类似，我们就不展示了，内容有点重复。<br>整体逻辑其实和<code>for...in...</code>循环的重试基本一致，但是我们封装成了一个装饰器函数，这样我们就可以到处用！简直不能太方便。<br>于此同时，我们可以看到 <code>except  (requests.ConnectTimeout, requests.ReadTimeout)</code> 这个地方！可以操作一下，假如错误类型是变量，那是不是就可以捕捉想捕捉的任意错误了。 并且，最大重试次数我们是写死的，这里肯定也能写成变量。那么，如何书写呢？</p>
+<p><strong>再加一层闭包。</strong> 没错，我们再套一层函数即可。</p>
+<h4 id="3-1-2-任意错误循环重试的函数装饰器"><a href="#3-1-2-任意错误循环重试的函数装饰器" class="headerlink" title="3.1.2 任意错误循环重试的函数装饰器"></a>3.1.2 任意错误循环重试的函数装饰器</h4><p><code>strong_retry</code>代码如下:</p>
+<pre><code class="python">def strong_retry(
+        max_retry: int = 3,
+        exception: Tuple[BaseException] = (
+                requests.ConnectTimeout,
+                requests.ReadTimeout,
+        )
+):
+    &quot;&quot;&quot;
+    万能函数重试装饰器诞生！
+    :param max_retry: 最大重试次数
+    :param exception: 捕捉错误类型
+    :return:
+    &quot;&quot;&quot;
+
+    def retry(func):
+        @wraps(func)  # 保留被装饰函数的元信息
+        def closure(*args, **kwargs) -&gt; BaseDictData:
+            for i in range(max_retry + 1):
+                try:
+                    res = func(*args, **kwargs)
+                except exception:
+                    print(f&quot;第{i + 1}次重试。&quot;)
+                else:
+                    return res
+            return {}
+        return closure
+    return retry
+
+@strong_common_retry(max_retry=4, exception=(requests.ReadTimeout,))
+def get_data(...):
+    # 装饰函数，最大重试数为 4，</code></pre>
+<p>再在外层函数帮助我们传入参数，并在原装饰器函数内部使用参数即可。</p>
+<p>这样，我们就能针对<strong>某些错误进行重试</strong>操作了！（有一个模块 <code>retrying</code>, 也能进行错误重试，我们轻松的实现了一个简易版本！）</p>
+<blockquote>
+<p>例如:<br>@strong_common_retry(exception=(ValueError, NameError))  # 针对这两个错误进行捕捉<br>但是有一点需要注意，千万不要用 <code>exception=(BaseException,)</code> !!!!这样连<kbd>Ctrl/Command</kbd> + <kbd>C</kbd> 都失效了！（引发<code>KeyboardInterrupt</code>错误的方法）</p>
+</blockquote>
+<p>到这里完了吗？当然没有，因为我们还能再优化一下，当装饰器带有参数时，装饰器函数嵌套层数太多。影响阅读，这时候，祭出我们的装饰器神器<code>wrapt</code>。(需要 <code>pip install wrapt</code>)<br>使用后代码如下:</p>
+<pre><code class="python">def strong_common_retry(max_retry, exception):
+    @wrapt.decorator  # 保留被装饰函数的元信息
+    def wrapper(wrapped, instance, args, kwargs) -&gt; BaseDictData:
+        &quot;&quot;&quot;
+
+        :param wrapped: 
+        :param instance:如果被装饰者为普通类方法，该值为类实例
+                        如果被装饰者为 classmethod 类方法，该值为类
+                        如果被装饰者为类/函数/静态方法，该值为 None 
+        :param args: 
+        :param kwargs: 
+        :return: 
+        &quot;&quot;&quot;
+        for i in range(max_retry + 1):
+            try:
+                res = wrapped(*args, **kwargs)
+            except exception:
+                print(f&quot;第{i + 1}次重试。&quot;)
+            else:
+                return res
+        return {}
+    return wrapper</code></pre>
+<p>这样快速地就<strong>减少了装饰器函数的嵌套层数</strong>，同时还能解决对类中的函数装饰器绑定对象的问题。</p>
+<p>所以当需要编写装饰器函数的时候，不妨试试<code>wrapt</code>吧！绝对是你的好帮手！</p>
+<p>循环重试搞定了，函数装饰器也讲的差不多了，但是我们还有适配器装饰器没有讲，怎么办！当然换点花样，类的装饰器 <strong>start</strong>。</p>
+<h3 id="3-2-Session适配器重试"><a href="#3-2-Session适配器重试" class="headerlink" title="3.2 Session适配器重试"></a>3.2 <code>Session</code>适配器重试</h3><p>这次，我们的装饰器需要实现对原请求函数中的 <code>Session对象</code> 添加适配器，但是我们需要用类来实现。</p>
+<p>但是类怎么实现呢？装饰器函数比较好理解，调用函数<code>func()</code>，我们就能完成原函数的替代。但是类怎么调用呢？ 这时候，就需要 python 给我们提供的魔术方法（双下方法）<code>__call__</code> 来实现了！</p>
+<h4 id="3-2-1-类装饰器原理"><a href="#3-2-1-类装饰器原理" class="headerlink" title="3.2.1 类装饰器原理"></a>3.2.1 类装饰器原理</h4><p>其实<code>__call__</code>方法理解比较简单，就是可以让实例话的对象直接调用。Examples are as follows:</p>
+<pre><code class="python">class MySpider:
+    def __call__(self):
+        print(f&quot;{self.__class__.__name__} is calling&quot;)
+
+
+MySpider()()</code></pre>
+<p>输出结果如下：<br><code>MySpider is calling</code></p>
+<p>这样我们就成功调用了实例化对象。</p>
+<p>利用这个特性，我们就可以自然地写出装饰器类。</p>
+<pre><code class="python">class MySpider:
+    def __init__(self, func: Callable):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print(&quot;reset for on second&quot;)
+        time.sleep(1)
+        res_data = self.func(*args, **kwargs)
+        return res_data
+
+    def at_once_run(self, *args, **kwargs):
+        print(&quot;now, run the function&quot;)
+        return self.func(*args, **kwargs)
+
+def spider():
+    print(&quot;正在抓取&quot;)
+
+spider = MySpider(spider)
+spider()</code></pre>
+<p>输出结果如下：</p>
+<pre><code>reset for on second
+正在抓取</code></pre><p>与装饰器函数很像，核心就是 <code>__call__</code> 方法。<br>那么类的装饰器有什么好处呢？</p>
+<blockquote>
+<ol>
+<li>没有复杂的函数嵌套，阅读代码时更加清晰，更加pythonic。</li>
+<li>可以增加许多额外的属性，更好的管理装饰器对象。</li>
+<li>可以给装饰器添加更多的功能。</li>
+</ol>
+</blockquote>
+<p>功能怎么加呢？别忘了我们上个代码段还有一个函数没有使用！话不多说，直接看看怎么用。<br>原始用法：</p>
+<pre><code class="python">spider = MySpider(spider).at_once_run
+spider()</code></pre>
+<p>但是看起来并不优雅，每次也比较麻烦。<br>语法糖用法：</p>
+<pre><code class="python">@MySpider
+def spider():
+    ...
+spider.at_once_run()</code></pre>
+<p>运行结果如下：</p>
+<pre><code>now, run the function
+正在抓取</code></pre><p>就像加了魔法一样，我们的原始函数<code>spider</code>变得异常强大，还增加了许多新的功能！</p>
+<p>好了，把类当作装饰器的简单原理如上。接下来，我们就展示一下，用类装饰器为<code>Session</code>对象撞上翅膀！</p>
+<h4 id="3-2-2-类装饰器实战"><a href="#3-2-2-类装饰器实战" class="headerlink" title="3.2.2 类装饰器实战"></a>3.2.2 类装饰器实战</h4><p>代码如下：</p>
+<pre><code class="python">class RequestsRetry:
+    def __init__(self, max_retry: int, func: Callable) -&gt; None:
+        &quot;&quot;&quot;需要注意。被装饰的函数是最后传入的。&quot;&quot;&quot;
+        self.max_retry = max_retry
+        functools.wraps(func)(self)  # 保留原函数的元信息
+        self.func = func
+
+    def __call__(self, *args, **kwargs) -&gt; BaseDictData:
+        &quot;&quot;&quot;装饰器处理逻辑函数&quot;&quot;&quot;
+        session: requests.Session = kwargs.get(&quot;session&quot;, requests.Session())  # 获取session 或者新建 session
+        max_retry: requests.Session = kwargs.get(&quot;max_retry&quot;)  # 获取 max_retry
+        adapter: HTTPAdapter = HTTPAdapter(max_retries=max_retry)  # 初始自带处理额外操作的适配器
+        session.mount(&quot;http://&quot;, adapter=adapter)  # 给我们的 session 安装上 adapter, 第一个参数为前缀，代表哪种请求需要装上适配器
+        kwargs.update(session=session)  # 更新 session， 如果没有传session，就将带适配器的 session 传入命名参数
+        try:
+            response: BaseDictData = self.func(*args, **kwargs)
+        except requests.ConnectTimeout:
+            print(f&quot;{max_retry}次请求都超时了，即将返回空值，请耐心等待返回空值&quot;)
+            return {}
+        else:
+            return response
+
+    def itself(self, *args, **kwargs) -&gt; BaseDictData:
+        &quot;&quot;&quot;不做处理，调用本身&quot;&quot;&quot;
+        return self.func(*args, **kwargs)
+
+    def __get__(self, instance, owner) -&gt; object:
+        &quot;&quot;&quot;实现该方法后，可以将装饰器器用于类的函数的装饰。&quot;&quot;&quot;
+        if instance is None:
+            return self
+        return types.MethodType(self, instance)  # 如果有参数，就绑定至self
+
+
+def retry(max_retry: int = 3):
+    &quot;&quot;&quot;装饰器包装，增加请求重试参数。&quot;&quot;&quot;
+    # 此处为了避免定义额外函数，直接使用 functools.partial 帮助构造 RequestsRetry 实例
+    return functools.partial(RequestsRetry, max_retry)
+
+
+
+@retry(max_retry=3)
+def get_data(url: str, time_out: float = 3., **kwargs) -&gt; BaseDictData:
+    --skip--</code></pre>
+<p><code>__init__</code>方法比较简单，接受了一个额外参数<code>max_retry</code>，然后利用<code>functools</code>保留<strong>元函数信息</strong>，和函数装饰器类似。<br>然后核心代码为<code>__call__</code>中的部分我们利用<code>kwargs</code>获取传入的<code>Session</code>对象，然后再将该对象加上<strong>适配器</strong>，然后还给<code>kwargs</code>，即可。这样就加上了最大重试次数，也就自带重试功能了。比<code>for...in...</code>更加简单，逻辑更加清晰，但是缺点就是只能针对<code>Session</code>对象的错误，不能针对万能错误进行重试。</p>
+<p>最后<code>retry</code>函数，用了一个<code>partial</code>函数<strong>辅助构造</strong>（如果不实用该函数，为装饰器增加<code>max_retry</code>参数较为麻烦，此处不展开说明方法，感兴趣可以自己尝试，欢迎和我交流）类装饰器，顺便给装饰器换了个名字:)。</p>
+<p>额外的东西：</p>
+<blockquote>
+<p>我们为了保留元函数，增加了<code>itself</code>方法，该方法就是不增加额外功能的装饰器（<strong>保持原函数逻辑调用</strong>）。<br>有一个<code>__get__</code>方法，当实例化对象调用方法时，实质就会先调用该函数<strong>获取绑定在实例化对象上的方法</strong>。类的装饰器装饰其他类中的函数时，需要补上该方法，否则类中的函数不能使用装饰器。此处我们利用该方法，<strong>重新构造绑定逻辑。</strong></p>
+</blockquote>
+<p>输出结果和上文中的输出一致，这里就不重复展示结果了。<br>到这里，我们的所有重试方法就讲解完毕啦，相信你一定也收获满满。<br>老规矩，我们再总结一下本文所讲内容：</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p><strong>1. <code>for...in...</code>循环实现<code>requests</code>请求重试<br>2. 利用<code>adapter</code> 实现<code>requests</code>请求重试<br>3. 装饰器函数原理<br>4. 利用函数装饰器实现<code>requests</code>请求重试到万能重试装饰器<br>5. 类装饰器简单原理<br>6. 类装饰器实战<code>requests</code>请求重试</strong></p>
+<p><a href="https://github.com/Dustyposa/goSpider/tree/master/python_advance/requests%E8%AF%B7%E6%B1%82%E9%87%8D%E8%AF%95" target="_blank" rel="noopener">完整代码地址</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <p>
+                
+                  <span>
+                <i class="iconfont icon-inbox"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/advance/">advance</a>
+                      &nbsp;
+                    
+                  </span>&nbsp;&nbsp;
+                
+                
+                  <span>
+                <i class="iconfont icon-tag"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/python/">python</a>
+                    
+                      <a class="hover-with-bg" href="/tags/decorator/">decorator</a>
+                    
+                  </span>
+                
+              </p>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/04/07/%E5%BC%82%E6%AD%A5%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB(tr)/">
+                        <i class="fa fa-chevron-left"></i>
+                        <span class="hidden-mobile">异步网络爬虫</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/04/07/%E4%BD%BF%E7%94%A8python%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%92%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E5%AE%9E%E4%BE%8B/">
+                        <span class="hidden-mobile">使用python客户端和服务器的功能测试实例</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="fa fa-chevron-right"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+              
+                <!-- Comments -->
+                <div class="comments" id="comments">
+                  
+                  
+
+                </div>
+              
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc-start"></div>
+<div id="toc">
+  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var navHeight = $('#navbar').height();
+      var toc = $('#toc');
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+      var tocLimMax = 2 * boardTop + boardCtn.height();
+
+      $(window).scroll(function () {
+        var tocLimMin = $('#toc-start').offset().top - navHeight;
+        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
+
+        if (tocLimMin <= scroH && scroH <= tocLimMax) {
+          toc.css({
+            'display': 'block',
+            'position': 'fixed',
+            'top': navHeight,
+          });
+        } else if (scroH <= tocLimMin) {
+          toc.css({
+            'position': '',
+            'top': '',
+          });
+        } else if (scroH > tocLimMax) {
+          toc.css('display', 'none');
+        }
+      });
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc > p').css('visibility', 'visible');
+      }
+      var offset = boardCtn.css('margin-right')
+      $('#toc-ctn').css({
+        'right': offset
+      })
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  ');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "使用python客æ从requests请求重试到万能重试装饰器&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
