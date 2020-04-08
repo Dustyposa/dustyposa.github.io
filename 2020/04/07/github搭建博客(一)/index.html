@@ -133,7 +133,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    1k 字
+                    1.5k 字
                   </span>
                 
 
@@ -141,7 +141,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      3 分钟
+                      5 分钟
                   </span>
                 
 
@@ -243,8 +243,44 @@ print(a)
 ```
 </code></pre>
 </li>
-<li><h4 id="d-生成静态站点并部署"><a href="#d-生成静态站点并部署" class="headerlink" title="d. 生成静态站点并部署"></a>d. 生成静态站点并部署</h4></li>
+<li><h4 id="d-实时博客效果"><a href="#d-实时博客效果" class="headerlink" title="d. 实时博客效果"></a>d. 实时博客效果</h4><p>文章写好了。怎么看效果呢？<br>我们运行 <code>hexo server</code> 即可。</p>
+<pre><code class="bash">$ hexo server # or hexo s
+INFO  Start processing
+INFO  Hexo is running at http://localhost:4000 . Press Ctrl+C to stop.</code></pre>
+<p>得到输出结果如上，打开 <a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a> 就能看到我们的页面了！</p>
+<blockquote>
+<p>待补图</p>
+</blockquote>
+<blockquote>
+<p>我们更改一下我们的 <code>md</code> 文件，再刷新一下，就能<strong>实时</strong>看到效果。</p>
+</blockquote>
+</li>
+<li><h4 id="e-生成静态站点并部署"><a href="#e-生成静态站点并部署" class="headerlink" title="e.生成静态站点并部署"></a>e.生成静态站点并部署</h4><p>博客预览ok，那么就可以准备生成静态站点文件了。<br>So，我们运行</p>
+<pre><code class="bash">hexo generate # or hexo g</code></pre>
+<p>就能看到有一堆文件产生，都放在了我们的 <code>public</code> 文件夹下面。<br>最重要的 <code>index.html</code> 也在其中。<br>那么问题来了，因为 <code>index.html</code> <strong>必须</strong>在 <code>/ or /docs</code> 目录下面。<br>而现在我们的目录结构是 <code>/docs/public/index.html</code> 。这样直接推上去肯定是不行的，那么怎么办呢？</p>
+<blockquote>
+<p>当然，解决办法有很多<br>例如：</p>
+<ul>
+<li>单开一个分支用来写，master 只用来部署，保留 public 文件夹内容。实现方式利用软连接即可，这样可以写一个分支，部署一个分支，做到分离。</li>
+<li>改变 git 根目录，改变仓库位置。</li>
 </ul>
+</blockquote>
+<p>这时候，就可以寄出我们的部署神器 <code>hexo-deployer-git</code><br>首先安装它（记得切换一个分支， 比如 <code>writing</code> ， 专门用来写文章）：</p>
+<pre><code>npm install hexo-deployer-git</code></pre><p>之后编辑一下 <code>_config.yml</code>， 在末尾加上：</p>
+<pre><code># Deployment
+## Docs: https://hexo.io/docs/deployment.html
+deploy:
+ type: git
+ repo: git@github.com:username/username.github.io.git
+ branch: master</code></pre><p>之后运行</p>
+<pre><code>hexo deploy # hexo d
+# 或者 生成加部署 hexo g &amp; d</code></pre><p>就能自动部署完成了！<br>一气呵成。</p>
+</li>
+</ul>
+<p>那么第一篇就到这里(第一步踩坑完成)，之后我们会出第二篇，会加上一些小操作～来让我们写博客更简单！</p>
+<blockquote>
+<p>详细文档<br><a href="https://help.github.com/cn/github/working-with-github-pages/about-github-pages" target="_blank" rel="noopener">Github Pages 中文文档</a><br><a href="https://hexo.io/zh-cn/docs/" target="_blank" rel="noopener">Hexo 中文文档</a></p>
+</blockquote>
 
             </div>
             <hr>
