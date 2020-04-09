@@ -5,7 +5,7 @@ node_js:
 cache: npm
 install:
   - cd blog && npm i
-# 仓库的分支
+# 限制使用 travis 的分支
 branches:
   only:
     - writing
@@ -16,6 +16,8 @@ deploy:
   provider: pages
   skip-cleanup: true
   github-token: $GH_TOKEN
-  target-branch: master
+  target-branch: master  # 目标分支
   keep-history: true
-  local-dir: blog/public
+  on:
+    branch: writing  # 在哪个分支运行脚本
+  local-dir: blog/public  # 部署的文件夹
