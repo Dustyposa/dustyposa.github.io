@@ -133,7 +133,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    952 字
+                    1.3k 字
                   </span>
                 
 
@@ -141,7 +141,7 @@
                   
                   <span class="post-meta">
                       <i class="far fa-clock"></i>
-                      3 分钟
+                      4 分钟
                   </span>
                 
 
@@ -171,8 +171,8 @@
             <div class="markdown-body">
               <h1 id="搭建-github-博客之旅-（Part-2）"><a href="#搭建-github-博客之旅-（Part-2）" class="headerlink" title="搭建 github 博客之旅 （Part 2）"></a>搭建 github 博客之旅 （Part 2）</h1><p>在第一部分，我们介绍了如何搭建一个免费博客并部署在 <code>Github</code> 上面，但是我们还有很多可以优化（更懒）的地方，例如：</p>
 <ul>
-<li>自动部署（非一键部署）</li>
-<li>主题更换（换个漂亮的皮肤）</li>
+<li><a href="#自动化部署-CI-CD">自动部署（非一键部署）</a></li>
+<li><a href="#更换主题">主题更换（换个漂亮的皮肤）</a></li>
 <li>性能优化（带宽，响应太慢？）</li>
 <li>加点料</li>
 <li>etc…</li>
@@ -239,8 +239,24 @@ deploy:
      branch: writing  # 在哪个分支运行脚本
    local-dir: docs/public  # 部署的文件夹
 </code></pre>
+<p> 这样在我们的自动部署就差不多完成了，我们将配置好的文件 <code>push</code> 上去。稍等片刻，就能看到自动部署详情了。</p>
 </li>
 </ul>
+<h2 id="更换主题"><a href="#更换主题" class="headerlink" title="更换主题"></a>更换主题</h2><p>默认主题的 <code>hexo</code> 比较单调，一点都不炫酷。自然，换肤的需求就诞生了。到现在，<code>hexo</code> 也有了很多炫酷的主题可选，在这里，我推荐一个 <code>Material Design</code> 风格的主题 <a href="https://hexo.fluid-dev.com/docs/guide/#%E4%B8%BB%E9%A2%98%E7%AE%80%E4%BB%8B" target="_blank" rel="noopener"><code>flud</code></a><br>当然也有很多其他主题可选，在<a href="https://hexo.io/themes/" target="_blank" rel="noopener">这里</a>可以看，使用方式基本一致，依葫芦画瓢即可。</p>
+<h3 id="安装-flud"><a href="#安装-flud" class="headerlink" title="安装 flud"></a>安装 flud</h3><p>  下载 <a href="https://github.com/fluid-dev/hexo-theme-fluid/releases" target="_blank" rel="noopener">最新 release 版本</a>，<code>master</code> 分支无法保证稳定。<br>  下载后解压到 <code>themes</code> 目录下并重命名为 <code>fluid</code>。<br>  结果如下图：<br><img src="https://i.loli.net/2020/04/09/IaOnpSDxCGYFeUK.png" srcset="/img/loading.gif" alt="image.png"></p>
+<h3 id="更换主题-1"><a href="#更换主题-1" class="headerlink" title="更换主题"></a>更换主题</h3><p>   更换主题也很简单，我们更改 <code>hexo</code> 配置文件即可。<br>   打开 <code>docs/_config.yml</code> (即博客目录下的该配置文件),更改下面的配置：</p>
+<pre><code>
+theme: fluid  # 指定主题
+
+language: zh-CN  # 指定语言，可不改</code></pre><p>这样我们重新运行<br><code>hexo s</code><br>就能看到我们新的主题了！效果如下：</p>
+<blockquote>
+<p>待补图</p>
+</blockquote>
+<p>整个操作也很简单，但是需要定制化操作的话，看<a href="https://hexo.fluid-dev.com/docs/guide" target="_blank" rel="noopener">官方文档</a>即可～非常详细。</p>
+<p>参考文献：</p>
+<blockquote>
+<p><a href="https://hexo.io/zh-cn/docs/github-pages" target="_blank" rel="noopener">hexo 文档</a><br><a href="https://hexo.fluid-dev.com/docs/guide/#%E5%85%B3%E4%BA%8E%E6%8C%87%E5%8D%97" target="_blank" rel="noopener">fluid 文档</a></p>
+</blockquote>
 
             </div>
             <hr>
