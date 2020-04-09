@@ -50,7 +50,12 @@ So，我们开始吧。
 </details>
 
 ### 2. 创建 `Github Pages`
-- a. 创建`Github Pages`仓库，名字为 `<username>.github.io`。 [详细教程](https://help.github.com/cn/github/working-with-github-pages/creating-a-github-pages-site)
+- a. 创建`Github Pages`仓库，名字必须为 `<username>.github.io`。 [详细教程](https://help.github.com/cn/github/working-with-github-pages/creating-a-github-pages-site)
+    也就是你的用户名 + '.github.io' 
+    比如我的就是这样：
+    ![image.png](https://i.loli.net/2020/04/09/RMB6AstjyE3m5Dc.png)
+    创建时建议**勾选上**，避免手动 `init`:
+    ![image.png](https://i.loli.net/2020/04/09/AhHR5Y7TzvmgeFi.png)
 - b. 克隆创建的仓库 
   `git clone https://github.com/username/username.github.io`
 - c. 创建页面文件并部署页面
@@ -176,7 +181,7 @@ hexo generate # or hexo g
     hexo deploy # hexo d
     # 或者 生成加部署 hexo g & d
     ```
-    就能自动部署完成了！
+    就能一键部署完成了！
     一气呵成。
 
 那么第一篇就到这里(第一步踩坑完成)，之后我们会出第二篇，会加上一些小操作～来让我们写博客更简单！

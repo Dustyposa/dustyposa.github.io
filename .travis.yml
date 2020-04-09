@@ -5,10 +5,12 @@ node_js:
 cache: npm
 install:
   - cd blog && npm i
+# 仓库的分支
 branches:
   only:
-    - writing # build master branch only
+    - writing
 script:
+  - hexo clean
   - hexo generate # generate static files
 deploy:
   provider: pages
@@ -16,6 +18,4 @@ deploy:
   github-token: $GH_TOKEN
   target-branch: master
   keep-history: true
-  on:
-    branch: writing
   local-dir: blog/public
