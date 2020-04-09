@@ -57,7 +57,7 @@ So，我们开始吧。
     创建时建议**勾选上**，避免手动 `init`:
     ![image.png](https://i.loli.net/2020/04/09/AhHR5Y7TzvmgeFi.png)
 - b. 克隆创建的仓库 
-  `git clone https://github.com/username/username.github.io`
+  `git clone https://github.com/username/username.github.io.git`
 - c. 创建页面文件并部署页面
    ```bash
    cd username.github.io  
@@ -67,9 +67,10 @@ So，我们开始吧。
    git commit -m "init first page"
    git push -u origin master  # 推到 master 分支后相当于自动部署
    ```
-   做完上述操作后，我们打开[你的站点页面(https://username.github.io)]()
+   做完上述操作后，我们打开[你的站点页面(https://username.github.io)]
    就能看到我们的创建的网站～不过目前只有一句话。
-
+    效果如下图：
+    ![image.png](https://i.loli.net/2020/04/09/P8msFpzLXjbSliq.png)
 ### 3. 总结
 `Github Pages`就相当于一个**独立站点**，从上面的操作步骤可以看出。展示内容与我们的仓库内容相关。尤其是 `index.html`。 
 那么，我们就有很多发挥空间了。
