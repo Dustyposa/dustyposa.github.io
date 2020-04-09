@@ -17,7 +17,7 @@
   <meta name="description" content="一些经验的记录。">
   <meta name="author" content="Dusty Posa">
   <meta name="keywords" content="python,python3,process,script">
-  <title>标签 - hexo - Posaのにわ</title>
+  <title>归档 - Posaのにわ</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
 <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
@@ -145,25 +145,31 @@
                 
 
 <div class="list-group">
-<!--  <p class="h4">共计 2 篇文章</p>-->
+  <p class="h4">共计 11 篇文章</p>
   <hr>
   
     
       
       <p class="h5">2020</p>
     
-    <a href="/2020/04/09/github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2-part-2/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">从零开始搭建Github博客(其二)</span>
-      <span style="float: right;">04-09</span>
-    </a>
-  
-    
-    <a href="/2020/04/07/github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2-part-1/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">从零开始搭建Github博客(其一)</span>
-      <span style="float: right;">04-07</span>
+    <a href="/2020/04/06/python-server/" class="list-group-item list-group-item-action">
+      <span class="archive-post-title">python 编写多进程 socket web静态服务器</span>
+      <span style="float: right;">04-06</span>
     </a>
   
 </div>
+
+  <nav aria-label="index posts navigation">
+    <span class="pagination pg-blue justify-content-center mt-5" id="pagination">
+      <a class="extend prev" rel="prev" href="/archives/2020/04/"><i class="fas fa-angle-double-left"></i></a><a class="page-number" href="/archives/2020/04/">1</a><span class="page-number current">2</span>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByTagName("a")) {
+      ele.href += '#board';
+    }
+  </script>
 
 
 
@@ -267,7 +273,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "标签 - hexo&nbsp;",
+        "归档&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
