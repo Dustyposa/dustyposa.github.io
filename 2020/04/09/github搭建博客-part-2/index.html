@@ -133,7 +133,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    873 字
+                    952 字
                   </span>
                 
 
@@ -215,7 +215,30 @@ git 比较好想，我们出发点使用 push 或者 分支更新即可。
 </blockquote>
 <p>你应该会被重定向到 <code>Travis CI</code> 的页面。如果没有，请 <a href="https://travis-ci.com/" target="_blank" rel="noopener">手动前往</a>。              </p>
 <p> 在浏览器新建一个标签页，前往 GitHub 新建 <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Personal Access Token</a>，只勾选 <code>repo</code> 的权限并生成一个新的 Token。Token 生成后请复制并保存好。<br> 回到 Travis CI，前往你的 repository 的设置页面，在 <strong>Environment Variables</strong> 下新建一个环境变量，<strong>Name</strong> 为 <code>GH_TOKEN</code>，<strong>Value</strong> 为刚才你在 GitHub 生成的 Token。确保 <strong>DISPLAY VALUE IN BUILD LOG</strong> 保持 <strong>不被勾选</strong> 避免你的 Token 泄漏。点击 <code>Add</code> 保存。<br> c. 编写自动部署脚本<br> 新建一个 <code>.travis.yml</code> 的文件:</p>
-<pre><code class="yaml"></code></pre>
+<pre><code class="yaml">sudo: false
+language: node_js
+node_js:
+   - 10 # use nodejs v10 LTS
+cache: npm
+install:
+   - cd blog &amp;&amp; npm i
+# 限制使用 travis 的分支
+branches:
+   only:
+       - writing
+script:
+   - hexo clean
+   - hexo generate # generate static files
+deploy:
+   provider: pages
+   skip-cleanup: true
+   github-token: $GH_TOKEN
+   target-branch: master  # 目标分支
+   keep-history: true
+   on:
+     branch: writing  # 在哪个分支运行脚本
+   local-dir: docs/public  # 部署的文件夹
+</code></pre>
 </li>
 </ul>
 
