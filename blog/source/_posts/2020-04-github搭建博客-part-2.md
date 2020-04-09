@@ -71,5 +71,28 @@ like this：
     c. 编写自动部署脚本
     新建一个 `.travis.yml` 的文件:
     ```yaml
-   
+   sudo: false
+language: node_js
+node_js:
+      - 10 # use nodejs v10 LTS
+cache: npm
+install:
+      - cd blog && npm i
+# 限制使用 travis 的分支
+branches:
+      only:
+          - writing
+script:
+      - hexo clean
+      - hexo generate # generate static files
+deploy:
+      provider: pages
+      skip-cleanup: true
+      github-token: $GH_TOKEN
+      target-branch: master  # 目标分支
+      keep-history: true
+      on:
+        branch: writing  # 在哪个分支运行脚本
+      local-dir: docs/public  # 部署的文件夹
+
    ```
