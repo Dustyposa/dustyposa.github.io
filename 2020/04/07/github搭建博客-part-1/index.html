@@ -196,16 +196,15 @@
 
 <h3 id="2-创建-Github-Pages"><a href="#2-创建-Github-Pages" class="headerlink" title="2. 创建 Github Pages"></a>2. 创建 <code>Github Pages</code></h3><ul>
 <li>a. 创建<code>Github Pages</code>仓库，名字必须为 <code>&lt;username&gt;.github.io</code>。 <a href="https://help.github.com/cn/github/working-with-github-pages/creating-a-github-pages-site" target="_blank" rel="noopener">详细教程</a><br>  也就是你的用户名 + ‘.github.io’<br>  比如我的就是这样：<br>  <img src="https://i.loli.net/2020/04/09/RMB6AstjyE3m5Dc.png" srcset="/img/loading.gif" alt="image.png"><br>  创建时建议<strong>勾选上</strong>，避免手动 <code>init</code>:<br>  <img src="https://i.loli.net/2020/04/09/AhHR5Y7TzvmgeFi.png" srcset="/img/loading.gif" alt="image.png"></li>
-<li>b. 克隆创建的仓库<br><code>git clone https://github.com/username/username.github.io</code></li>
+<li>b. 克隆创建的仓库<br><code>git clone https://github.com/username/username.github.io.git</code></li>
 <li>c. 创建页面文件并部署页面<pre><code class="bash"> cd username.github.io  
  echo &quot;my first page in git hub&quot; &gt; index.html  # 创建 index.html 文件
  # 开始部署
  git add --all 
  git commit -m &quot;init first page&quot;
  git push -u origin master  # 推到 master 分支后相当于自动部署</code></pre>
- 做完上述操作后，我们打开<a href="">你的站点页面(https://username.github.io)</a><br> 就能看到我们的创建的网站～不过目前只有一句话。</li>
+ 做完上述操作后，我们打开[你的站点页面(<a href="https://username.github.io)]">https://username.github.io)]</a><br> 就能看到我们的创建的网站～不过目前只有一句话。<br>  效果如下图：<br>  <img src="https://i.loli.net/2020/04/09/P8msFpzLXjbSliq.png" srcset="/img/loading.gif" alt="image.png"><h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><code>Github Pages</code>就相当于一个<strong>独立站点</strong>，从上面的操作步骤可以看出。展示内容与我们的仓库内容相关。尤其是 <code>index.html</code>。<br>那么，我们就有很多发挥空间了。<br>编写静态博客太麻烦？<br>上 <code>Hexo</code> ！</li>
 </ul>
-<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结"></a>3. 总结</h3><p><code>Github Pages</code>就相当于一个<strong>独立站点</strong>，从上面的操作步骤可以看出。展示内容与我们的仓库内容相关。尤其是 <code>index.html</code>。<br>那么，我们就有很多发挥空间了。<br>编写静态博客太麻烦？<br>上 <code>Hexo</code> ！</p>
 <h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><h3 id="1-Hexo-简介"><a href="#1-Hexo-简介" class="headerlink" title="1. Hexo 简介"></a>1. Hexo 简介</h3><details>
   <summary>Hexo是...</summary>
 
