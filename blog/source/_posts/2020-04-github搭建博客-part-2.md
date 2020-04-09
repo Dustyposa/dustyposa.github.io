@@ -6,8 +6,8 @@ date: 2020-04-09 10:28:39
 ---
 # 搭建 github 博客之旅 （Part 2）
 在第一部分，我们介绍了如何搭建一个免费博客并部署在 `Github` 上面，但是我们还有很多可以优化（更懒）的地方，例如：
-- 自动部署（非一键部署）
-- 主题更换（换个漂亮的皮肤）
+- [自动部署（非一键部署）](#自动化部署-CI-CD)
+- [主题更换（换个漂亮的皮肤）](#更换主题)
 - 性能优化（带宽，响应太慢？）
 - 加点料
 - etc...
@@ -96,3 +96,35 @@ deploy:
       local-dir: docs/public  # 部署的文件夹
 
    ```
+    这样在我们的自动部署就差不多完成了，我们将配置好的文件 `push` 上去。稍等片刻，就能看到自动部署详情了。
+    
+## 更换主题
+默认主题的 `hexo` 比较单调，一点都不炫酷。自然，换肤的需求就诞生了。到现在，`hexo` 也有了很多炫酷的主题可选，在这里，我推荐一个 `Material Design` 风格的主题 [`flud`](https://hexo.fluid-dev.com/docs/guide/#%E4%B8%BB%E9%A2%98%E7%AE%80%E4%BB%8B)
+当然也有很多其他主题可选，在[这里](https://hexo.io/themes/)可以看，使用方式基本一致，依葫芦画瓢即可。
+
+### 安装 flud 
+  下载 [最新 release 版本](https://github.com/fluid-dev/hexo-theme-fluid/releases)，`master` 分支无法保证稳定。
+  下载后解压到 `themes` 目录下并重命名为 `fluid`。
+  结果如下图：
+![image.png](https://i.loli.net/2020/04/09/IaOnpSDxCGYFeUK.png)
+
+### 更换主题
+   更换主题也很简单，我们更改 `hexo` 配置文件即可。
+   打开 `docs/_config.yml` (即博客目录下的该配置文件),更改下面的配置：
+   ```
+
+theme: fluid  # 指定主题
+
+language: zh-CN  # 指定语言，可不改
+```
+这样我们重新运行
+```hexo s```
+就能看到我们新的主题了！效果如下：
+> 待补图
+
+整个操作也很简单，但是需要定制化操作的话，看[官方文档](https://hexo.fluid-dev.com/docs/guide)即可～非常详细。
+
+参考文献：
+> [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
+[fluid 文档](https://hexo.fluid-dev.com/docs/guide/#%E5%85%B3%E4%BA%8E%E6%8C%87%E5%8D%97)
+
