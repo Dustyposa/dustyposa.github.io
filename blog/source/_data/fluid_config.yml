@@ -214,11 +214,15 @@ post:
     enable: false
     specific: false  # 开启后，只有在文章 Front-matter 里指定 `math: true` 才会在文章页启动公式转换，以便在页面不包含公式时提高加载速度
     engine: mathjax  # 公式引擎  available: mathjax | katex
-  mermaid:
-    enable: true
-    specific: false
-    options:
 
+  # mermaid chart
+  mermaid: ## mermaid url https://github.com/knsv/mermaid
+    enable: true  # default true
+    specific: false
+#    cdn: https://cdn.bootcss.com/mermaid/8.4.8/mermaid.min.js
+    cdn: https://cdn.jsdelivr.net/npm/mermaid@7/dist/mermaid.min.js
+    options:  # find more api options from https://github.com/knsv/mermaid/blob/master/src/mermaidAPI.js
+      theme: default
 #---------------------------
 # 评论
 # Comments

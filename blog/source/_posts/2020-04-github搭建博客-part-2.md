@@ -3,6 +3,7 @@ title: 从零开始搭建Github博客(其二)
 tags: [github_pages, hexo]
 category: [blog]
 date: 2020-04-09 10:28:39
+mermaid: false
 ---
 # 搭建 github 博客之旅 （Part 2）
 在第一部分，我们介绍了如何搭建一个免费博客并部署在 `Github` 上面，但是我们还有很多可以优化（更懒）的地方，例如：
@@ -70,11 +71,14 @@ like this：
    你应该会被重定向到 `Travis CI` 的页面。如果没有，请 [手动前往](https://travis-ci.com/)。              
                                   
     在浏览器新建一个标签页，前往 GitHub 新建 [Personal Access Token](https://github.com/settings/tokens)，只勾选 `repo` 的权限并生成一个新的 Token。Token 生成后请复制并保存好。
+    
     回到 Travis CI，前往你的 repository 的设置页面，在 **Environment Variables** 下新建一个环境变量，**Name** 为 `GH_TOKEN`，**Value** 为刚才你在 GitHub 生成的 Token。确保 **DISPLAY VALUE IN BUILD LOG** 保持 **不被勾选** 避免你的 Token 泄漏。点击 `Add` 保存。
+    设置页面在这里进：
+    ![image.png](https://i.loli.net/2020/04/10/A1ZGmkyTudVjWfz.png)
     
     
 - #### c. 编写自动部署脚本
-    新建一个 `.travis.yml` 的文件:
+    在**根目录**新建一个 `.travis.yml` 的文件:
     ```yaml
    sudo: false
 language: node_js
@@ -153,6 +157,46 @@ npm install hexo-all-minifier --save
 > mac 用户可能需要安装其他东西
 `brew install libtool automake autoconf nasm`
 
+- 开启插件 
+在博客配置文件中加入
+```
+all_minifier: true
+```
+我们在运行 `hexo g` 或者部署即可看到效果，`js,css` 等文件都被压缩了。
+> 压缩详细配置可参考文档：
+[hexo_all_minifier](https://github.com/chenzhutian/hexo-all-minifier)
+
+
+### 图片压缩以及存储
+#### 图片压缩
+我们的文件压缩了，大一点图片怎么办呢？（比如图片就有：1M， 这样我们网站加载也会很慢）
+当然图片也可以直接通过 `js` 来压缩，但是压缩品质可能不太好。我们换一种服务，[tinyjpg](https://tinyjpg.com/)
+使用也很简单，把要压缩的图片放上去，压缩后下载回来即可，我们就不阐述了。
+#### 图片存储
+那么图片有了，我们应该把图片放哪里呢？放本地？不大好，毕竟**带宽很慢，也浪费资源。**
+这里我们推荐一种通用方式，`CDN or 图床 or 文件存储服务之类`。这里我们选用**图床**，其他的都大同小异。
+图床有很多可以选择的，因为图片比较少，我就推荐一个我目前使用的图床。[MS](https://sm.ms/)
+
+> 图床是什么？
+简单的说就是一个专门用来放图片的地方，图片在图床服务的服务器。
+好处是？
+图片在别的服务器，当然就不会占用我们服务器的带宽，有些图床还支持 `CDN` 速度能更快。
+另外，图片管理也更方便，平时的图片都可以存上面（非隐私图片）。
+
+使用那就很简单了，我们把图片上传到图床即可。上传之后大致可以得到如图效果：
+> ![image.png](https://i.loli.net/2020/04/10/PrDiS9lLkMfWJ7V.png)
+
+常用的链接一般就这两个～一个是绝对链接，一个是 `Markdown` 语法的，复制到 `md` 文件中就能看到效果了。
+
+综上，合理**压缩和利用图床**等存储服务，能**极大的提升我们的博客响应速度**。降低服务器压力～将用户体验提升到极致。（当然任何服务都可以酌情应用该方案，不止博客！）
+
+### 小插曲
+**ちょっと待って，不对不对，你这不是套我嘛？浏览者的用户体验提升了，但是写作者的用户体验没提升呀，还要传来传去，跳来跳去，多麻烦。**
+没错！这个问题，我们当然也能优化！怎么做？
+**等下回咯**（逃，不要打我
+
+到这里结束了嘛？当然没有，我们再加一点其他的小插件。
+
 
 ### 图片生成
 https://favicon.io
@@ -160,4 +204,4 @@ https://favicon.io
 >参考资料：
 [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
 [fluid 文档](https://hexo.fluid-dev.com/docs/guide/#%E5%85%B3%E4%BA%8E%E6%8C%87%E5%8D%97)
-
+[hexo_all_minifier 文档](https://github.com/chenzhutian/hexo-all-minifier)

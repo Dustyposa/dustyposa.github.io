@@ -48,9 +48,11 @@ So，我们开始吧。
 - a. 创建`Github Pages`仓库，名字必须为 `<username>.github.io`。 [详细教程](https://help.github.com/cn/github/working-with-github-pages/creating-a-github-pages-site)
     也就是你的用户名 + '.github.io' 
     比如我的就是这样：
-    ![image.png](https://i.loli.net/2020/04/09/RMB6AstjyE3m5Dc.png)
+    > ![image.png](https://i.loli.net/2020/04/09/RMB6AstjyE3m5Dc.png)
+                             
+                                                                                                                                                                                                    >
     创建时建议**勾选上**，避免手动 `init`:
-    ![image.png](https://i.loli.net/2020/04/09/AhHR5Y7TzvmgeFi.png)
+    > ![image.png](https://i.loli.net/2020/04/09/AhHR5Y7TzvmgeFi.png)
 - b. 克隆创建的仓库 
   `git clone https://github.com/username/username.github.io.git`
 - c. 创建页面文件并部署页面
@@ -65,7 +67,7 @@ So，我们开始吧。
    做完上述操作后，我们打开[你的站点页面(https://username.github.io)]
    就能看到我们的创建的网站～不过目前只有一句话。
     效果如下图：
-    ![image.png](https://i.loli.net/2020/04/09/P8msFpzLXjbSliq.png)
+    > ![image.png](https://i.loli.net/2020/04/09/P8msFpzLXjbSliq.png)
 ### 3. 总结
 `Github Pages`就相当于一个**独立站点**，从上面的操作步骤可以看出。展示内容与我们的仓库内容相关。尤其是 `index.html`。 
 那么，我们就有很多发挥空间了。
@@ -141,8 +143,9 @@ So，我们开始吧。
     得到输出结果如上，打开 [http://localhost:4000](http://localhost:4000) 就能看到我们的页面了！
     > 待补图
     
-    > 我们更改一下我们的 `md` 文件，再刷新一下，就能**实时**看到效果。
-    
+    我们更改一下我们的 `md` 文件，再刷新一下，就能**实时**看到效果。
+    参考效果如下：
+    > ![image.png](https://i.loli.net/2020/04/10/5hozAHC6kqx3sVY.png)
    - #### e.生成静态站点并部署
    博客预览ok，那么就可以准备生成静态站点文件了。
    So，我们运行
@@ -153,17 +156,17 @@ hexo generate # or hexo g
     最重要的 `index.html` 也在其中。
     那么问题来了，因为 `index.html` **必须**在 `/ or /docs` 目录下面。
     而现在我们的目录结构是 `/docs/public/index.html` 。这样直接推上去肯定是不行的，那么怎么办呢？
-    > 当然，解决办法有很多
+    > 当然，解决办法有很多，但是都**不是很推荐**，我们列举几个，发散一下思维。
     例如：
     > - 单开一个分支用来写，master 只用来部署，保留 public 文件夹内容。实现方式利用软连接即可，这样可以写一个分支，部署一个分支，做到分离。
     > - 改变 git 根目录，改变仓库位置。
     
-    这时候，就可以寄出我们的部署神器 `hexo-deployer-git`
+    这时候，就可以祭出我们的部署神器 `hexo-deployer-git`
     首先安装它（记得切换一个分支， 比如 `writing` ， 专门用来写文章）：
     ```
     npm install hexo-deployer-git
     ```
-    之后编辑一下 `_config.yml`， 在末尾加上：
+    之后编辑一下 `_config.yml`， 将末尾替换一下：
     ```
     # Deployment
     ## Docs: https://hexo.io/docs/deployment.html
@@ -171,6 +174,7 @@ hexo generate # or hexo g
       type: git
       repo: git@github.com:username/username.github.io.git
       branch: master
+    # username 是你的 github 昵称！！！！！！！！！！
     ```
     之后运行
     ```
