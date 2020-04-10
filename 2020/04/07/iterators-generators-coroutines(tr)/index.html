@@ -1,233 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-
-
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.png">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="一些经验的记录。">
-  <meta name="author" content="Dusty Posa">
-  <meta name="keywords" content="python,python3,process,script">
-  <title>iterators,generators,coroutines - Posaのにわ</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
-
-
-
-  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-
-  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-
-<!-- 自定义样式保持在最底部 -->
-
-
-<meta name="generator" content="Hexo 4.2.0"></head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/">首页</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/archives/">归档</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/categories/">分类</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/tags/">标签</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/about/">关于</a>
-          </li>
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/default.png') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask rgba-black-light flex-center">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              
-                <p class="mt-3 post-meta">
-                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期二, 四月 7日 2020, 10:10 上午
-                </p>
-              
-
-              <p class="mt-1">
-                
-                  
-                  <span class="post-meta">
-                    <i class="far fa-chart-bar"></i>
-                    3.9k 字
-                  </span>
-                
-
-                
-                  
-                  <span class="post-meta">
-                      <i class="far fa-clock"></i>
-                      14 分钟
-                  </span>
-                
-
-                
-              </p>
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5 z-depth-3" id="board">
-          <div class="post-content mx-auto" id="post">
-            
-            <div class="markdown-body">
-              <h2 id="Python-101-iterators-generators-coroutines"><a href="#Python-101-iterators-generators-coroutines" class="headerlink" title="Python 101: iterators,generators,coroutines"></a>Python 101: iterators,generators,coroutines</h2><blockquote>
-<p>作者：<br>Mark McDonnell<br>发布时间: 2019-12-28<br>原文链接：<a href="https://www.integralist.co.uk/posts/python-generators/" target="_blank" rel="noopener">https://www.integralist.co.uk/posts/python-generators/</a>  </p>
-<p>翻译:<br>Dustyposa  </p>
-</blockquote>
-<p>在这篇文章中，我将讨论一下什么是生成器<code>(generators)</code>以及和协程<code>(coroutines)</code>作比较，但是为了了解这两个概念<em>（生成器和协程）</em>我们需要回头看一看并了解迭代器<code>(Iterator)</code>的概念。<br>我们最终将会讨论…</p>
-<ul>
-<li><a href="#迭代器">迭代器(Iterators)</a><ul>
-<li><a href="#为什么使用迭代器%3F">为什么要使用迭代器？</a></li>
-<li><a href="#迭代器的实现">迭代器的实现</a></li>
-<li><a href="#迭代器示例">迭代器示例</a></li>
-</ul>
-</li>
-<li><a href="#生成器">生成器(Generators)</a><ul>
-<li><a href="#为什么使用生成器？">为什么要使用生成器？</a></li>
-<li><a href="#生成器的实现">生成器的实现</a></li>
-<li><a href="#生成器示例">生成器示例</a></li>
-<li><a href="#生成器表达式">生成器表达式</a></li>
-<li><a href="#生成器嵌套（例如：yield-from）">嵌套生成器（例如:yield from）</a></li>
-</ul>
-</li>
-<li><a href="#协程">协程(Coroutines)</a><ul>
-<li><a href="#为什么使用协程？">为什么要使用协程？</a></li>
-<li><a href="#协程的实现">协程的实现</a></li>
-<li><a href="#协程示例">协程示例</a></li>
-<li><a href="#Aysncio%3A-基于生成器的协程">Asyncio: 基于生成器的协程</a></li>
-<li><a href="#Asyncio%3A-新的-async-协程">Asyncio: 新的 async 协程</a></li>
-<li><a href="#协程的种类">协程的种类</a></li>
-<li><a href="#其他方面">其他方面</a></li>
-</ul>
-</li>
-</ul>
-<p>每个章节都会引导到下一章节，所以这篇文章的最好的阅读方式就是按照默认章节的顺序。除非你已经熟悉前面的部分，更喜欢跳读。</p>
-<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><hr>
-<p>在之后我们将讨论的所有东西的摘要如下：</p>
-<ul>
-<li>迭代器允许你对自定义对象进行迭代</li>
-<li>生成器构建于迭代器之上（它们较少了模版）。</li>
-<li>生成器表达式比生成器更加简洁</li>
-<li>协程就<em>是</em>生成器，但是协程的<code>yield</code>语句会接收一个值。</li>
-<li>协程可以暂停和重新执行（对于并发来说是非常好的）</li>
-</ul>
-<blockquote>
-<p>† think <a href="https://gist.github.com/e5310d1082b0ff8307e39b71a6f9bae5" target="_blank" rel="noopener">comprehensions</a>.</p>
-</blockquote>
-<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><hr>
-<p>根据官方<a href="https://docs.python.org/3.7/glossary.html#term-iterator" target="_blank" rel="noopener"><code>Python术语表</code></a>，<em>迭代器</em>是…  </p>
-<blockquote>
-<p>表示数据流的对象</p>
-</blockquote>
-<h3 id="为什么使用迭代器"><a href="#为什么使用迭代器" class="headerlink" title="为什么使用迭代器?"></a>为什么使用迭代器?</h3><p>迭代器是很有用的，因为它允许使用标准的<code>Python for-in</code>语法对任意自定义对象进行迭代。这就是内部列表和字典类型的工作方式，以及它们如何允许<code>for-in</code>对它们进行迭代。<br>更重要的是，迭代器（我们会发现）非常节省内存，这就意味着一次只能处理一个元素。因此，你可以有一个提供无限元素的序列可迭代对象并且你会发现你的程序永远不会耗尽内存分配。</p>
-<h3 id="迭代器的实现"><a href="#迭代器的实现" class="headerlink" title="迭代器的实现"></a>迭代器的实现</h3><p>一个迭代器是（通常）是一个实现了<code>__iter__ and __next__</code><em>‘双下(dunder)’</em>方法，尽管<code>__next__</code>方法不需要作为定义了<code>__iter__</code>方法的对象的一部分被定义。让我澄清一下…</p>
-<p><code>&#39;迭代器&#39;</code>实际上只是一些数据的容器。这个<code>&#39;容器&#39;</code>，根据*<a href="https://docs.python.org/3.7/library/stdtypes.html#iterator.__iter__" target="_blank" rel="noopener">协议文档(protocol documentation)</a>*必须有一个<code>__iter__</code>方法，应该返回一个可迭代对象（例如：一些含有<code>__next__</code>方法的东西）。<code>__next__</code>方法会在相关数据集中向前移动。</p>
-<p>所以，你可以设计一个同时包含<code>__iter__ and __next__</code> 方法的单类<em>(single class)</em>(就像我在下面展示的)，或者你可能想把<code>__next__</code>方法定义为单独类的一部分（这取决于你感觉的什么是对于你项目来说最好的方式）。</p>
-<blockquote>
-<p>注意：<a href="https://docs.python.org/3.7/library/collections.abc.html#collections.abc.Iterator" target="_blank" rel="noopener">collections.abc</a>对应的<code>Python</code>文档强调了那些<code>Pytrhon</code>拥有的以及各种它们需要的方法(可以看一些<a href="https://www.integralist.co.uk/posts/python-code-design/#interfaces-protocols-and-abstract-methods" target="_blank" rel="noopener">我的早期文章</a>，详细讨论了<code>protocols + abstract classes</code>)其他<em>‘协议(protocols)’*。如果你对</em>‘双下’方法还部不熟悉，我给你推荐一篇很好的文章:<a href="https://rszalski.github.io/magicmethods/" target="_blank" rel="noopener">魔术方法指南</a>*</p>
-</blockquote>
-<p>通过实现这两个方法，能使<code>Python</code>迭代一个’集合(collection)’。它不关心集合是什么，只要迭代器对象定义了<code>Python</code>知道如何去迭代的行为。</p>
-<h3 id="迭代器示例"><a href="#迭代器示例" class="headerlink" title="迭代器示例"></a>迭代器示例</h3><p>下面是一个样例，展示了如何创建这样的对象。在这个例子中，我们通过一个字符串列表传递给类的构造函数，该类实现了允许进行<code>for-in</code>迭代数据集合的相关方法。</p>
-<pre><code class="python">class Foo:
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="一些经验的记录。"><meta name="author" content="Dusty Posa"><meta name="keywords" content="python,python3,process,script"><title>iterators,generators,coroutines - Posaのにわ</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.0"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(/img/default.png) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期二, 四月 7日 2020, 10:10 上午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 3.9k 字 </span><span class="post-meta"><i class="far fa-clock"></i> 14 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><div class="markdown-body"><h2 id="Python-101-iterators-generators-coroutines"><a href="#Python-101-iterators-generators-coroutines" class="headerlink" title="Python 101: iterators,generators,coroutines"></a>Python 101: iterators,generators,coroutines</h2><blockquote><p>作者：<br>Mark McDonnell<br>发布时间: 2019-12-28<br>原文链接：<a href="https://www.integralist.co.uk/posts/python-generators/" target="_blank" rel="noopener">https://www.integralist.co.uk/posts/python-generators/</a></p><p>翻译:<br>Dustyposa</p></blockquote><p>在这篇文章中，我将讨论一下什么是生成器<code>(generators)</code>以及和协程<code>(coroutines)</code>作比较，但是为了了解这两个概念<em>（生成器和协程）</em>我们需要回头看一看并了解迭代器<code>(Iterator)</code>的概念。<br>我们最终将会讨论…</p><ul><li><a href="#迭代器">迭代器(Iterators)</a><ul><li><a href="#为什么使用迭代器%3F">为什么要使用迭代器？</a></li><li><a href="#迭代器的实现">迭代器的实现</a></li><li><a href="#迭代器示例">迭代器示例</a></li></ul></li><li><a href="#生成器">生成器(Generators)</a><ul><li><a href="#为什么使用生成器？">为什么要使用生成器？</a></li><li><a href="#生成器的实现">生成器的实现</a></li><li><a href="#生成器示例">生成器示例</a></li><li><a href="#生成器表达式">生成器表达式</a></li><li><a href="#生成器嵌套（例如：yield-from）">嵌套生成器（例如:yield from）</a></li></ul></li><li><a href="#协程">协程(Coroutines)</a><ul><li><a href="#为什么使用协程？">为什么要使用协程？</a></li><li><a href="#协程的实现">协程的实现</a></li><li><a href="#协程示例">协程示例</a></li><li><a href="#Aysncio%3A-基于生成器的协程">Asyncio: 基于生成器的协程</a></li><li><a href="#Asyncio%3A-新的-async-协程">Asyncio: 新的 async 协程</a></li><li><a href="#协程的种类">协程的种类</a></li><li><a href="#其他方面">其他方面</a></li></ul></li></ul><p>每个章节都会引导到下一章节，所以这篇文章的最好的阅读方式就是按照默认章节的顺序。除非你已经熟悉前面的部分，更喜欢跳读。</p><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><hr><p>在之后我们将讨论的所有东西的摘要如下：</p><ul><li>迭代器允许你对自定义对象进行迭代</li><li>生成器构建于迭代器之上（它们较少了模版）。</li><li>生成器表达式比生成器更加简洁</li><li>协程就<em>是</em>生成器，但是协程的<code>yield</code>语句会接收一个值。</li><li>协程可以暂停和重新执行（对于并发来说是非常好的）</li></ul><blockquote><p>† think <a href="https://gist.github.com/e5310d1082b0ff8307e39b71a6f9bae5" target="_blank" rel="noopener">comprehensions</a>.</p></blockquote><h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><hr><p>根据官方<a href="https://docs.python.org/3.7/glossary.html#term-iterator" target="_blank" rel="noopener"><code>Python术语表</code></a>，<em>迭代器</em>是…</p><blockquote><p>表示数据流的对象</p></blockquote><h3 id="为什么使用迭代器"><a href="#为什么使用迭代器" class="headerlink" title="为什么使用迭代器?"></a>为什么使用迭代器?</h3><p>迭代器是很有用的，因为它允许使用标准的<code>Python for-in</code>语法对任意自定义对象进行迭代。这就是内部列表和字典类型的工作方式，以及它们如何允许<code>for-in</code>对它们进行迭代。<br>更重要的是，迭代器（我们会发现）非常节省内存，这就意味着一次只能处理一个元素。因此，你可以有一个提供无限元素的序列可迭代对象并且你会发现你的程序永远不会耗尽内存分配。</p><h3 id="迭代器的实现"><a href="#迭代器的实现" class="headerlink" title="迭代器的实现"></a>迭代器的实现</h3><p>一个迭代器是（通常）是一个实现了<code>__iter__ and __next__</code><em>‘双下(dunder)’</em>方法，尽管<code>__next__</code>方法不需要作为定义了<code>__iter__</code>方法的对象的一部分被定义。让我澄清一下…</p><p><code>&#39;迭代器&#39;</code>实际上只是一些数据的容器。这个<code>&#39;容器&#39;</code>，根据*<a href="https://docs.python.org/3.7/library/stdtypes.html#iterator.__iter__" target="_blank" rel="noopener">协议文档(protocol documentation)</a>*必须有一个<code>__iter__</code>方法，应该返回一个可迭代对象（例如：一些含有<code>__next__</code>方法的东西）。<code>__next__</code>方法会在相关数据集中向前移动。</p><p>所以，你可以设计一个同时包含<code>__iter__ and __next__</code> 方法的单类<em>(single class)</em>(就像我在下面展示的)，或者你可能想把<code>__next__</code>方法定义为单独类的一部分（这取决于你感觉的什么是对于你项目来说最好的方式）。</p><blockquote><p>注意：<a href="https://docs.python.org/3.7/library/collections.abc.html#collections.abc.Iterator" target="_blank" rel="noopener">collections.abc</a>对应的<code>Python</code>文档强调了那些<code>Pytrhon</code>拥有的以及各种它们需要的方法(可以看一些<a href="https://www.integralist.co.uk/posts/python-code-design/#interfaces-protocols-and-abstract-methods" target="_blank" rel="noopener">我的早期文章</a>，详细讨论了<code>protocols + abstract classes</code>)其他<em>‘协议(protocols)’*。如果你对</em>‘双下’方法还部不熟悉，我给你推荐一篇很好的文章:<a href="https://rszalski.github.io/magicmethods/" target="_blank" rel="noopener">魔术方法指南</a>*</p></blockquote><p>通过实现这两个方法，能使<code>Python</code>迭代一个’集合(collection)’。它不关心集合是什么，只要迭代器对象定义了<code>Python</code>知道如何去迭代的行为。</p><h3 id="迭代器示例"><a href="#迭代器示例" class="headerlink" title="迭代器示例"></a>迭代器示例</h3><p>下面是一个样例，展示了如何创建这样的对象。在这个例子中，我们通过一个字符串列表传递给类的构造函数，该类实现了允许进行<code>for-in</code>迭代数据集合的相关方法。</p><pre><code class="python">class Foo:
     def __init__(self, collection):
         self.collection = collection
         self.index = 0
@@ -255,55 +26,23 @@
 
 # 我们现在可以遍历我们的自定义 Foo 类了！
 for element in Foo([&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]):
-    print(element)</code></pre>
-<blockquote>
-<p>注意： 抛出 <code>StopIteration</code> 异常是正确实现一个迭代器的必要条件。</p>
-</blockquote>
-<p>在这个示例中，我们也可以<strong>手动</strong>迭代我们的<code>Foo</code>类，用<code>iter and next</code>函数，就像这样：</p>
-<pre><code class="python">foo = Foo(list(&quot;abc&quot;))
+    print(element)</code></pre><blockquote><p>注意： 抛出 <code>StopIteration</code> 异常是正确实现一个迭代器的必要条件。</p></blockquote><p>在这个示例中，我们也可以<strong>手动</strong>迭代我们的<code>Foo</code>类，用<code>iter and next</code>函数，就像这样：</p><pre><code class="python">foo = Foo(list(&quot;abc&quot;))
 iterator = iter(foo)
 
 next(iterator)  # &#39;a&#39;
 next(iterator)  # &#39;b&#39;
-next(iterator)  # &#39;c&#39;</code></pre>
-<blockquote>
-<p>注意：<code>iter(foo)</code> 和 <code>foo.__iter__()</code>相同，而<code>next(iterator)</code> 和 <code>iterator.__next__()</code>相同——所以这些函数都是由标准库提供的基础语法糖，可以让我们的代码看起来更清爽。</p>
-</blockquote>
-<p>这种类型的迭代器被叫做’基于类的迭代器<code>(class-based iterator)</code>‘，不是唯一实现可迭代对象的方法。<a href="https://www.integralist.co.uk/posts/python-generators/#generators" target="_blank" rel="noopener">生成器</a>以及<a href="https://www.integralist.co.uk/posts/python-generators/#generator-expressions" target="_blank" rel="noopener">生成器表达式</a>(请参考以下章节)是另一些节省内存的迭代对象的方式。<br>我们也可以通过使用<code>list</code>方法提取所有集合，就像这样：</p>
-<pre><code class="python">iterator = Foo(list(&quot;abc&quot;))
-list(iterator)</code></pre>
-<blockquote>
-<p>注意：小心点，因为如果迭代器产生无数的元素，之后就会耗尽你应用的所有内存！</p>
-</blockquote>
-<h3 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h3><hr>
-<p>根据官方<a href="https://docs.python.org/3.7/library/stdtypes.html#generator-types" target="_blank" rel="noopener">Python文档</a>,’生成器’提供…</p>
-<blockquote>
-<p>一个简便的方式去实现可迭代协议。如果一个容器对象的<code>__iter__()</code>方法被作为一个生成器实现，它将会自动返回一个可迭代对象。</p>
-</blockquote>
-<h3 id="为什么使用生成器？"><a href="#为什么使用生成器？" class="headerlink" title="为什么使用生成器？"></a>为什么使用生成器？</h3><p>他们不仅为了创建简单的迭代器提供了很好的语法，而且可以帮助减少让一些东西可迭代所需的模版代码。</p>
-<p>一个生成器可以帮助减少与’基于类’的迭代器相关的模版代码，因为他们可以被设计来去处理’状态管理(<code>state management</code>)’逻辑，否则你不得不自己编写。</p>
-<h3 id="生成器的实现"><a href="#生成器的实现" class="headerlink" title="生成器的实现"></a>生成器的实现</h3><p>生成器是一个返回’生成器迭代器<code>(gerator iterator)</code>‘的函数，所以它的行为和<code>__iter__</code>工作方式类似（记住它返回一个迭代器）。</p>
-<p>实际上，生成器是迭代器的子类。生成器函数本身应该利用<code>yield</code>语句将控制权返回给生成器函数的调用方。</p>
-<p>调用方在之后可以通过<code>for-in</code>语句或者<code>next</code>函数来推进生成器迭代器（和我们之前的’基于类’的迭代器的例子中看到的那样），这再次突出了生成器实际上是迭代器的子类。</p>
-<p>当生成器<code>yields</code>时，它实际上在那时候暂停了函数并返回了一个值。调用<code>next</code>（或者作为<code>for-in</code>的一部分）将会推进函数，要么移动到生成器函数结束或者在生成器函数中的下一个<code>yield</code>声明处停止。</p>
-<h3 id="生成器示例"><a href="#生成器示例" class="headerlink" title="生成器示例"></a>生成器示例</h3><p>下面的例子将会先打印 <code>a</code>, 然后<code>b</code>，最后<code>c</code>：</p>
-<pre><code class="python">def generator():
+next(iterator)  # &#39;c&#39;</code></pre><blockquote><p>注意：<code>iter(foo)</code> 和 <code>foo.__iter__()</code>相同，而<code>next(iterator)</code> 和 <code>iterator.__next__()</code>相同——所以这些函数都是由标准库提供的基础语法糖，可以让我们的代码看起来更清爽。</p></blockquote><p>这种类型的迭代器被叫做’基于类的迭代器<code>(class-based iterator)</code>‘，不是唯一实现可迭代对象的方法。<a href="https://www.integralist.co.uk/posts/python-generators/#generators" target="_blank" rel="noopener">生成器</a>以及<a href="https://www.integralist.co.uk/posts/python-generators/#generator-expressions" target="_blank" rel="noopener">生成器表达式</a>(请参考以下章节)是另一些节省内存的迭代对象的方式。<br>我们也可以通过使用<code>list</code>方法提取所有集合，就像这样：</p><pre><code class="python">iterator = Foo(list(&quot;abc&quot;))
+list(iterator)</code></pre><blockquote><p>注意：小心点，因为如果迭代器产生无数的元素，之后就会耗尽你应用的所有内存！</p></blockquote><h3 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h3><hr><p>根据官方<a href="https://docs.python.org/3.7/library/stdtypes.html#generator-types" target="_blank" rel="noopener">Python文档</a>,’生成器’提供…</p><blockquote><p>一个简便的方式去实现可迭代协议。如果一个容器对象的<code>__iter__()</code>方法被作为一个生成器实现，它将会自动返回一个可迭代对象。</p></blockquote><h3 id="为什么使用生成器？"><a href="#为什么使用生成器？" class="headerlink" title="为什么使用生成器？"></a>为什么使用生成器？</h3><p>他们不仅为了创建简单的迭代器提供了很好的语法，而且可以帮助减少让一些东西可迭代所需的模版代码。</p><p>一个生成器可以帮助减少与’基于类’的迭代器相关的模版代码，因为他们可以被设计来去处理’状态管理(<code>state management</code>)’逻辑，否则你不得不自己编写。</p><h3 id="生成器的实现"><a href="#生成器的实现" class="headerlink" title="生成器的实现"></a>生成器的实现</h3><p>生成器是一个返回’生成器迭代器<code>(gerator iterator)</code>‘的函数，所以它的行为和<code>__iter__</code>工作方式类似（记住它返回一个迭代器）。</p><p>实际上，生成器是迭代器的子类。生成器函数本身应该利用<code>yield</code>语句将控制权返回给生成器函数的调用方。</p><p>调用方在之后可以通过<code>for-in</code>语句或者<code>next</code>函数来推进生成器迭代器（和我们之前的’基于类’的迭代器的例子中看到的那样），这再次突出了生成器实际上是迭代器的子类。</p><p>当生成器<code>yields</code>时，它实际上在那时候暂停了函数并返回了一个值。调用<code>next</code>（或者作为<code>for-in</code>的一部分）将会推进函数，要么移动到生成器函数结束或者在生成器函数中的下一个<code>yield</code>声明处停止。</p><h3 id="生成器示例"><a href="#生成器示例" class="headerlink" title="生成器示例"></a>生成器示例</h3><p>下面的例子将会先打印 <code>a</code>, 然后<code>b</code>，最后<code>c</code>：</p><pre><code class="python">def generator():
     yield &quot;a&quot;
     yield &quot;b&quot;
     yield &quot;c&quot;
 
 for v in generator():
-    print(v)</code></pre>
-<p>如果我们用<code>next()</code>函数作为替代，我们可以执行如下操作：</p>
-<pre><code class="python">gen = generator()
+    print(v)</code></pre><p>如果我们用<code>next()</code>函数作为替代，我们可以执行如下操作：</p><pre><code class="python">gen = generator()
 next(gen)  # a
 next(gen)  # b
 next(gen)  # c
-next(gen)  # raises StopIteration</code></pre>
-<p>注意，和我们早期自定义’基于类’迭代器相比，我们已经大大的减少了我们的代码样板，因为不需要再去在类示例上定义<code>__iter__ and __next__</code>方法（我们自己也不需要管理任何状态）。我们简单地调用<code>yield</code>。</p>
-<p>如果我们的使用足够简单，那么生成器就够了。否则如果我们需要执行非常特殊的逻辑，可能就需要自定义’基于类’的生成器了。</p>
-<p>记住，迭代器（以及生成器扩展）是非常节省内存的，因此我们可以创建一个生成无限多元素的生成器，就像这样：</p>
-<pre><code class="python">def unbouded_generator():
+next(gen)  # raises StopIteration</code></pre><p>注意，和我们早期自定义’基于类’迭代器相比，我们已经大大的减少了我们的代码样板，因为不需要再去在类示例上定义<code>__iter__ and __next__</code>方法（我们自己也不需要管理任何状态）。我们简单地调用<code>yield</code>。</p><p>如果我们的使用足够简单，那么生成器就够了。否则如果我们需要执行非常特殊的逻辑，可能就需要自定义’基于类’的生成器了。</p><p>记住，迭代器（以及生成器扩展）是非常节省内存的，因此我们可以创建一个生成无限多元素的生成器，就像这样：</p><pre><code class="python">def unbouded_generator():
     while True:
         yield &quot;some value&quot;
 
@@ -318,38 +57,19 @@ next(gen)  # ...
 # 译者注，我们也可以关闭或者抛出异常来结束生成器，就像这样
 gen.close()
 next(gen)  # StopIteration
-gen.throw(ValueError(&quot;Too many balue&quot;))  # ValueError</code></pre>
-<p>所以，就像我们之前提到的，当对生成器函数用<code>list()</code>的时候也要小心（见下面的例子），因为这将获取整个集合，可能耗尽你应用的内存。</p>
-<pre><code class="python">def generator():
+gen.throw(ValueError(&quot;Too many balue&quot;))  # ValueError</code></pre><p>所以，就像我们之前提到的，当对生成器函数用<code>list()</code>的时候也要小心（见下面的例子），因为这将获取整个集合，可能耗尽你应用的内存。</p><pre><code class="python">def generator():
     yield &quot;a&quot;
     yield &quot;b&quot;
     yield &quot;c&quot;
 
 gen = generator()
-list(gen)  # [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</code></pre>
-<h3 id="生成器表达式"><a href="#生成器表达式" class="headerlink" title="生成器表达式"></a>生成器表达式</h3><p>根据官方的<a href="https://www.python.org/dev/peps/pep-0289/" target="_blank" rel="noopener">PEP 289文档</a>，对于生成器表达式…</p>
-<blockquote>
-<p>生成器表达式是列表推导式的一个高性能，省内存的泛化。</p>
-</blockquote>
-<p>本质上它们是一种用与<a href="https://gist.github.com/e5310d1082b0ff8307e39b71a6f9bae5" target="_blank" rel="noopener">列表推导式</a>相似的语法创建生成器的方法。</p>
-<p>以下是一个会打印<code>&quot;foo&quot;</code>5次的生成器函数的示例：</p>
-<pre><code class="python">def generator(limit):
+list(gen)  # [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</code></pre><h3 id="生成器表达式"><a href="#生成器表达式" class="headerlink" title="生成器表达式"></a>生成器表达式</h3><p>根据官方的<a href="https://www.python.org/dev/peps/pep-0289/" target="_blank" rel="noopener">PEP 289文档</a>，对于生成器表达式…</p><blockquote><p>生成器表达式是列表推导式的一个高性能，省内存的泛化。</p></blockquote><p>本质上它们是一种用与<a href="https://gist.github.com/e5310d1082b0ff8307e39b71a6f9bae5" target="_blank" rel="noopener">列表推导式</a>相似的语法创建生成器的方法。</p><p>以下是一个会打印<code>&quot;foo&quot;</code>5次的生成器函数的示例：</p><pre><code class="python">def generator(limit):
     for i in range(limit):
         yield &quot;foo&quot;
 
 for v in generator(5):
-    print(v)</code></pre>
-<p>这和生成器表达式是一样的：</p>
-<pre><code class="python">for v in (&quot;foo&quot; for i in range(5)):
-    print(v)</code></pre>
-<p>生成器表达式的语法也和推导式的语法很相似，不同之处在我们使用<code>()</code>替代了边界/分界符<code>[] or {}</code>。</p>
-<pre><code class="python">(expression for item in collection if condition)</code></pre>
-<blockquote>
-<p>注意： 尽管没有演示，因为支持<code>&quot;if&quot;</code>条件，你也可以过滤生成值。</p>
-</blockquote>
-<h3 id="生成器嵌套（例如：yield-from）"><a href="#生成器嵌套（例如：yield-from）" class="headerlink" title="生成器嵌套（例如：yield from）"></a>生成器嵌套（例如：yield from）</h3><p>Python 3.3 提供了 <code>yield from</code>语句，提供了一些基础语法糖来处理嵌套生成器。</p>
-<p>让我们来看一下如果没有<code>yield from</code>我们需要怎么做：</p>
-<pre><code class="python">def baz():
+    print(v)</code></pre><p>这和生成器表达式是一样的：</p><pre><code class="python">for v in (&quot;foo&quot; for i in range(5)):
+    print(v)</code></pre><p>生成器表达式的语法也和推导式的语法很相似，不同之处在我们使用<code>()</code>替代了边界/分界符<code>[] or {}</code>。</p><pre><code class="python">(expression for item in collection if condition)</code></pre><blockquote><p>注意： 尽管没有演示，因为支持<code>&quot;if&quot;</code>条件，你也可以过滤生成值。</p></blockquote><h3 id="生成器嵌套（例如：yield-from）"><a href="#生成器嵌套（例如：yield-from）" class="headerlink" title="生成器嵌套（例如：yield from）"></a>生成器嵌套（例如：yield from）</h3><p>Python 3.3 提供了 <code>yield from</code>语句，提供了一些基础语法糖来处理嵌套生成器。</p><p>让我们来看一下如果没有<code>yield from</code>我们需要怎么做：</p><pre><code class="python">def baz():
     for i in range(10):
         yield i
 
@@ -364,10 +84,7 @@ def foo():
         yield v
 
 for v in foo():
-    print(v)</code></pre>
-<p>注意我们有两个单独的<code>for-in</code>循环（在<code>foo</code>生成器函数中），每个循环对应一个嵌套生成器。</p>
-<p>现在，让我们看看用<code>yield from</code>会怎样：</p>
-<pre><code class="python">def baz():
+    print(v)</code></pre><p>注意我们有两个单独的<code>for-in</code>循环（在<code>foo</code>生成器函数中），每个循环对应一个嵌套生成器。</p><p>现在，让我们看看用<code>yield from</code>会怎样：</p><pre><code class="python">def baz():
     for i in range(10):
         yield i
 
@@ -380,10 +97,7 @@ def foo():
     yield from bar()
 
 for v in foo():
-    print(v)</code></pre>
-<p>Ok 这并不是很突出的功能，但是如果你曾经对<code>yield from</code>很疑惑，你现在知道了它是<code>for-in</code>语法的简单版外观。</p>
-<p>尽管值得指出的是，如果我们没有<code>yield from</code>，我们仍然可以使用<code>itertool</code>模块的<code>chain()</code>函数来改写我们的原代码，就像这样：</p>
-<pre><code class="python">from itertools import chain
+    print(v)</code></pre><p>Ok 这并不是很突出的功能，但是如果你曾经对<code>yield from</code>很疑惑，你现在知道了它是<code>for-in</code>语法的简单版外观。</p><p>尽管值得指出的是，如果我们没有<code>yield from</code>，我们仍然可以使用<code>itertool</code>模块的<code>chain()</code>函数来改写我们的原代码，就像这样：</p><pre><code class="python">from itertools import chain
 
 def baz():
     for i in range(10):
@@ -398,23 +112,7 @@ def foo():
         yield v
 
 for v in foo():
-    print(v)</code></pre>
-<blockquote>
-<p>注意：请参阅<a href="https://www.python.org/dev/peps/pep-0380/" target="_blank" rel="noopener">PEP 380</a>以获得更多关于<code>yield from</code>的详细信息，以及将其包含在·Python·语言中的基本原理。</p>
-</blockquote>
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><hr>
-<p>协程（就<code>Python</code>而言）一直被设计成生成器的扩展。</p>
-<blockquote>
-<p>协程是计算机程序的一类组件，推广了协作式多任务的子程序，允许执行被挂起与被恢复。—— 维基百科</p>
-</blockquote>
-<h3 id="为什么使用协程？"><a href="#为什么使用协程？" class="headerlink" title="为什么使用协程？"></a>为什么使用协程？</h3><p>因为协程可以暂停和恢复执行上下文，对于并发编程来说非常合适，因为它们可以让程序决定什么时候’切换上下文’。</p>
-<p>这就是协程为什么经常被用来处理例如：<a href="https://www.integralist.co.uk/posts/python-asyncio/#event-loop" target="_blank" rel="noopener">事件循环</a>(构建于<code>Python</code>的 <code>asyncio</code>之上)。</p>
-<h3 id="协程的实现"><a href="#协程的实现" class="headerlink" title="协程的实现"></a>协程的实现</h3><p>生成器用<code>yield</code>关键字在函数中在某时间点返回值，但是对于协程，<code>yield</code>指令<strong>也</strong>可以被用在<code>=</code>操作符的右边。表示它可以在这个时间点<strong>接收一个值</strong>。</p>
-<h3 id="协程示例"><a href="#协程示例" class="headerlink" title="协程示例"></a>协程示例</h3><p>下面是一个协程的示例。记住！协程任然是一个生成器，所以你会看到我们的例子用了和生成器相关的特性（例如：<code>yield</code> 和 <code>next()</code>函数）：</p>
-<blockquote>
-<p>注意：请参考注释来提高可读性</p>
-</blockquote>
-<pre><code class="python">def foo():
+    print(v)</code></pre><blockquote><p>注意：请参阅<a href="https://www.python.org/dev/peps/pep-0380/" target="_blank" rel="noopener">PEP 380</a>以获得更多关于<code>yield from</code>的详细信息，以及将其包含在·Python·语言中的基本原理。</p></blockquote><h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><hr><p>协程（就<code>Python</code>而言）一直被设计成生成器的扩展。</p><blockquote><p>协程是计算机程序的一类组件，推广了协作式多任务的子程序，允许执行被挂起与被恢复。—— 维基百科</p></blockquote><h3 id="为什么使用协程？"><a href="#为什么使用协程？" class="headerlink" title="为什么使用协程？"></a>为什么使用协程？</h3><p>因为协程可以暂停和恢复执行上下文，对于并发编程来说非常合适，因为它们可以让程序决定什么时候’切换上下文’。</p><p>这就是协程为什么经常被用来处理例如：<a href="https://www.integralist.co.uk/posts/python-asyncio/#event-loop" target="_blank" rel="noopener">事件循环</a>(构建于<code>Python</code>的 <code>asyncio</code>之上)。</p><h3 id="协程的实现"><a href="#协程的实现" class="headerlink" title="协程的实现"></a>协程的实现</h3><p>生成器用<code>yield</code>关键字在函数中在某时间点返回值，但是对于协程，<code>yield</code>指令<strong>也</strong>可以被用在<code>=</code>操作符的右边。表示它可以在这个时间点<strong>接收一个值</strong>。</p><h3 id="协程示例"><a href="#协程示例" class="headerlink" title="协程示例"></a>协程示例</h3><p>下面是一个协程的示例。记住！协程任然是一个生成器，所以你会看到我们的例子用了和生成器相关的特性（例如：<code>yield</code> 和 <code>next()</code>函数）：</p><blockquote><p>注意：请参考注释来提高可读性</p></blockquote><pre><code class="python">def foo():
     &quot;&quot;&quot;
     注意我们在传统的生成器和协程上都使用了 yield
     &quot;&quot;&quot;
@@ -432,12 +130,7 @@ result = coro.send(&quot;bar&quot;)
 
 # 因为我们的协程也产生了 msg 变量
 # 这意味着我们可以打印值
-print(result)  # bar</code></pre>
-<blockquote>
-<p>注意：<code>coro</code>是一个标识符，通常指代一个协程。要查看其他更多的协程可以用的方法，请查看<a href="https://docs.python.org/3.8/reference/datamodel.html#coroutines" target="_blank" rel="noopener">文档</a>。</p>
-</blockquote>
-<p>下面是用协程使用<code>yield</code>在调用方通过<code>.send()</code>方法接收值之前向调用者返回了一个值。</p>
-<pre><code class="python">def foo():
+print(result)  # bar</code></pre><blockquote><p>注意：<code>coro</code>是一个标识符，通常指代一个协程。要查看其他更多的协程可以用的方法，请查看<a href="https://docs.python.org/3.8/reference/datamodel.html#coroutines" target="_blank" rel="noopener">文档</a>。</p></blockquote><p>下面是用协程使用<code>yield</code>在调用方通过<code>.send()</code>方法接收值之前向调用者返回了一个值。</p><pre><code class="python">def foo():
     msg = yield &quot;beep&quot;
     yield msg
 
@@ -447,305 +140,14 @@ print(next(coro))  # beep
 
 result = coro.send(&quot;bar&quot;)
 
-print(result)  # bar</code></pre>
-<p>你可以看到上面的例子，当我们移动生成器协程到一个<code>first</code>语句(使用<code>next(coro</code>)时，值<code>&quot;beep&quot;</code>被返回给我们用来<code>print</code>了。</p>
-<h3 id="Aysncio-基于生成器的协程"><a href="#Aysncio-基于生成器的协程" class="headerlink" title="Aysncio: 基于生成器的协程"></a>Aysncio: 基于生成器的协程</h3><p>当<code>asyncio</code>模块首次被推出时，它还不支持<code>async/await</code>语法，因此当它被引入时，为了确保任何有需要被并发运行的遗留代码(例如: <code>awaited</code>)都需要使用一个<code>asyncio.coroutine</code>装饰器函数，来让它和新的<code>async/await</code>语法保持兼容。</p>
-<blockquote>
-<p>注意：有关这个被弃用的特性（从 <code>Python</code> 3.10开始） ，以及一些其他适用于基于协程的生成器函数，比如<code>asyncio.iscoroutine</code>的信息，请参考文档。</p>
-</blockquote>
-<p>最初基于生成器的协程意味着任何基于<code>asyncio</code>的代码都需要使用<code>yield from</code>在<code>Futures</code>以及另外协程上等待。</p>
-<p>下面的示例演示了如何同时使用新的<code>async</code>协程和早期的基于生成器的协程：</p>
-<pre><code class="python">import asyncio
+print(result)  # bar</code></pre><p>你可以看到上面的例子，当我们移动生成器协程到一个<code>first</code>语句(使用<code>next(coro</code>)时，值<code>&quot;beep&quot;</code>被返回给我们用来<code>print</code>了。</p><h3 id="Aysncio-基于生成器的协程"><a href="#Aysncio-基于生成器的协程" class="headerlink" title="Aysncio: 基于生成器的协程"></a>Aysncio: 基于生成器的协程</h3><p>当<code>asyncio</code>模块首次被推出时，它还不支持<code>async/await</code>语法，因此当它被引入时，为了确保任何有需要被并发运行的遗留代码(例如: <code>awaited</code>)都需要使用一个<code>asyncio.coroutine</code>装饰器函数，来让它和新的<code>async/await</code>语法保持兼容。</p><blockquote><p>注意：有关这个被弃用的特性（从 <code>Python</code> 3.10开始） ，以及一些其他适用于基于协程的生成器函数，比如<code>asyncio.iscoroutine</code>的信息，请参考文档。</p></blockquote><p>最初基于生成器的协程意味着任何基于<code>asyncio</code>的代码都需要使用<code>yield from</code>在<code>Futures</code>以及另外协程上等待。</p><p>下面的示例演示了如何同时使用新的<code>async</code>协程和早期的基于生成器的协程：</p><pre><code class="python">import asyncio
 
 @asyncio.coroutine
 def old_style_coroutine():
     yield from asyncio.sleep(1)
 
 async def main():
-    await old_style_coroutine()</code></pre>
-<h3 id="Asyncio-新的-async-协程"><a href="#Asyncio-新的-async-协程" class="headerlink" title="Asyncio: 新的 async 协程"></a>Asyncio: 新的 async 协程</h3><p>使用<code>async def</code>创建的协程是用的最新的<code>__await__</code>双下方法（<a href="https://docs.python.org/3.8/reference/datamodel.html#coroutines" target="_blank" rel="noopener">文档在这里</a>）,然而基于生成器的协程使用了传统的基于’生成器’的实现。</p>
-<h3 id="协程的种类"><a href="#协程的种类" class="headerlink" title="协程的种类"></a>协程的种类</h3><p>这导致了术语’协程’在不同的语境下有不同的含义。我们现在有：</p>
-<ul>
-<li><code>simple coroutines</code>：传统的生成器协程（非 async io）</li>
-<li><code>generator coroutine</code>: 用传统的 <code>asyncio</code>实现的 async io</li>
-<li><code>native coroutines</code>：用最新的 <code>async/await</code>实现的async io</li>
-</ul>
-<h3 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h3><p><code>Python</code>提供的一些有趣的装饰器函数可能有一些让人迷惑，因为这些函数看起来有重叠的功能。</p>
-<p>它们并不重叠，但似乎是一起使用的：</p>
-<ul>
-<li><code>types.coroutine</code>: 将生成器函数转为一个协程</li>
-<li><code>asyncio.coroutine</code>: 确保<code>asyncio</code>兼容性的抽象</li>
-</ul>
-<blockquote>
-<p>注意：之后我们会看到，<code>asyncio.coroutine</code>实际上调用了<code>types.coroutine</code>。在处理<code>asyncio</code>代码时，你最好使用前者。</p>
-</blockquote>
-<p>更具体的来说，如果我们看一下<a href="https://github.com/python/cpython/blob/master/Lib/asyncio/coroutines.py#L105" target="_blank" rel="noopener"><code>asyncio.coroutine</code></a>代码的实现，我们可以看到：</p>
-<ol>
-<li>如果被装饰的函数已经是一个协程了，那么就直接返回。</li>
-<li>如果被装饰的函数是一个生成器，那么就将它转为协程(使用<code>types.coroutine</code>)。</li>
-<li>否则装饰被装饰的函数，以便当它被转为协程时，它可以<code>await</code>任何可以等待的结果。</li>
-</ol>
-
-            </div>
-            <hr>
-            <div>
-              <p>
-                
-                  <span>
-                <i class="iconfont icon-inbox"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/">翻译</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/advance/">advance</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/advance/%E7%BD%91%E7%BB%9C/">网络</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/advance/%E7%BD%91%E7%BB%9C/%E5%BC%82%E6%AD%A5/">异步</a>
-                      &nbsp;
-                    
-                  </span>&nbsp;&nbsp;
-                
-                
-                  <span>
-                <i class="iconfont icon-tag"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/python/">python</a>
-                    
-                      <a class="hover-with-bg" href="/tags/async/">async</a>
-                    
-                      <a class="hover-with-bg" href="/tags/generator/">generator</a>
-                    
-                      <a class="hover-with-bg" href="/tags/iterator/">iterator</a>
-                    
-                  </span>
-                
-              </p>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
-              
-              
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/04/07/github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2-part-1/">
-                        <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">从零开始搭建Github博客(其一)</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </div>
-                  <div class="post-next col-6">
-                    
-                    
-                      <a href="/2020/04/07/%E5%BC%82%E6%AD%A5%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB(tr)/">
-                        <span class="hidden-mobile">异步网络爬虫</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="fa fa-chevron-right"></i>
-                      </a>
-                    
-                  </div>
-                </div>
-              
-            </div>
-
-              
-                <!-- Comments -->
-                <div class="comments" id="comments">
-                  
-                  
-
-                </div>
-              
-          </div>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc-start"></div>
-<div id="toc">
-  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
-      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
-<script  src="/js/main.js" ></script>
-
-
-  <script  src="/js/lazyload.js" ></script>
-
-
-
-  
-  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var navHeight = $('#navbar').height();
-      var toc = $('#toc');
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-      var tocLimMax = 2 * boardTop + boardCtn.height();
-
-      $(window).scroll(function () {
-        var tocLimMin = $('#toc-start').offset().top - navHeight;
-        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
-
-        if (tocLimMin <= scroH && scroH <= tocLimMax) {
-          toc.css({
-            'display': 'block',
-            'position': 'fixed',
-            'top': navHeight,
-          });
-        } else if (scroH <= tocLimMin) {
-          toc.css({
-            'position': '',
-            'top': '',
-          });
-        } else if (scroH > tocLimMax) {
-          toc.css('display', 'none');
-        }
-      });
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '.post-content',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc > p').css('visibility', 'visible');
-      }
-      var offset = boardCtn.css('margin-right')
-      $('#toc-ctn').css({
-        'right': offset
-      })
-    });
-  </script>
-
-
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-
-<!-- Plugins -->
-
-
-
-  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      $('pre').addClass('prettyprint  ');
-      prettyPrint();
-    })
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "iterators,generators,coroutines&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
+    await old_style_coroutine()</code></pre><h3 id="Asyncio-新的-async-协程"><a href="#Asyncio-新的-async-协程" class="headerlink" title="Asyncio: 新的 async 协程"></a>Asyncio: 新的 async 协程</h3><p>使用<code>async def</code>创建的协程是用的最新的<code>__await__</code>双下方法（<a href="https://docs.python.org/3.8/reference/datamodel.html#coroutines" target="_blank" rel="noopener">文档在这里</a>）,然而基于生成器的协程使用了传统的基于’生成器’的实现。</p><h3 id="协程的种类"><a href="#协程的种类" class="headerlink" title="协程的种类"></a>协程的种类</h3><p>这导致了术语’协程’在不同的语境下有不同的含义。我们现在有：</p><ul><li><code>simple coroutines</code>：传统的生成器协程（非 async io）</li><li><code>generator coroutine</code>: 用传统的 <code>asyncio</code>实现的 async io</li><li><code>native coroutines</code>：用最新的 <code>async/await</code>实现的async io</li></ul><h3 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h3><p><code>Python</code>提供的一些有趣的装饰器函数可能有一些让人迷惑，因为这些函数看起来有重叠的功能。</p><p>它们并不重叠，但似乎是一起使用的：</p><ul><li><code>types.coroutine</code>: 将生成器函数转为一个协程</li><li><code>asyncio.coroutine</code>: 确保<code>asyncio</code>兼容性的抽象</li></ul><blockquote><p>注意：之后我们会看到，<code>asyncio.coroutine</code>实际上调用了<code>types.coroutine</code>。在处理<code>asyncio</code>代码时，你最好使用前者。</p></blockquote><p>更具体的来说，如果我们看一下<a href="https://github.com/python/cpython/blob/master/Lib/asyncio/coroutines.py#L105" target="_blank" rel="noopener"><code>asyncio.coroutine</code></a>代码的实现，我们可以看到：</p><ol><li>如果被装饰的函数已经是一个协程了，那么就直接返回。</li><li>如果被装饰的函数是一个生成器，那么就将它转为协程(使用<code>types.coroutine</code>)。</li><li>否则装饰被装饰的函数，以便当它被转为协程时，它可以<code>await</code>任何可以等待的结果。</li></ol></div><hr><div><p><span><i class="iconfont icon-inbox"></i> <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/">翻译</a> &nbsp; <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/advance/">advance</a> &nbsp; <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/advance/%E7%BD%91%E7%BB%9C/">网络</a> &nbsp; <a class="hover-with-bg" href="/categories/%E7%BF%BB%E8%AF%91/advance/%E7%BD%91%E7%BB%9C/%E5%BC%82%E6%AD%A5/">异步</a> &nbsp; </span>&nbsp;&nbsp; <span><i class="iconfont icon-tag"></i> <a class="hover-with-bg" href="/tags/python/">python</a> <a class="hover-with-bg" href="/tags/async/">async</a> <a class="hover-with-bg" href="/tags/generator/">generator</a> <a class="hover-with-bg" href="/tags/iterator/">iterator</a></span></p><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"><a href="/2020/04/07/github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2-part-1/"><i class="fa fa-chevron-left"></i> <span class="hidden-mobile">从零开始搭建Github博客(其一)</span> <span class="visible-mobile">上一篇</span></a></div><div class="post-next col-6"><a href="/2020/04/07/%E5%BC%82%E6%AD%A5%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB(tr)/"><span class="hidden-mobile">异步网络爬虫</span> <span class="visible-mobile">下一篇</span> <i class="fa fa-chevron-right"></i></a></div></div></div><div class="comments" id="comments"></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc-start"></div><div id="toc"><p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a class="z-depth-1" id="scroll-top-button" href="#" role="button"><i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><b>Fluid</b></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js"></script><script>$(document).ready(function(){var s=$("#navbar").height(),c=$("#toc"),t=$("#board-ctn"),o=t.offset().top,i=2*o+t.height();$(window).scroll(function(){var t=$("#toc-start").offset().top-s,o=document.body.scrollTop+document.documentElement.scrollTop;t<=o&&o<=i?c.css({display:"block",position:"fixed",top:s}):o<=t?c.css({position:"",top:""}):i<o&&c.css("display","none")}),tocbot.init({tocSelector:"#tocbot",contentSelector:".post-content",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",scrollSmooth:!0,headingsOffset:-o}),0<$(".toc-list-item").length&&$("#toc > p").css("visibility","visible");var l=t.css("margin-right");$("#toc-ctn").css({right:l})})</script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js"></script><script>$(document).ready(function(){$("pre").addClass("prettyprint  "),prettyPrint()})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","iterators,generators,coroutines&nbsp;"],cursorChar:"_",typeSpeed:70,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
       placement: "right",
       visible: "hover",
       
@@ -755,45 +157,4 @@ async def main():
     for (item of el) {
       res.push(".markdown-body > " + item)
     }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      getSearchFile(path);
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <script>
-    $("#post img:not(.no-zoom img, img[no-zoom])").each(
-      function () {
-        var element = document.createElement("a");
-        $(element).attr("data-fancybox", "images");
-        $(element).attr("href", $(this).attr("src"));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+    anchors.add(res.join(", "))</script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){getSearchFile(path),this.onclick=null}</script><script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><script>$("#post img:not(.no-zoom img, img[no-zoom])").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>

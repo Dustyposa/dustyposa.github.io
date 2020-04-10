@@ -1,196 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-
-
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.png">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="一些经验的记录。">
-  <meta name="author" content="Dusty Posa">
-  <meta name="keywords" content="python,python3,process,script">
-  <title>使用python客户端和服务器的功能测试实例 - Posaのにわ</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
-
-
-
-  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-
-  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-
-<!-- 自定义样式保持在最底部 -->
-
-
-<meta name="generator" content="Hexo 4.2.0"></head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/">首页</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/archives/">归档</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/categories/">分类</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/tags/">标签</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/about/">关于</a>
-          </li>
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/default.png') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask rgba-black-light flex-center">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              
-                <p class="mt-3 post-meta">
-                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期二, 四月 7日 2020, 10:01 上午
-                </p>
-              
-
-              <p class="mt-1">
-                
-                  
-                  <span class="post-meta">
-                    <i class="far fa-chart-bar"></i>
-                    2.7k 字
-                  </span>
-                
-
-                
-                  
-                  <span class="post-meta">
-                      <i class="far fa-clock"></i>
-                      11 分钟
-                  </span>
-                
-
-                
-              </p>
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5 z-depth-3" id="board">
-          <div class="post-content mx-auto" id="post">
-            
-            <div class="markdown-body">
-              <blockquote>
-<h3 id="编写功能测试的目的"><a href="#编写功能测试的目的" class="headerlink" title="编写功能测试的目的"></a>编写功能测试的目的</h3><p>验证应用的行为和期望一致的测试<br>确认异常修复的测试（增加测试覆盖率）<br>想想一个场景，因为接口需要增加一些功能，而更改了一些代码。<br>那么修改的代码会不会对之前的功能有影响呢？测试就来了。<br><strong>并且，良好的编写测试习惯，持续地写测试写文档写代码是必备的。更改代码也更加方便（重构），只用相同的测试代码即可。而且还能提升代码的可读性，测试代码也是功能的描述。</strong></p>
-</blockquote>
-<h4 id="测试的分类"><a href="#测试的分类" class="headerlink" title="测试的分类"></a>测试的分类</h4><ol>
-<li>单元测试（unit test）# 主要测函数</li>
-<li>功能测试（function test）# 主要测某些代码段完整的功能</li>
-<li>集成测试（integration test）  # 主要在线上环境测试</li>
-<li>负载/压力测试 （load test）  # 大家比较熟悉</li>
-<li>端到端测试 （end-to-end test） # 完整的测试产品</li>
-</ol>
-<p>本文主要讲解功能测试实例的编写。</p>
-<h2 id="在python中编写功能测试代码"><a href="#在python中编写功能测试代码" class="headerlink" title="在python中编写功能测试代码"></a>在python中编写功能测试代码</h2><p>主要分为两部分，客户端测试和服务器端测试。<br>目的都是为了检测自己写的代码是否实现了自己想要的功能。</p>
-<blockquote>
-<p>功能测试组要注意的点：<br><strong>功能测试都不占用网络服务资源，请求都直接模拟网络资源</strong></p>
-</blockquote>
-<p><strong>客户端测试可以用在哪里呢？</strong></p>
-<blockquote>
-<p>带有请求的地方都可以:<br><strong>爬虫</strong><br><strong>调用第三方的接口</strong>（OSS， 数据库， AI服务等）</p>
-</blockquote>
-<p>PS: 为了提升代码质量，所有代码都会使用静态注释,你的<code>python version</code> 需要 &gt;= 3.5<br><strong>如何实现网络资源请求的模拟呢？这时候，我们的 mock 就要出场了。</strong></p>
-<h3 id="1-客户端测试-request-mock"><a href="#1-客户端测试-request-mock" class="headerlink" title="1. 客户端测试 request_mock"></a>1. 客户端测试 request_mock</h3><p>首先，我们编写一个简单的客户端，当作我们用来测试的客户端 <code>client.py</code>，代码如下:</p>
-<pre><code class="python">import typing
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="一些经验的记录。"><meta name="author" content="Dusty Posa"><meta name="keywords" content="python,python3,process,script"><title>使用python客户端和服务器的功能测试实例 - Posaのにわ</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.0"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(/img/default.png) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期二, 四月 7日 2020, 10:01 上午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 2.7k 字 </span><span class="post-meta"><i class="far fa-clock"></i> 11 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><div class="markdown-body"><blockquote><h3 id="编写功能测试的目的"><a href="#编写功能测试的目的" class="headerlink" title="编写功能测试的目的"></a>编写功能测试的目的</h3><p>验证应用的行为和期望一致的测试<br>确认异常修复的测试（增加测试覆盖率）<br>想想一个场景，因为接口需要增加一些功能，而更改了一些代码。<br>那么修改的代码会不会对之前的功能有影响呢？测试就来了。<br><strong>并且，良好的编写测试习惯，持续地写测试写文档写代码是必备的。更改代码也更加方便（重构），只用相同的测试代码即可。而且还能提升代码的可读性，测试代码也是功能的描述。</strong></p></blockquote><h4 id="测试的分类"><a href="#测试的分类" class="headerlink" title="测试的分类"></a>测试的分类</h4><ol><li>单元测试（unit test）# 主要测函数</li><li>功能测试（function test）# 主要测某些代码段完整的功能</li><li>集成测试（integration test） # 主要在线上环境测试</li><li>负载/压力测试 （load test） # 大家比较熟悉</li><li>端到端测试 （end-to-end test） # 完整的测试产品</li></ol><p>本文主要讲解功能测试实例的编写。</p><h2 id="在python中编写功能测试代码"><a href="#在python中编写功能测试代码" class="headerlink" title="在python中编写功能测试代码"></a>在python中编写功能测试代码</h2><p>主要分为两部分，客户端测试和服务器端测试。<br>目的都是为了检测自己写的代码是否实现了自己想要的功能。</p><blockquote><p>功能测试组要注意的点：<br><strong>功能测试都不占用网络服务资源，请求都直接模拟网络资源</strong></p></blockquote><p><strong>客户端测试可以用在哪里呢？</strong></p><blockquote><p>带有请求的地方都可以:<br><strong>爬虫</strong><br><strong>调用第三方的接口</strong>（OSS， 数据库， AI服务等）</p></blockquote><p>PS: 为了提升代码质量，所有代码都会使用静态注释,你的<code>python version</code> 需要 &gt;= 3.5<br><strong>如何实现网络资源请求的模拟呢？这时候，我们的 mock 就要出场了。</strong></p><h3 id="1-客户端测试-request-mock"><a href="#1-客户端测试-request-mock" class="headerlink" title="1. 客户端测试 request_mock"></a>1. 客户端测试 request_mock</h3><p>首先，我们编写一个简单的客户端，当作我们用来测试的客户端 <code>client.py</code>，代码如下:</p><pre><code class="python">import typing
 from urllib import parse
 
 import requests
@@ -225,9 +33,7 @@ class MySpider:
                 return_data.append(parse.urljoin(self.return_base_url, goods_id))
             return {&quot;data&quot;: return_data}
         return {&quot;data&quot;: []}
-</code></pre>
-<p>客户端简单的实现了一个请求网站并处理返回数据的逻辑.<br>那么，开始测试我们的客户端吧！<br>记住：<strong>这是功能测试，与网络资源访问无关，我们只需要测试功能逻辑！其余第三方对象用模拟对象即可！</strong><br>一般的对象，<code>unittest</code> 自带的 <code>mock</code> 对象就能满足。那么如何网络模拟对象的实现呢？这时候，我们的 <code>requests_mock</code> 就要登场了。<br>它会实现对请求的拦截，以此达到我们想要的效果。<br>测试代码 <code>test_client.py</code> 如下:</p>
-<pre><code class="python">import unittest
+</code></pre><p>客户端简单的实现了一个请求网站并处理返回数据的逻辑.<br>那么，开始测试我们的客户端吧！<br>记住：<strong>这是功能测试，与网络资源访问无关，我们只需要测试功能逻辑！其余第三方对象用模拟对象即可！</strong><br>一般的对象，<code>unittest</code> 自带的 <code>mock</code> 对象就能满足。那么如何网络模拟对象的实现呢？这时候，我们的 <code>requests_mock</code> 就要登场了。<br>它会实现对请求的拦截，以此达到我们想要的效果。<br>测试代码 <code>test_client.py</code> 如下:</p><pre><code class="python">import unittest
 from unittest import mock
 
 import requests
@@ -276,19 +82,7 @@ class TestMySpider(unittest.TestCase):
 
 
 if __name__ == &#39;__main__&#39;:
-    unittest.main()</code></pre>
-<p>我们运行一下就能看到测试的结果。<br>整个测试代码整体也比较简单，<br><code>requests_mock</code> 作为一个装饰器，<code>reqeusts</code>进行了拦截。之后就直接进行了设定值的返回。<br>需要注意的几个函数:</p>
-<ol>
-<li><code>unittest</code> 为 python 标准库，可以直接导入并使用，不过后续的文章我们会升级成 <code>pytest</code> , 可定制性更强。</li>
-<li>安装 <code>requests_mock</code> , 也比较简单，直接 <code>pip install reqeusts_mock</code> 即可，后续我们会进行 <code>requests_mock</code> 的源码分析。并且，<code>reqeusts_mock</code> 的源码对于学习静态注释也是极好的。</li>
-<li><code>@unittest.mock.patch.object</code> 是进行对象层面的异常状态抛出，当 <code>requests</code> 对象调用 <code>get</code> 方法时，便抛出错误。<h3 id="2-测试服务器端"><a href="#2-测试服务器端" class="headerlink" title="2. 测试服务器端"></a>2. 测试服务器端</h3>其实客户端的测试比服务器端难一些。<blockquote>
-<p>因为服务器端的测试，框架已经帮你封装好了！<br><strong>服务端功能测试用在哪？当然是测自己写的接口啦！</strong></p>
-</blockquote>
-</li>
-</ol>
-<p>测试步骤类似，编写服务器，我们用 <code>flask</code> 和 <code>starlette</code> 进行举例，分别代表<code>python</code> 同步web框架和异步web框架。</p>
-<h4 id="flask"><a href="#flask" class="headerlink" title="flask"></a>flask</h4><p>我们编写一个简单的<code>flask_server.py</code>, 代码如下:</p>
-<pre><code class="python">from flask import Flask, jsonify
+    unittest.main()</code></pre><p>我们运行一下就能看到测试的结果。<br>整个测试代码整体也比较简单，<br><code>requests_mock</code> 作为一个装饰器，<code>reqeusts</code>进行了拦截。之后就直接进行了设定值的返回。<br>需要注意的几个函数:</p><ol><li><code>unittest</code> 为 python 标准库，可以直接导入并使用，不过后续的文章我们会升级成 <code>pytest</code> , 可定制性更强。</li><li>安装 <code>requests_mock</code> , 也比较简单，直接 <code>pip install reqeusts_mock</code> 即可，后续我们会进行 <code>requests_mock</code> 的源码分析。并且，<code>reqeusts_mock</code> 的源码对于学习静态注释也是极好的。</li><li><code>@unittest.mock.patch.object</code> 是进行对象层面的异常状态抛出，当 <code>requests</code> 对象调用 <code>get</code> 方法时，便抛出错误。<h3 id="2-测试服务器端"><a href="#2-测试服务器端" class="headerlink" title="2. 测试服务器端"></a>2. 测试服务器端</h3>其实客户端的测试比服务器端难一些。<blockquote><p>因为服务器端的测试，框架已经帮你封装好了！<br><strong>服务端功能测试用在哪？当然是测自己写的接口啦！</strong></p></blockquote></li></ol><p>测试步骤类似，编写服务器，我们用 <code>flask</code> 和 <code>starlette</code> 进行举例，分别代表<code>python</code> 同步web框架和异步web框架。</p><h4 id="flask"><a href="#flask" class="headerlink" title="flask"></a>flask</h4><p>我们编写一个简单的<code>flask_server.py</code>, 代码如下:</p><pre><code class="python">from flask import Flask, jsonify
 
 app = Flask(__name__)
 
@@ -313,20 +107,10 @@ def error_404_handing(error):
 
 if __name__ == &#39;__main__&#39;:
     app.run()
-</code></pre>
-<p>代表也比较简单，有3个路由</p>
-<ol>
-<li>常规返回的路由 <code>/api</code></li>
-<li>路由带id <code>/goods/123123</code></li>
-<li>404 页面<br>测试代码<code>test_flask_client.py</code> 代码如下:<pre><code class="python">import json
+</code></pre><p>代表也比较简单，有3个路由</p><ol><li>常规返回的路由 <code>/api</code></li><li>路由带id <code>/goods/123123</code></li><li>404 页面<br>测试代码<code>test_flask_client.py</code> 代码如下:<pre><code class="python">import json
 import typing
 import unittest
-</code></pre>
-</li>
-</ol>
-<p>from flask_basic import app as my_app</p>
-<p>class TestApp(unittest.TestCase):</p>
-<pre><code>def setUp(self) -&gt; None:
+</code></pre></li></ol><p>from flask_basic import app as my_app</p><p>class TestApp(unittest.TestCase):</p><pre><code>def setUp(self) -&gt; None:
     self.client = my_app.test_client()  # 初始化客户端，app 自带的测试客户端
 
 def test_msg_api(self) -&gt; None:
@@ -344,8 +128,7 @@ def test_404_page(self) -&gt; None:
     response = self.client.get(&quot;/idontknow&quot;)  # 访问路由
     self.assertEqual(response.status, &quot;404 NOT FOUND&quot;)  # 404 状态监测
     data: typing.Dict[str, typing.Any] = json.loads(response.data.decode(&quot;u8&quot;))  # 响应数据格式化
-    self.assertEqual(data[&quot;msg&quot;], &quot;no route&quot;)  # 返回数据监测</code></pre><p>if <strong>name</strong> == ‘<strong>main</strong>‘:<br>    unittest.main()</p>
-<pre><code>整个代码也就很简单清晰了，因为`flask` 自带的`app`就包含了测试客户端，只需要请求检查响应即可，整个过程可以一气呵成！
+    self.assertEqual(data[&quot;msg&quot;], &quot;no route&quot;)  # 返回数据监测</code></pre><p>if <strong>name</strong> == ‘<strong>main</strong>‘:<br>unittest.main()</p><pre><code>整个代码也就很简单清晰了，因为`flask` 自带的`app`就包含了测试客户端，只需要请求检查响应即可，整个过程可以一气呵成！
 #### starletee
 我们编写 `starletee` 的服务器文件 `starletee_server.py`,代码如下:
 ```python
@@ -370,14 +153,7 @@ async def query_goods(request) -&gt; JSONResponse:
 @app.exception_handler(404)
 async def not_found(request, exc) -&gt; JSONResponse:
     &quot;&quot;&quot;404处理&quot;&quot;&quot;
-    return JSONResponse(content={&quot;msg&quot;: &quot;no route&quot;}, status_code=exc.status_code)</code></pre><p><code>starletee</code>整体代码和<code>flask</code>很相似，所以遇到新的框架不要畏惧，大体其实是差不多的，只有一些小细节不一样，例如：</p>
-<ol>
-<li><code>flask</code> 的 <code>request</code>对象是全局的，而 <code>starletee</code>的 <code>request</code>对象和<code>django</code>的 <code>request</code>对象相似，都是在分发在路由中。</li>
-<li>路由中的变量获取方式不同，一个存在参数中，一个存在请求对象中。</li>
-<li>错误状态码处理方式返回数据格式不同。</li>
-</ol>
-<p>下面为测试<code>starletee</code>的代码<code>test_starletee_api.py</code>:</p>
-<pre><code class="python">import typing
+    return JSONResponse(content={&quot;msg&quot;: &quot;no route&quot;}, status_code=exc.status_code)</code></pre><p><code>starletee</code>整体代码和<code>flask</code>很相似，所以遇到新的框架不要畏惧，大体其实是差不多的，只有一些小细节不一样，例如：</p><ol><li><code>flask</code> 的 <code>request</code>对象是全局的，而 <code>starletee</code>的 <code>request</code>对象和<code>django</code>的 <code>request</code>对象相似，都是在分发在路由中。</li><li>路由中的变量获取方式不同，一个存在参数中，一个存在请求对象中。</li><li>错误状态码处理方式返回数据格式不同。</li></ol><p>下面为测试<code>starletee</code>的代码<code>test_starletee_api.py</code>:</p><pre><code class="python">import typing
 import unittest
 
 from starlette.testclient import TestClient
@@ -409,264 +185,7 @@ class TestApp(unittest.TestCase):
 
 
 if __name__ == &#39;__main__&#39;:
-    unittest.main()</code></pre>
-<p>除了响应数据的解析方式不同外，其他都一模一样。<br>对了，有一点不一样，就是客户端的初始化不一样。<code>TestClient(my_app)</code><br>当然，这只是示例，用的自带的<code>TestClien</code>,并且明显比<code>flask</code>自带的好用。之后的文章我们会讲解 <code>WebTest</code>这个专门设计来作为测试客户端（<code>flask</code>中有 <code>flask_webtest</code>）</p>
-<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h3><p>服务器的功能测试其实很类似，我们可以看到，测试代码几乎不用更改就能使用，那我们思考一下，这样有什么好处呢？<br>dangdangdang，答案就是：<br><strong>在写测试demo时，可以很方便的更换框架来继续进行测试，而不用更改测试代码，所以我们可以选择最适合当前业务的框架来使用！（特别对于微服务来说，针对当前业务，选择最合适的后端。）</strong></p>
-<p><strong>python客户端和服务器的功能测试流程大题如上文所述，我们需要记住以下几个要点：</strong></p>
-<ol>
-<li>功能测试（及单元测试）不依赖网络资源，IO等，一般使用<code>MOCK</code>对象来模拟返回数据。</li>
-<li>客户端请求我们可以使用<code>requests_mock</code>来模拟，测试自己客户端处理响应的逻辑。</li>
-<li>服务器端基本上所有框架都自带有 <code>test_client</code> 作为服务器测试客户端（不同框架名字可能不一样，具体参考文档）</li>
-</ol>
-<p><a href="https://github.com/Dustyposa/goSpider/tree/master/python_advance/%E4%BD%BF%E7%94%A8python%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%92%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E5%AE%9E%E4%BE%8B" target="_blank" rel="noopener">完整代码地址</a></p>
-
-            </div>
-            <hr>
-            <div>
-              <p>
-                
-                  <span>
-                <i class="iconfont icon-inbox"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/advance/">advance</a>
-                      &nbsp;
-                    
-                  </span>&nbsp;&nbsp;
-                
-                
-                  <span>
-                <i class="iconfont icon-tag"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/python/">python</a>
-                    
-                      <a class="hover-with-bg" href="/tags/tests/">tests</a>
-                    
-                  </span>
-                
-              </p>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
-              
-              
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/04/07/%E4%BD%BF%E7%94%A8python%E5%AE%A2ae%E4%BB%8Erequests%E8%AF%B7%E6%B1%82%E9%87%8D%E8%AF%95%E5%88%B0%E4%B8%87%E8%83%BD%E9%87%8D%E8%AF%95%E8%A3%85%E9%A5%B0%E5%99%A8/">
-                        <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">从requests请求重试到万能重试装饰器</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </div>
-                  <div class="post-next col-6">
-                    
-                    
-                      <a href="/2020/04/07/python_requests_%E4%BB%A3%E7%90%86%E5%92%8C%E9%87%8D%E5%AE%9A%E5%90%91%E4%BF%A1%E6%81%AF/">
-                        <span class="hidden-mobile">python requests 代理和重定向信息</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="fa fa-chevron-right"></i>
-                      </a>
-                    
-                  </div>
-                </div>
-              
-            </div>
-
-              
-                <!-- Comments -->
-                <div class="comments" id="comments">
-                  
-                  
-
-                </div>
-              
-          </div>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc-start"></div>
-<div id="toc">
-  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
-      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
-<script  src="/js/main.js" ></script>
-
-
-  <script  src="/js/lazyload.js" ></script>
-
-
-
-  
-  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var navHeight = $('#navbar').height();
-      var toc = $('#toc');
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-      var tocLimMax = 2 * boardTop + boardCtn.height();
-
-      $(window).scroll(function () {
-        var tocLimMin = $('#toc-start').offset().top - navHeight;
-        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
-
-        if (tocLimMin <= scroH && scroH <= tocLimMax) {
-          toc.css({
-            'display': 'block',
-            'position': 'fixed',
-            'top': navHeight,
-          });
-        } else if (scroH <= tocLimMin) {
-          toc.css({
-            'position': '',
-            'top': '',
-          });
-        } else if (scroH > tocLimMax) {
-          toc.css('display', 'none');
-        }
-      });
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '.post-content',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc > p').css('visibility', 'visible');
-      }
-      var offset = boardCtn.css('margin-right')
-      $('#toc-ctn').css({
-        'right': offset
-      })
-    });
-  </script>
-
-
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-
-<!-- Plugins -->
-
-
-
-  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      $('pre').addClass('prettyprint  ');
-      prettyPrint();
-    })
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "使用python客户端和服务器的功能测试实例&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
+    unittest.main()</code></pre><p>除了响应数据的解析方式不同外，其他都一模一样。<br>对了，有一点不一样，就是客户端的初始化不一样。<code>TestClient(my_app)</code><br>当然，这只是示例，用的自带的<code>TestClien</code>,并且明显比<code>flask</code>自带的好用。之后的文章我们会讲解 <code>WebTest</code>这个专门设计来作为测试客户端（<code>flask</code>中有 <code>flask_webtest</code>）</p><h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h3><p>服务器的功能测试其实很类似，我们可以看到，测试代码几乎不用更改就能使用，那我们思考一下，这样有什么好处呢？<br>dangdangdang，答案就是：<br><strong>在写测试demo时，可以很方便的更换框架来继续进行测试，而不用更改测试代码，所以我们可以选择最适合当前业务的框架来使用！（特别对于微服务来说，针对当前业务，选择最合适的后端。）</strong></p><p><strong>python客户端和服务器的功能测试流程大题如上文所述，我们需要记住以下几个要点：</strong></p><ol><li>功能测试（及单元测试）不依赖网络资源，IO等，一般使用<code>MOCK</code>对象来模拟返回数据。</li><li>客户端请求我们可以使用<code>requests_mock</code>来模拟，测试自己客户端处理响应的逻辑。</li><li>服务器端基本上所有框架都自带有 <code>test_client</code> 作为服务器测试客户端（不同框架名字可能不一样，具体参考文档）</li></ol><p><a href="https://github.com/Dustyposa/goSpider/tree/master/python_advance/%E4%BD%BF%E7%94%A8python%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%92%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%8A%9F%E8%83%BD%E6%B5%8B%E8%AF%95%E5%AE%9E%E4%BE%8B" target="_blank" rel="noopener">完整代码地址</a></p></div><hr><div><p><span><i class="iconfont icon-inbox"></i> <a class="hover-with-bg" href="/categories/advance/">advance</a> &nbsp; </span>&nbsp;&nbsp; <span><i class="iconfont icon-tag"></i> <a class="hover-with-bg" href="/tags/python/">python</a> <a class="hover-with-bg" href="/tags/tests/">tests</a></span></p><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"><a href="/2020/04/07/%E4%BD%BF%E7%94%A8python%E5%AE%A2ae%E4%BB%8Erequests%E8%AF%B7%E6%B1%82%E9%87%8D%E8%AF%95%E5%88%B0%E4%B8%87%E8%83%BD%E9%87%8D%E8%AF%95%E8%A3%85%E9%A5%B0%E5%99%A8/"><i class="fa fa-chevron-left"></i> <span class="hidden-mobile">从requests请求重试到万能重试装饰器</span> <span class="visible-mobile">上一篇</span></a></div><div class="post-next col-6"><a href="/2020/04/07/python_requests_%E4%BB%A3%E7%90%86%E5%92%8C%E9%87%8D%E5%AE%9A%E5%90%91%E4%BF%A1%E6%81%AF/"><span class="hidden-mobile">python requests 代理和重定向信息</span> <span class="visible-mobile">下一篇</span> <i class="fa fa-chevron-right"></i></a></div></div></div><div class="comments" id="comments"></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc-start"></div><div id="toc"><p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a class="z-depth-1" id="scroll-top-button" href="#" role="button"><i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><b>Fluid</b></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js"></script><script>$(document).ready(function(){var s=$("#navbar").height(),c=$("#toc"),t=$("#board-ctn"),o=t.offset().top,i=2*o+t.height();$(window).scroll(function(){var t=$("#toc-start").offset().top-s,o=document.body.scrollTop+document.documentElement.scrollTop;t<=o&&o<=i?c.css({display:"block",position:"fixed",top:s}):o<=t?c.css({position:"",top:""}):i<o&&c.css("display","none")}),tocbot.init({tocSelector:"#tocbot",contentSelector:".post-content",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",scrollSmooth:!0,headingsOffset:-o}),0<$(".toc-list-item").length&&$("#toc > p").css("visibility","visible");var l=t.css("margin-right");$("#toc-ctn").css({right:l})})</script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js"></script><script>$(document).ready(function(){$("pre").addClass("prettyprint  "),prettyPrint()})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","使用python客户端和服务器的功能测试实例&nbsp;"],cursorChar:"_",typeSpeed:70,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
       placement: "right",
       visible: "hover",
       
@@ -676,45 +195,4 @@ if __name__ == &#39;__main__&#39;:
     for (item of el) {
       res.push(".markdown-body > " + item)
     }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      getSearchFile(path);
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <script>
-    $("#post img:not(.no-zoom img, img[no-zoom])").each(
-      function () {
-        var element = document.createElement("a");
-        $(element).attr("data-fancybox", "images");
-        $(element).attr("href", $(this).attr("src"));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+    anchors.add(res.join(", "))</script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){getSearchFile(path),this.onclick=null}</script><script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><script>$("#post img:not(.no-zoom img, img[no-zoom])").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>

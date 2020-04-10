@@ -1,183 +1,6 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-
-
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.png">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="一些经验的记录。">
-  <meta name="author" content="Dusty Posa">
-  <meta name="keywords" content="python,python3,process,script">
-  <title>python 编写多进程 socket web静态服务器 - Posaのにわ</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
-
-
-
-  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-
-  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-
-<!-- 自定义样式保持在最底部 -->
-
-
-<meta name="generator" content="Hexo 4.2.0"></head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/">首页</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/archives/">归档</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/categories/">分类</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/tags/">标签</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/about/">关于</a>
-          </li>
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/default.png') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask rgba-black-light flex-center">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              
-                <p class="mt-3 post-meta">
-                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期一, 四月 6日 2020, 11:12 上午
-                </p>
-              
-
-              <p class="mt-1">
-                
-                  
-                  <span class="post-meta">
-                    <i class="far fa-chart-bar"></i>
-                    1.4k 字
-                  </span>
-                
-
-                
-                  
-                  <span class="post-meta">
-                      <i class="far fa-clock"></i>
-                      6 分钟
-                  </span>
-                
-
-                
-              </p>
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5 z-depth-3" id="board">
-          <div class="post-content mx-auto" id="post">
-            
-            <div class="markdown-body">
-              <h3 id="服务器模型-C-S模型"><a href="#服务器模型-C-S模型" class="headerlink" title="服务器模型 C/S模型"></a>服务器模型 C/S模型</h3><p><strong>socket</strong> 是什么 ？<br><strong>一种进程间的通信技术 由伯克利大学（BSD） 发明， 才有了当前的互联网</strong></p>
-<p><strong>几乎所有的C/S模型服务器， 底层都是socket实现的， web服务器也不例外， 只是web服务器用了：</strong></p>
-<h4 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a><strong>HTTP协议</strong></h4><a id="more"></a>
-<p>用python搭建简易的web服务器：</p>
-<h4 id="1-导入相关模块"><a href="#1-导入相关模块" class="headerlink" title="1. 导入相关模块"></a>1. 导入相关模块</h4><pre><code class="python">import os  # 导入系统模块
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="一些经验的记录。"><meta name="author" content="Dusty Posa"><meta name="keywords" content="python,python3,process,script"><title>python 编写多进程 socket web静态服务器 - Posaのにわ</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.0"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(/img/default.png) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期一, 四月 6日 2020, 11:12 上午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 1.4k 字 </span><span class="post-meta"><i class="far fa-clock"></i> 6 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><div class="markdown-body"><h3 id="服务器模型-C-S模型"><a href="#服务器模型-C-S模型" class="headerlink" title="服务器模型 C/S模型"></a>服务器模型 C/S模型</h3><p><strong>socket</strong> 是什么 ？<br><strong>一种进程间的通信技术 由伯克利大学（BSD） 发明， 才有了当前的互联网</strong></p><p><strong>几乎所有的C/S模型服务器， 底层都是socket实现的， web服务器也不例外， 只是web服务器用了：</strong></p><h4 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a><strong>HTTP协议</strong></h4><a id="more"></a><p>用python搭建简易的web服务器：</p><h4 id="1-导入相关模块"><a href="#1-导入相关模块" class="headerlink" title="1. 导入相关模块"></a>1. 导入相关模块</h4><pre><code class="python">import os  # 导入系统模块
 import socket  # 导入 socket包
-from multiprocessing import Process  # 导入多进程模块</code></pre>
-<h4 id="2-创建类并初始化"><a href="#2-创建类并初始化" class="headerlink" title="2. 创建类并初始化"></a>2. 创建类并初始化</h4><p><strong>初始化出部分需要的属性 方便之后方法的使用</strong><br>port 主机需要绑定的端口</p>
-<pre><code class="python">class WebServer(object):
+from multiprocessing import Process  # 导入多进程模块</code></pre><h4 id="2-创建类并初始化"><a href="#2-创建类并初始化" class="headerlink" title="2. 创建类并初始化"></a>2. 创建类并初始化</h4><p><strong>初始化出部分需要的属性 方便之后方法的使用</strong><br>port 主机需要绑定的端口</p><pre><code class="python">class WebServer(object):
     BASE_DIR = os.path.join(os.getcwd(), &#39;static&#39;)  # 查询文件夹， 用来查找访问的文件
     RESPONSE_STATUS = {200: &#39;OK&#39;, 404: &#39;Not Found&#39;, 403: &#39;Forbid&#39;}  # 设置响应行可选返回状态码， 只选择了部分做演示
 
@@ -189,12 +12,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
         self.soc = self.create_server(port)  # 初始化socket对象
         self.new_fd: socket.socket = ...  # 方便pycharm提示,防止pycharm报波浪线
         self.request_dict = {}  # 设置空字典， 用于存储处理过后的请求头
-        self.response_dict = [(&#39;Server&#39;, &#39;my_server&#39;), (&#39;Content-Type&#39;, &#39;text/html; charset=utf-8&#39;)]  # 设置响应头，因为可能有多个Set-Cookie， 所以用列表中的元组存储</code></pre>
-<h4 id="3-初始化socket对象-固定四部曲"><a href="#3-初始化socket对象-固定四部曲" class="headerlink" title="3. 初始化socket对象 固定四部曲"></a>3. 初始化socket对象 固定四部曲</h4><ol>
-<li>创建socket对象</li>
-<li>绑定address， ip及端口</li>
-<li>防止服务器异常时， 端口的占用， 影响服务器的重启</li>
-<li>转成监听模式<pre><code class="python"> # 创建socket对象
+        self.response_dict = [(&#39;Server&#39;, &#39;my_server&#39;), (&#39;Content-Type&#39;, &#39;text/html; charset=utf-8&#39;)]  # 设置响应头，因为可能有多个Set-Cookie， 所以用列表中的元组存储</code></pre><h4 id="3-初始化socket对象-固定四部曲"><a href="#3-初始化socket对象-固定四部曲" class="headerlink" title="3. 初始化socket对象 固定四部曲"></a>3. 初始化socket对象 固定四部曲</h4><ol><li>创建socket对象</li><li>绑定address， ip及端口</li><li>防止服务器异常时， 端口的占用， 影响服务器的重启</li><li>转成监听模式<pre><code class="python"> # 创建socket对象
  def create_server(self, port):
      &quot;&quot;&quot;
      用来初始化server对象
@@ -204,12 +22,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
      self.soc.bind((&#39;&#39;, port))  # 绑定套接字到address， 一般为 ip+port， 并且host一般是127.0.0.1或者不填(等内核分配)，一般无权绑定非本机ip
      self.soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # 接续服务器突然宕掉时，端口暂时不能使用的问题
      self.soc.listen(5)  # 转为监听状态 服务器必须
-     return self.soc</code></pre>
-<h4 id="4-多进程接受请求"><a href="#4-多进程接受请求" class="headerlink" title="4. 多进程接受请求"></a>4. 多进程接受请求</h4></li>
-<li>accept() 从缓存中拿出连接描述符 此处为 阻塞IO 加入子进程</li>
-<li>创建子进程 此处为 阻塞IO 在子进程中处理</li>
-<li>开启子进程</li>
-<li>剪掉主进程对描述符的引用<pre><code class="python"> # 开启多进程
+     return self.soc</code></pre><h4 id="4-多进程接受请求"><a href="#4-多进程接受请求" class="headerlink" title="4. 多进程接受请求"></a>4. 多进程接受请求</h4></li><li>accept() 从缓存中拿出连接描述符 此处为 阻塞IO 加入子进程</li><li>创建子进程 此处为 阻塞IO 在子进程中处理</li><li>开启子进程</li><li>剪掉主进程对描述符的引用<pre><code class="python"> # 开启多进程
  def runserver(self):
      &quot;&quot;&quot;
      多进程处理请求
@@ -219,10 +32,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
          self.new_fd, _ = self.soc.accept()  # 从缓存中读取新的请求
          fd = Process(target=self.handler)  # 转到子进程中执行
          fd.start()  # 开启进程
-         self.new_fd.close()  # 去掉主进程引用</code></pre>
-<h4 id="5-接受描述符发送的信息"><a href="#5-接受描述符发送的信息" class="headerlink" title="5. 接受描述符发送的信息"></a>5. 接受描述符发送的信息</h4></li>
-</ol>
-<pre><code class="python">    # 接收请求头
+         self.new_fd.close()  # 去掉主进程引用</code></pre><h4 id="5-接受描述符发送的信息"><a href="#5-接受描述符发送的信息" class="headerlink" title="5. 接受描述符发送的信息"></a>5. 接受描述符发送的信息</h4></li></ol><pre><code class="python">    # 接收请求头
     def handler(self):
         &quot;&quot;&quot;
         处理发送过来的信息
@@ -233,14 +43,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
         if buf:
             new_buf = buf.decode(&#39;utf8&#39;)  # 将二进制数据转成str
             # 解析字符串
-            self._request_handler(new_buf)</code></pre>
-<h4 id="6-处理请求头"><a href="#6-处理请求头" class="headerlink" title="6. 处理请求头"></a>6. 处理请求头</h4><ol>
-<li>处理请求行， 推荐使用 splitlines()进行分割， split(‘\r\n’)在跨平台时不好用</li>
-<li>处理请求体</li>
-<li>获取文件路径</li>
-<li>进行后续处理</li>
-</ol>
-<pre><code class="python">    # 解析请求头
+            self._request_handler(new_buf)</code></pre><h4 id="6-处理请求头"><a href="#6-处理请求头" class="headerlink" title="6. 处理请求头"></a>6. 处理请求头</h4><ol><li>处理请求行， 推荐使用 splitlines()进行分割， split(‘\r\n’)在跨平台时不好用</li><li>处理请求体</li><li>获取文件路径</li><li>进行后续处理</li></ol><pre><code class="python">    # 解析请求头
     def _request_handler(self, data: str):
         &quot;&quot;&quot;
         浏览器请求 格式固定
@@ -262,18 +65,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
         self.filename = self.request_dict[&#39;Path&#39;][1:]  # 获取请求的url
         os.chdir(self.BASE_DIR)  # 改变查找文件
         self._response_handler()
-</code></pre>
-<h4 id="7-拼接及发送响应头"><a href="#7-拼接及发送响应头" class="headerlink" title="7. 拼接及发送响应头"></a>7. 拼接及发送响应头</h4><ol>
-<li><p>等待状态码的返回</p>
-</li>
-<li><p>根据不同状态吗 拼接不同的响应行</p>
-</li>
-<li><p>拼接响应头</p>
-</li>
-<li><p>发送响应头</p>
-</li>
-<li><p>处理响应体</p>
-<pre><code class="python"># 发送响应头
+</code></pre><h4 id="7-拼接及发送响应头"><a href="#7-拼接及发送响应头" class="headerlink" title="7. 拼接及发送响应头"></a>7. 拼接及发送响应头</h4><ol><li><p>等待状态码的返回</p></li><li><p>根据不同状态吗 拼接不同的响应行</p></li><li><p>拼接响应头</p></li><li><p>发送响应头</p></li><li><p>处理响应体</p><pre><code class="python"># 发送响应头
  def _response_handler(self):
 
      &quot;&quot;&quot;
@@ -290,10 +82,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
      self.response = response_head + response_content + response_end
      # 发送请求头信息
      self.new_fd.send(self.response.encode(&#39;utf8&#39;))
-     self.send_response()</code></pre>
-<h4 id="8-判断状态码，简单判断，有资源返回200，没有资源返回404"><a href="#8-判断状态码，简单判断，有资源返回200，没有资源返回404" class="headerlink" title="8. 判断状态码，简单判断，有资源返回200，没有资源返回404"></a>8. 判断状态码，简单判断，有资源返回200，没有资源返回404</h4></li>
-<li><p>判断是否是文件</p>
-<pre><code class="python"> @set_status
+     self.send_response()</code></pre><h4 id="8-判断状态码，简单判断，有资源返回200，没有资源返回404"><a href="#8-判断状态码，简单判断，有资源返回200，没有资源返回404" class="headerlink" title="8. 判断状态码，简单判断，有资源返回200，没有资源返回404"></a>8. 判断状态码，简单判断，有资源返回200，没有资源返回404</h4></li><li><p>判断是否是文件</p><pre><code class="python"> @set_status
  def _check_request(self):
      &quot;&quot;&quot;
      给出返回值， 403用装饰器装饰
@@ -302,12 +91,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
      if os.path.isfile(self.filename):
          return 200
      else:
-         return 404</code></pre>
-<h4 id="9-装饰器添加User-Agent验证"><a href="#9-装饰器添加User-Agent验证" class="headerlink" title="9. 装饰器添加User-Agent验证"></a>9. 装饰器添加User-Agent验证</h4></li>
-<li><p>在类外面定义装饰器函数，</p>
-</li>
-<li><p>进行User-Agent判断</p>
-<pre><code class="python">def set_status(fun):
+         return 404</code></pre><h4 id="9-装饰器添加User-Agent验证"><a href="#9-装饰器添加User-Agent验证" class="headerlink" title="9. 装饰器添加User-Agent验证"></a>9. 装饰器添加User-Agent验证</h4></li><li><p>在类外面定义装饰器函数，</p></li><li><p>进行User-Agent判断</p><pre><code class="python">def set_status(fun):
  &quot;&quot;&quot;
  返回值的装饰器, 增加User-Agent判断代理是否异常， 返回403
  :param fun:
@@ -320,11 +104,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
      else:
          return fun(self, *args, **kwargs)
 
- return change</code></pre>
-<h4 id="10-发送响应体，关闭连接"><a href="#10-发送响应体，关闭连接" class="headerlink" title="10. 发送响应体，关闭连接"></a>10. 发送响应体，关闭连接</h4></li>
-</ol>
-<ul>
-<li>根据不同的返回值，决定如何返回<pre><code class="python">  # 发送响应体内容
+ return change</code></pre><h4 id="10-发送响应体，关闭连接"><a href="#10-发送响应体，关闭连接" class="headerlink" title="10. 发送响应体，关闭连接"></a>10. 发送响应体，关闭连接</h4></li></ol><ul><li>根据不同的返回值，决定如何返回<pre><code class="python">  # 发送响应体内容
   def send_response(self):
       if self.status == 200:
           # 正常访问页面
@@ -335,256 +115,7 @@ from multiprocessing import Process  # 导入多进程模块</code></pre>
           with open(&#39;404.html&#39;, &#39;rb&#39;) as f:
               self.new_fd.send(f.read())
       elif self.status == 403:
-          self.new_fd.send(&#39;ForForForbid&#39;.encode(&#39;utf8&#39;))  # 皮一下</code></pre>
-github上的完整代码 <a href="https://github.com/Dustyposa/segementfault/blob/master/web_server.py" target="_blank" rel="noopener">web_server</a></li>
-</ul>
-
-            </div>
-            <hr>
-            <div>
-              <p>
-                
-                  <span>
-                <i class="iconfont icon-inbox"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/%E6%9C%8D%E5%8A%A1%E5%99%A8/">服务器</a>
-                      &nbsp;
-                    
-                  </span>&nbsp;&nbsp;
-                
-                
-                  <span>
-                <i class="iconfont icon-tag"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/python3/">python3</a>
-                    
-                      <a class="hover-with-bg" href="/tags/server/">server</a>
-                    
-                      <a class="hover-with-bg" href="/tags/socket/">socket</a>
-                    
-                  </span>
-                
-              </p>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
-              
-              
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/04/07/spider-parser/">
-                        <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">python 请求分析及多提取器 提取数据</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </div>
-                  <div class="post-next col-6">
-                    
-                    
-                  </div>
-                </div>
-              
-            </div>
-
-              
-                <!-- Comments -->
-                <div class="comments" id="comments">
-                  
-                  
-
-                </div>
-              
-          </div>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc-start"></div>
-<div id="toc">
-  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
-      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
-<script  src="/js/main.js" ></script>
-
-
-  <script  src="/js/lazyload.js" ></script>
-
-
-
-  
-  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var navHeight = $('#navbar').height();
-      var toc = $('#toc');
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-      var tocLimMax = 2 * boardTop + boardCtn.height();
-
-      $(window).scroll(function () {
-        var tocLimMin = $('#toc-start').offset().top - navHeight;
-        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
-
-        if (tocLimMin <= scroH && scroH <= tocLimMax) {
-          toc.css({
-            'display': 'block',
-            'position': 'fixed',
-            'top': navHeight,
-          });
-        } else if (scroH <= tocLimMin) {
-          toc.css({
-            'position': '',
-            'top': '',
-          });
-        } else if (scroH > tocLimMax) {
-          toc.css('display', 'none');
-        }
-      });
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '.post-content',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc > p').css('visibility', 'visible');
-      }
-      var offset = boardCtn.css('margin-right')
-      $('#toc-ctn').css({
-        'right': offset
-      })
-    });
-  </script>
-
-
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-
-<!-- Plugins -->
-
-
-
-  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      $('pre').addClass('prettyprint  ');
-      prettyPrint();
-    })
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "python 编写多进程 socket web静态服务器&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
+          self.new_fd.send(&#39;ForForForbid&#39;.encode(&#39;utf8&#39;))  # 皮一下</code></pre>github上的完整代码 <a href="https://github.com/Dustyposa/segementfault/blob/master/web_server.py" target="_blank" rel="noopener">web_server</a></li></ul></div><hr><div><p><span><i class="iconfont icon-inbox"></i> <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a> &nbsp; <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/%E6%9C%8D%E5%8A%A1%E5%99%A8/">服务器</a> &nbsp; </span>&nbsp;&nbsp; <span><i class="iconfont icon-tag"></i> <a class="hover-with-bg" href="/tags/python3/">python3</a> <a class="hover-with-bg" href="/tags/server/">server</a> <a class="hover-with-bg" href="/tags/socket/">socket</a></span></p><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"><a href="/2020/04/07/spider-parser/"><i class="fa fa-chevron-left"></i> <span class="hidden-mobile">python 请求分析及多提取器 提取数据</span> <span class="visible-mobile">上一篇</span></a></div><div class="post-next col-6"></div></div></div><div class="comments" id="comments"></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc-start"></div><div id="toc"><p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a class="z-depth-1" id="scroll-top-button" href="#" role="button"><i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><b>Fluid</b></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js"></script><script>$(document).ready(function(){var s=$("#navbar").height(),c=$("#toc"),t=$("#board-ctn"),o=t.offset().top,i=2*o+t.height();$(window).scroll(function(){var t=$("#toc-start").offset().top-s,o=document.body.scrollTop+document.documentElement.scrollTop;t<=o&&o<=i?c.css({display:"block",position:"fixed",top:s}):o<=t?c.css({position:"",top:""}):i<o&&c.css("display","none")}),tocbot.init({tocSelector:"#tocbot",contentSelector:".post-content",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",scrollSmooth:!0,headingsOffset:-o}),0<$(".toc-list-item").length&&$("#toc > p").css("visibility","visible");var l=t.css("margin-right");$("#toc-ctn").css({right:l})})</script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js"></script><script>$(document).ready(function(){$("pre").addClass("prettyprint  "),prettyPrint()})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","python 编写多进程 socket web静态服务器&nbsp;"],cursorChar:"_",typeSpeed:70,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
       placement: "right",
       visible: "hover",
       
@@ -594,45 +125,4 @@ github上的完整代码 <a href="https://github.com/Dustyposa/segementfault/blo
     for (item of el) {
       res.push(".markdown-body > " + item)
     }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      getSearchFile(path);
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <script>
-    $("#post img:not(.no-zoom img, img[no-zoom])").each(
-      function () {
-        var element = document.createElement("a");
-        $(element).attr("data-fancybox", "images");
-        $(element).attr("href", $(this).attr("src"));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+    anchors.add(res.join(", "))</script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){getSearchFile(path),this.onclick=null}</script><script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><script>$("#post img:not(.no-zoom img, img[no-zoom])").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>

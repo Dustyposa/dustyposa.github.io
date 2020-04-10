@@ -1,212 +1,5 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-
-
-
-
-
-<head>
-  <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.png">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="一些经验的记录。">
-  <meta name="author" content="Dusty Posa">
-  <meta name="keywords" content="python,python3,process,script">
-  <title>python 请求分析及多提取器 提取数据 - Posaのにわ</title>
-
-  <link  rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css" />
-<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css" />
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
-
-
-
-  <link  rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css" />
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-
-  <link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-
-<!-- 自定义样式保持在最底部 -->
-
-
-<meta name="generator" content="Hexo 4.2.0"></head>
-
-
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a>
-
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
-
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/">首页</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/archives/">归档</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/categories/">分类</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/tags/">标签</a>
-          </li>
-        
-          
-          
-          
-          
-          <li class="nav-item">
-            <a class="nav-link" href="/about/">关于</a>
-          </li>
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-    <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/default.png') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask rgba-black-light flex-center">
-          <div class="container text-center white-text fadeInUp">
-            <span class="h2" id="subtitle">
-              
-            </span>
-
-            
-              
-                <p class="mt-3 post-meta">
-                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                  星期二, 四月 7日 2020, 9:15 上午
-                </p>
-              
-
-              <p class="mt-1">
-                
-                  
-                  <span class="post-meta">
-                    <i class="far fa-chart-bar"></i>
-                    4.4k 字
-                  </span>
-                
-
-                
-                  
-                  <span class="post-meta">
-                      <i class="far fa-clock"></i>
-                      20 分钟
-                  </span>
-                
-
-                
-              </p>
-            
-          </div>
-
-          
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-md">
-      <div class="container nopadding-md" id="board-ctn">
-        <div class="py-5 z-depth-3" id="board">
-          <div class="post-content mx-auto" id="post">
-            
-            <div class="markdown-body">
-              <h1 id="豆瓣电影的多方法解析"><a href="#豆瓣电影的多方法解析" class="headerlink" title="豆瓣电影的多方法解析"></a>豆瓣电影的多方法解析</h1><p><a href="https://movie.douban.com/tag/Top100" target="_blank" rel="noopener">豆瓣top100</a></p>
-<p>本项目主要是数据提取的练习,提供了5种数据提取的方式.</p>
-<h3 id="1-分析网页-需要的数据请求地址分析"><a href="#1-分析网页-需要的数据请求地址分析" class="headerlink" title="1. 分析网页  # 需要的数据请求地址分析"></a>1. <a href="#1-分析网页确认爬取目标的数据类型">分析网页</a>  # 需要的数据请求地址分析</h3><h3 id="2-正则提取-正则提取所须数据"><a href="#2-正则提取-正则提取所须数据" class="headerlink" title="2. 正则提取  # 正则提取所须数据"></a>2. <a href="#1-正则提取">正则提取</a>  # 正则提取所须数据</h3><h3 id="3-Css选择器提取-利用BeautifulSoup4-进行提取"><a href="#3-Css选择器提取-利用BeautifulSoup4-进行提取" class="headerlink" title="3. Css选择器提取  # 利用BeautifulSoup4 进行提取"></a>3. <a href="#2-beautifulsoup-css选择器-提取">Css选择器提取</a>  # 利用BeautifulSoup4 进行提取</h3><h3 id="4-Xpath选择器提取-利用lxml的etree模块进行xpath提取"><a href="#4-Xpath选择器提取-利用lxml的etree模块进行xpath提取" class="headerlink" title="4. Xpath选择器提取  # 利用lxml的etree模块进行xpath提取"></a>4. <a href="#3-xpath-提取">Xpath选择器提取</a>  # 利用lxml的etree模块进行xpath提取</h3><h3 id="5-jQuery提取-有前端的知识的朋友应该很熟悉-利用的是pyquery模块-节点选择语法与jQuery一致"><a href="#5-jQuery提取-有前端的知识的朋友应该很熟悉-利用的是pyquery模块-节点选择语法与jQuery一致" class="headerlink" title="5. jQuery提取  # 有前端的知识的朋友应该很熟悉,利用的是pyquery模块,节点选择语法与jQuery一致"></a>5. <a href="#4-pyquery-的数据提取">jQuery提取</a>  # 有前端的知识的朋友应该很熟悉,利用的是pyquery模块,节点选择语法与jQuery一致</h3><h3 id="6-Scrapy-parsel-混合提取器-利用scrapy的Selector模块进行混合提取"><a href="#6-Scrapy-parsel-混合提取器-利用scrapy的Selector模块进行混合提取" class="headerlink" title="6. Scrapy/parsel 混合提取器  # 利用scrapy的Selector模块进行混合提取"></a>6. <a href="#5-scrapy-混合提取">Scrapy/parsel 混合提取器</a>  # 利用scrapy的Selector模块进行混合提取</h3><h3 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. <a href="#总结">总结</a></h3><h4 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a><a href="./douban_spider.ipynb">完整代码</a></h4><h3 id="1-分析网页，确认爬取目标的数据类型。"><a href="#1-分析网页，确认爬取目标的数据类型。" class="headerlink" title="1. 分析网页，确认爬取目标的数据类型。"></a>1. 分析网页，确认爬取目标的数据类型。</h3><ul>
-<li><h4 id="打开-目标url-定位数据位置"><a href="#打开-目标url-定位数据位置" class="headerlink" title="打开 目标url, 定位数据位置"></a>打开 <a href="https://movie.douban.com/tag/Top100" target="_blank" rel="noopener">目标url</a>, 定位数据位置</h4><img src="https://img-blog.csdnimg.cn/2019090309464243.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="首页"></li>
-<li><h4 id="定位需要的数据位置，查看爬取目标。"><a href="#定位需要的数据位置，查看爬取目标。" class="headerlink" title="定位需要的数据位置，查看爬取目标。"></a>定位需要的数据位置，查看爬取目标。</h4> <img src="https://img-blog.csdnimg.cn/20190903094719997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="数据源"><br> 由图可得，我们需要的数据分别为，[‘海报’, ‘电影名’, ‘上映日期’, ‘演员’, ‘评分’, ‘评价人数’]</li>
-<li><h4 id="查看请求，分析数据来源请求（F12-gt-gt-network-打开请求界面，如下图）"><a href="#查看请求，分析数据来源请求（F12-gt-gt-network-打开请求界面，如下图）" class="headerlink" title="查看请求，分析数据来源请求（F12 &gt;&gt; network 打开请求界面，如下图）"></a>查看请求，分析数据来源请求（F12 &gt;&gt; network 打开请求界面，如下图）</h4><img src="https://img-blog.csdnimg.cn/20190903094745651.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="抓包"> </li>
-<li><h4 id="确认数据请求来源-Ctrl-F-搜索-辛德勒"><a href="#确认数据请求来源-Ctrl-F-搜索-辛德勒" class="headerlink" title="确认数据请求来源(Ctrl + F 搜索: 辛德勒)"></a>确认数据请求来源(Ctrl + F 搜索: 辛德勒)</h4> <img src="https://img-blog.csdnimg.cn/20190903094815715.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="定位请求"><br> 上图可知，该请求只有一个，所以就能轻松的确定来源拉！ </li>
-<li><h4 id="查看headers，分析请求报文"><a href="#查看headers，分析请求报文" class="headerlink" title="查看headers，分析请求报文"></a>查看headers，分析请求报文</h4><img src="https://img-blog.csdnimg.cn/2019090309491356.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"><br> 分析结果如图，所以我们可以得出以下结论：  </li>
-</ul>
-<table>
-<thead>
-<tr>
-<th align="left">信息</th>
-<th>结果</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">请求地址</td>
-<td><a href="https://movie.douban.com/tag/Top100" target="_blank" rel="noopener">https://movie.douban.com/tag/Top100</a></td>
-</tr>
-<tr>
-<td align="left">请求方法</td>
-<td>Get</td>
-</tr>
-<tr>
-<td align="left">响应格式</td>
-<td>text 文本</td>
-</tr>
-<tr>
-<td align="left">编码</td>
-<td>UTF-8</td>
-</tr>
-</tbody></table>
-<h2 id="2-利用requests进行请求测试"><a href="#2-利用requests进行请求测试" class="headerlink" title="2. 利用requests进行请求测试"></a>2. 利用requests进行请求测试</h2><p><code>requests.get</code><br>定义请求函数，<code>get_data</code><br>返回<code>text</code>数据  </p>
-<p>模块导入</p>
-<pre><code class="python">&gt;&gt;&gt; import requests
-&gt;&gt;&gt; from requests.exceptions import HTTPError</code></pre>
-<pre><code class="python">def get_data(url):
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="一些经验的记录。"><meta name="author" content="Dusty Posa"><meta name="keywords" content="python,python3,process,script"><title>python 请求分析及多提取器 提取数据 - Posaのにわ</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.0"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(/img/default.png) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期二, 四月 7日 2020, 9:15 上午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 4.4k 字 </span><span class="post-meta"><i class="far fa-clock"></i> 20 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><div class="markdown-body"><h1 id="豆瓣电影的多方法解析"><a href="#豆瓣电影的多方法解析" class="headerlink" title="豆瓣电影的多方法解析"></a>豆瓣电影的多方法解析</h1><p><a href="https://movie.douban.com/tag/Top100" target="_blank" rel="noopener">豆瓣top100</a></p><p>本项目主要是数据提取的练习,提供了5种数据提取的方式.</p><h3 id="1-分析网页-需要的数据请求地址分析"><a href="#1-分析网页-需要的数据请求地址分析" class="headerlink" title="1. 分析网页  # 需要的数据请求地址分析"></a>1. <a href="#1-分析网页确认爬取目标的数据类型">分析网页</a> # 需要的数据请求地址分析</h3><h3 id="2-正则提取-正则提取所须数据"><a href="#2-正则提取-正则提取所须数据" class="headerlink" title="2. 正则提取  # 正则提取所须数据"></a>2. <a href="#1-正则提取">正则提取</a> # 正则提取所须数据</h3><h3 id="3-Css选择器提取-利用BeautifulSoup4-进行提取"><a href="#3-Css选择器提取-利用BeautifulSoup4-进行提取" class="headerlink" title="3. Css选择器提取  # 利用BeautifulSoup4 进行提取"></a>3. <a href="#2-beautifulsoup-css选择器-提取">Css选择器提取</a> # 利用BeautifulSoup4 进行提取</h3><h3 id="4-Xpath选择器提取-利用lxml的etree模块进行xpath提取"><a href="#4-Xpath选择器提取-利用lxml的etree模块进行xpath提取" class="headerlink" title="4. Xpath选择器提取  # 利用lxml的etree模块进行xpath提取"></a>4. <a href="#3-xpath-提取">Xpath选择器提取</a> # 利用lxml的etree模块进行xpath提取</h3><h3 id="5-jQuery提取-有前端的知识的朋友应该很熟悉-利用的是pyquery模块-节点选择语法与jQuery一致"><a href="#5-jQuery提取-有前端的知识的朋友应该很熟悉-利用的是pyquery模块-节点选择语法与jQuery一致" class="headerlink" title="5. jQuery提取  # 有前端的知识的朋友应该很熟悉,利用的是pyquery模块,节点选择语法与jQuery一致"></a>5. <a href="#4-pyquery-的数据提取">jQuery提取</a> # 有前端的知识的朋友应该很熟悉,利用的是pyquery模块,节点选择语法与jQuery一致</h3><h3 id="6-Scrapy-parsel-混合提取器-利用scrapy的Selector模块进行混合提取"><a href="#6-Scrapy-parsel-混合提取器-利用scrapy的Selector模块进行混合提取" class="headerlink" title="6. Scrapy/parsel 混合提取器  # 利用scrapy的Selector模块进行混合提取"></a>6. <a href="#5-scrapy-混合提取">Scrapy/parsel 混合提取器</a> # 利用scrapy的Selector模块进行混合提取</h3><h3 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. <a href="#总结">总结</a></h3><h4 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a><a href="./douban_spider.ipynb">完整代码</a></h4><h3 id="1-分析网页，确认爬取目标的数据类型。"><a href="#1-分析网页，确认爬取目标的数据类型。" class="headerlink" title="1. 分析网页，确认爬取目标的数据类型。"></a>1. 分析网页，确认爬取目标的数据类型。</h3><ul><li><h4 id="打开-目标url-定位数据位置"><a href="#打开-目标url-定位数据位置" class="headerlink" title="打开 目标url, 定位数据位置"></a>打开 <a href="https://movie.douban.com/tag/Top100" target="_blank" rel="noopener">目标url</a>, 定位数据位置</h4><img src="https://img-blog.csdnimg.cn/2019090309464243.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="首页"></li><li><h4 id="定位需要的数据位置，查看爬取目标。"><a href="#定位需要的数据位置，查看爬取目标。" class="headerlink" title="定位需要的数据位置，查看爬取目标。"></a>定位需要的数据位置，查看爬取目标。</h4><img src="https://img-blog.csdnimg.cn/20190903094719997.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="数据源"><br>由图可得，我们需要的数据分别为，[‘海报’, ‘电影名’, ‘上映日期’, ‘演员’, ‘评分’, ‘评价人数’]</li><li><h4 id="查看请求，分析数据来源请求（F12-gt-gt-network-打开请求界面，如下图）"><a href="#查看请求，分析数据来源请求（F12-gt-gt-network-打开请求界面，如下图）" class="headerlink" title="查看请求，分析数据来源请求（F12 &gt;&gt; network 打开请求界面，如下图）"></a>查看请求，分析数据来源请求（F12 &gt;&gt; network 打开请求界面，如下图）</h4><img src="https://img-blog.csdnimg.cn/20190903094745651.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="抓包"></li><li><h4 id="确认数据请求来源-Ctrl-F-搜索-辛德勒"><a href="#确认数据请求来源-Ctrl-F-搜索-辛德勒" class="headerlink" title="确认数据请求来源(Ctrl + F 搜索: 辛德勒)"></a>确认数据请求来源(Ctrl + F 搜索: 辛德勒)</h4><img src="https://img-blog.csdnimg.cn/20190903094815715.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="定位请求"><br>上图可知，该请求只有一个，所以就能轻松的确定来源拉！</li><li><h4 id="查看headers，分析请求报文"><a href="#查看headers，分析请求报文" class="headerlink" title="查看headers，分析请求报文"></a>查看headers，分析请求报文</h4><img src="https://img-blog.csdnimg.cn/2019090309491356.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"><br>分析结果如图，所以我们可以得出以下结论：</li></ul><table><thead><tr><th align="left">信息</th><th>结果</th></tr></thead><tbody><tr><td align="left">请求地址</td><td><a href="https://movie.douban.com/tag/Top100" target="_blank" rel="noopener">https://movie.douban.com/tag/Top100</a></td></tr><tr><td align="left">请求方法</td><td>Get</td></tr><tr><td align="left">响应格式</td><td>text 文本</td></tr><tr><td align="left">编码</td><td>UTF-8</td></tr></tbody></table><h2 id="2-利用requests进行请求测试"><a href="#2-利用requests进行请求测试" class="headerlink" title="2. 利用requests进行请求测试"></a>2. 利用requests进行请求测试</h2><p><code>requests.get</code><br>定义请求函数，<code>get_data</code><br>返回<code>text</code>数据</p><p>模块导入</p><pre><code class="python">&gt;&gt;&gt; import requests
+&gt;&gt;&gt; from requests.exceptions import HTTPError</code></pre><pre><code class="python">def get_data(url):
 
     response = requests.get(url)
     if response.status_code == requests.codes.ok:  # 检测状态码
@@ -217,32 +10,11 @@
  url = &quot;https://movie.douban.com/tag/Top100&quot;
 data = get_data(url)  # 获取数据
 data_res = {}  # 存储数据的初始化字典
-data # 查看数据</code></pre>
-<pre><code>&lt;!DOCTYPE html&gt;
+data # 查看数据</code></pre><pre><code>&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;zh-cmn-Hans&quot; class=&quot;ua-windows ua-webkit&quot;&gt;
 &lt;head&gt;
     &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
-......</code></pre><h2 id="3-提取数据"><a href="#3-提取数据" class="headerlink" title="3. 提取数据"></a>3. 提取数据</h2><ul>
-<li>正则提取</li>
-<li>BeautifulSoup 提取</li>
-<li>Xpath 提取</li>
-<li>pyquery 提取</li>
-<li>scrapy 混合提取</li>
-</ul>
-<h3 id="1-正则提取"><a href="#1-正则提取" class="headerlink" title="1. 正则提取"></a>1. 正则提取</h3><ul>
-<li>观察数据位置<br><img src="https://img-blog.csdnimg.cn/20190903094936617.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="正则数据位置"></li>
-</ul>
-<p>导入模块</p>
-<pre><code class="python">&gt;&gt;&gt; import re</code></pre>
-<h3 id="提取-海报地址以及电影名称"><a href="#提取-海报地址以及电影名称" class="headerlink" title="提取 海报地址以及电影名称"></a>提取 海报地址以及电影名称</h3><p><strong>通过查看该请求的响应内容快速进行复制匹配,如下图搜索:</strong><br><img src="https://img-blog.csdnimg.cn/20190903094959517.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="正则获取数据"><br>用到的匹配规则提示:</p>
-<ul>
-<li>“.” 表示任意非空格换行等字符</li>
-<li>“.*?”  表示贪婪匹配,最少匹配一次</li>
-<li>“()”  表示提取()中的内容</li>
-<li>“\w” 表示正常字符,比如英文字母,中文等常见文字</li>
-<li>“.+”  表示至少匹配一次任意字符</li>
-</ul>
-<pre><code class="python">&gt;&gt;&gt; # 设置提取表达式 
+......</code></pre><h2 id="3-提取数据"><a href="#3-提取数据" class="headerlink" title="3. 提取数据"></a>3. 提取数据</h2><ul><li>正则提取</li><li>BeautifulSoup 提取</li><li>Xpath 提取</li><li>pyquery 提取</li><li>scrapy 混合提取</li></ul><h3 id="1-正则提取"><a href="#1-正则提取" class="headerlink" title="1. 正则提取"></a>1. 正则提取</h3><ul><li>观察数据位置<br><img src="https://img-blog.csdnimg.cn/20190903094936617.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="正则数据位置"></li></ul><p>导入模块</p><pre><code class="python">&gt;&gt;&gt; import re</code></pre><h3 id="提取-海报地址以及电影名称"><a href="#提取-海报地址以及电影名称" class="headerlink" title="提取 海报地址以及电影名称"></a>提取 海报地址以及电影名称</h3><p><strong>通过查看该请求的响应内容快速进行复制匹配,如下图搜索:</strong><br><img src="https://img-blog.csdnimg.cn/20190903094959517.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="正则获取数据"><br>用到的匹配规则提示:</p><ul><li>“.” 表示任意非空格换行等字符</li><li>“.*?” 表示贪婪匹配,最少匹配一次</li><li>“()” 表示提取()中的内容</li><li>“\w” 表示正常字符,比如英文字母,中文等常见文字</li><li>“.+” 表示至少匹配一次任意字符</li></ul><pre><code class="python">&gt;&gt;&gt; # 设置提取表达式 
 &gt;&gt;&gt; poster_pattern = re.compile(r&quot;&quot;&quot;&lt;a class=&quot;nbg&quot; href=&quot;.*?&quot;  title=&quot;.*?&quot;&gt;.*?&lt;img src=&quot;(.*?)&quot; width=&quot;75&quot; alt=&quot;(.*?)&quot; class=&quot;&quot;/&gt;.*?&lt;/a&gt;&quot;&quot;&quot;, re.S)  # 海报的正则表达式
 &gt;&gt;&gt; movie_name_pattern = re.compile(r&quot;&quot;&quot; &lt;div class=&quot;pl2&quot;&gt;.*? &lt;a href=&quot;.*?&quot;  class=&quot;&quot;&gt;.*?(\w+).*?&lt;span style=&quot;font-size:13px;&quot;&gt;(.*?)&lt;/span&gt;.*?&lt;/a&gt;&quot;&quot;&quot;, re.S)  # 电影名正则表达式
 &gt;&gt;&gt; poster_res = re.findall(poster_pattern, data)  # 获取所有匹配结果
@@ -256,12 +28,8 @@ data # 查看数据</code></pre>
 [(&#39;辛德勒的名单&#39;, &#39;舒特拉的名单(港) / 辛德勒名单&#39;),
 (&#39;狩猎&#39;, &#39;谎言的烙印(台) / 诬网(港)&#39;),
 (&#39;美国往事&#39;, &#39;四海兄弟(台) / 义薄云天(港)&#39;),
-......</code></pre>
-<p><strong>查看结果好像没什么问题, 我们用长度比较来看看数量是否一致</strong></p>
-<pre><code class="python">&gt;&gt;&gt; len(poster_res) == len(movie_name_res)
-True</code></pre>
-<p><strong>长度一致,看来匹配规则在这里没问题</strong><br>我们将提取到的数据存储到我们的数据结构<code>data_res</code>中</p>
-<pre><code class="python">for poster, movie_name in zip(poster_res, movie_name_res):  # 压缩遍历
+......</code></pre><p><strong>查看结果好像没什么问题, 我们用长度比较来看看数量是否一致</strong></p><pre><code class="python">&gt;&gt;&gt; len(poster_res) == len(movie_name_res)
+True</code></pre><p><strong>长度一致,看来匹配规则在这里没问题</strong><br>我们将提取到的数据存储到我们的数据结构<code>data_res</code>中</p><pre><code class="python">for poster, movie_name in zip(poster_res, movie_name_res):  # 压缩遍历
     # 进行名称验证，是否对应,
     name1 = poster[1]
     name2 = movie_name[0]
@@ -270,8 +38,7 @@ True</code></pre>
         tmp_dict.update({&quot;poster&quot;: poster[0]})  # 字典更新
         tmp_dict.update({&quot;else_name&quot;: movie_name[1]})  # 字典更新
         data_res[name1] = tmp_dict
-data_res</code></pre>
-<pre><code>{
+data_res</code></pre><pre><code>{
 &#39;辛德勒的名单&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p492406163.jpg&#39;,
   &#39;else_name&#39;: &#39;舒特拉的名单(港) / 辛德勒名单&#39;},
  &#39;狩猎&#39;: {&#39;poster&#39;: &#39;https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1546987967.jpg&#39;,
@@ -280,12 +47,9 @@ data_res</code></pre>
   &#39;else_name&#39;: &#39;四海兄弟(台) / 义薄云天(港)&#39;},
  &#39;十二怒汉&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2173577632.jpg&#39;,
  ......
- }</code></pre><p><strong>我们用同样的方法,提取其他需要的数据</strong><br><strong><em>这里有个小技巧,用额外的字段来得到唯一匹配, 如下图:</em></strong><br>需要的数据:<br><img src="https://img-blog.csdnimg.cn/20190903095020573.png" srcset="/img/loading.gif" alt="unique1"><br>额外数据匹配:<br><img src="https://img-blog.csdnimg.cn/20190903095034683.png" srcset="/img/loading.gif" alt="unique2"></p>
-<h4 id="整体提取"><a href="#整体提取" class="headerlink" title="整体提取"></a>整体提取</h4><p><strong>由于所有数据都集中在一个块，如下图：</strong><br><img src="https://img-blog.csdnimg.cn/20190903095100811.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"><br>所有我们就一次性全部提取，方便数据的收集.<br>由于有些是电影值有一个年份，所以匹配不好匹配，我们匹配整体后利用”/“进行分割再挑选.<br><em>PS: 其实正则匹配这种很多字段的容易出错，换行之类的字符容易忘记替代，所以建议一点一点的增加匹配表达式的长度.</em></p>
-<pre><code class="python">&gt;&gt;&gt; total_pattern = re.compile(&quot;&quot;&quot;&lt;p class=&quot;ul&quot;&gt;.*?&lt;a class=&quot;nbg&quot; href=&quot;.*?&quot;  title=&quot;(.*?)&quot;&gt;.*?&lt;img src=&quot;(.*?)&quot; width=&quot;75&quot;.*?&lt;div class=&quot;pl2&quot;&gt;.*?&lt;a href=&quot;.*?&quot;  class=&quot;&quot;&gt;.*?(\w+).*?style=&quot;font-size:13px;&quot;&gt;(.*?)&lt;/span&gt;.*?class=&quot;pl&quot;&gt;(.*?)&lt;/p&gt;.*?class=&quot;star clearfix&quot;&gt;.*?&quot;allstar45&quot;&gt;&lt;/span&gt;.*?&quot;rating_nums&quot;&gt;(.*?)&lt;/span&gt;.*?&lt;span class=&quot;pl&quot;&gt;\((.*?)\)&lt;/span&gt;.*?&lt;div id=&quot;.*?&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;, re.S)
+ }</code></pre><p><strong>我们用同样的方法,提取其他需要的数据</strong><br><strong><em>这里有个小技巧,用额外的字段来得到唯一匹配, 如下图:</em></strong><br>需要的数据:<br><img src="https://img-blog.csdnimg.cn/20190903095020573.png" srcset="/img/loading.gif" alt="unique1"><br>额外数据匹配:<br><img src="https://img-blog.csdnimg.cn/20190903095034683.png" srcset="/img/loading.gif" alt="unique2"></p><h4 id="整体提取"><a href="#整体提取" class="headerlink" title="整体提取"></a>整体提取</h4><p><strong>由于所有数据都集中在一个块，如下图：</strong><br><img src="https://img-blog.csdnimg.cn/20190903095100811.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2R1c3R5cG9zYQ==,size_16,color_FFFFFF,t_70" srcset="/img/loading.gif" alt="在这里插入图片描述"><br>所有我们就一次性全部提取，方便数据的收集.<br>由于有些是电影值有一个年份，所以匹配不好匹配，我们匹配整体后利用”/“进行分割再挑选.<br><em>PS: 其实正则匹配这种很多字段的容易出错，换行之类的字符容易忘记替代，所以建议一点一点的增加匹配表达式的长度.</em></p><pre><code class="python">&gt;&gt;&gt; total_pattern = re.compile(&quot;&quot;&quot;&lt;p class=&quot;ul&quot;&gt;.*?&lt;a class=&quot;nbg&quot; href=&quot;.*?&quot;  title=&quot;(.*?)&quot;&gt;.*?&lt;img src=&quot;(.*?)&quot; width=&quot;75&quot;.*?&lt;div class=&quot;pl2&quot;&gt;.*?&lt;a href=&quot;.*?&quot;  class=&quot;&quot;&gt;.*?(\w+).*?style=&quot;font-size:13px;&quot;&gt;(.*?)&lt;/span&gt;.*?class=&quot;pl&quot;&gt;(.*?)&lt;/p&gt;.*?class=&quot;star clearfix&quot;&gt;.*?&quot;allstar45&quot;&gt;&lt;/span&gt;.*?&quot;rating_nums&quot;&gt;(.*?)&lt;/span&gt;.*?&lt;span class=&quot;pl&quot;&gt;\((.*?)\)&lt;/span&gt;.*?&lt;div id=&quot;.*?&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;, re.S)
 &gt;&gt;&gt; res = re.findall(total_pattern, data)
-&gt;&gt;&gt; res</code></pre>
-<pre><code>[
+&gt;&gt;&gt; res</code></pre><pre><code>[
 (&#39;狩猎&#39;,
   &#39;https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1546987967.jpg&#39;,
   &#39;狩猎&#39;,
@@ -297,8 +61,7 @@ data_res</code></pre>
   &#39;https://img1.doubanio.com/view/photo/s_ratio_poster/public/p477229647.jpg&#39;,
   &#39;美国往事&#39;,
 ......
-]</code></pre><h4 id="观察整体数据情况，提取数据"><a href="#观察整体数据情况，提取数据" class="headerlink" title="观察整体数据情况，提取数据"></a>观察整体数据情况，提取数据</h4><p><img src="https://img-blog.csdnimg.cn/20190903095121985.png" srcset="/img/loading.gif" alt="处理时间"></p>
-<pre><code class="python">def get_time_actor(data):
+]</code></pre><h4 id="观察整体数据情况，提取数据"><a href="#观察整体数据情况，提取数据" class="headerlink" title="观察整体数据情况，提取数据"></a>观察整体数据情况，提取数据</h4><p><img src="https://img-blog.csdnimg.cn/20190903095121985.png" srcset="/img/loading.gif" alt="处理时间"></p><pre><code class="python">def get_time_actor(data):
     &quot;&quot;&quot;
     获取处理后的时间和演员数据
     :param data: 
@@ -311,8 +74,7 @@ data_res</code></pre>
             ind += 1
         else:
             break
-        return tmp_data[:ind], tmp_data[ind:]</code></pre>
-<pre><code class="python">for tmp_data in res:
+        return tmp_data[:ind], tmp_data[ind:]</code></pre><pre><code class="python">for tmp_data in res:
     tmp = data_res.get(tmp_data[0], {})  # 获取原来的字典数据
     if tmp_data[0] == tmp_data[2]:  # 检测数据是否对齐
         tmp.update({&quot;movie_name&quot;: tmp_data[0], &quot;poster_url&quot;: tmp_data[1], &quot;other_name&quot;: tmp_data[3], &quot;score&quot;: float(tmp_data[-2]), &quot;comment_people&quot;: tmp_data[-1].replace(&quot;人评价&quot;, &quot;&quot;)})  # 更新数据
@@ -321,29 +83,15 @@ data_res</code></pre>
         data_res[tmp_data[0]] = tmp
     else:
         print(&quot;数据有误&quot;)
-print(data_res)</code></pre>
-<pre><code>    {
+print(data_res)</code></pre><pre><code>    {
     &#39;辛德勒的名单&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p492406163.jpg&#39;, &#39;else_name&#39;: &#39;舒特拉的名单(港) / 辛德勒名单&#39;}, &#39;狩猎&#39;: {&#39;poster&#39;: &#39;https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1546987967.jpg&#39;, &#39;else_name&#39;: &#39;谎言的烙印(台) / 诬网(港)&#39;, &#39;movie_name&#39;: &#39;狩猎&#39;, &#39;poster_url&#39;: &#39;https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1546987967.jpg&#39;, &#39;other_name&#39;: &#39;谎言的烙印(台) / 诬网(港)&#39;,
     .....
-    }</code></pre><h2 id="2-BeautifulSoup-（css选择器）-提取"><a href="#2-BeautifulSoup-（css选择器）-提取" class="headerlink" title="2. BeautifulSoup （css选择器） 提取"></a>2. BeautifulSoup （css选择器） 提取</h2><p>导入模块</p>
-<pre><code class="python">&gt;&gt;&gt; from bs4 import BeautifulSoup</code></pre>
-<pre><code class="python">&gt;&gt;&gt; soup = BeautifulSoup(data, &quot;lxml&quot;)  # 初始化soup对象</code></pre>
-<h4 id="利用css选择器逐一获取数据"><a href="#利用css选择器逐一获取数据" class="headerlink" title="利用css选择器逐一获取数据"></a>利用css选择器逐一获取数据</h4><p><strong>poster</strong>: <code>&quot;.nbg img&quot;</code><br><strong>movie_name</strong>: <code>&quot;.pl2 a&quot;</code><br><strong>time_actor</strong>: <code>&quot;.pl2 p.pl&quot;</code><br><strong>score</strong>: <code>&quot;.rating_nums&quot;</code><br><strong>comment_people</strong>: <code>&quot;.star.clearfix .pl&quot;</code>   </p>
-<p><strong><em>PS:</em></strong>  </p>
-<ul>
-<li>“.” 表示class </li>
-<li>“ “表示子孙节点  </li>
-<li>img 就是img节点  </li>
-<li>a 就是a节点</li>
-<li>“#abd” 表示 id=”abc”的节点</li>
-</ul>
-<pre><code class="python">&gt;&gt;&gt; poster = soup.select(&quot;.nbg img&quot;)  # 海报
+    }</code></pre><h2 id="2-BeautifulSoup-（css选择器）-提取"><a href="#2-BeautifulSoup-（css选择器）-提取" class="headerlink" title="2. BeautifulSoup （css选择器） 提取"></a>2. BeautifulSoup （css选择器） 提取</h2><p>导入模块</p><pre><code class="python">&gt;&gt;&gt; from bs4 import BeautifulSoup</code></pre><pre><code class="python">&gt;&gt;&gt; soup = BeautifulSoup(data, &quot;lxml&quot;)  # 初始化soup对象</code></pre><h4 id="利用css选择器逐一获取数据"><a href="#利用css选择器逐一获取数据" class="headerlink" title="利用css选择器逐一获取数据"></a>利用css选择器逐一获取数据</h4><p><strong>poster</strong>: <code>&quot;.nbg img&quot;</code><br><strong>movie_name</strong>: <code>&quot;.pl2 a&quot;</code><br><strong>time_actor</strong>: <code>&quot;.pl2 p.pl&quot;</code><br><strong>score</strong>: <code>&quot;.rating_nums&quot;</code><br><strong>comment_people</strong>: <code>&quot;.star.clearfix .pl&quot;</code></p><p><strong><em>PS:</em></strong></p><ul><li>“.” 表示class</li><li>“ “表示子孙节点</li><li>img 就是img节点</li><li>a 就是a节点</li><li>“#abd” 表示 id=”abc”的节点</li></ul><pre><code class="python">&gt;&gt;&gt; poster = soup.select(&quot;.nbg img&quot;)  # 海报
 &gt;&gt;&gt; movie_name = soup.select(&quot;.pl2 a&quot;)  # 电影名称
 &gt;&gt;&gt; time_actor = soup.select(&quot;.pl2 p.pl&quot;)  # 上映时间及演员
 &gt;&gt;&gt; score = soup.select(&quot;.rating_nums&quot;)  # 电影评分
 &gt;&gt;&gt; comment_people = soup.select(&quot;.star.clearfix .pl&quot;)  # 评分人数
-&gt;&gt;&gt; movie_data = {}  # 存储结构</code></pre>
-<h4 id="批量获取数据"><a href="#批量获取数据" class="headerlink" title="批量获取数据"></a>批量获取数据</h4><pre><code class="python">for p, m, t, s, c in zip(poster, movie_name, time_actor, score, comment_people):
+&gt;&gt;&gt; movie_data = {}  # 存储结构</code></pre><h4 id="批量获取数据"><a href="#批量获取数据" class="headerlink" title="批量获取数据"></a>批量获取数据</h4><pre><code class="python">for p, m, t, s, c in zip(poster, movie_name, time_actor, score, comment_people):
     pos = p.get(&quot;src&quot;)  # 海报地址
     mov = m.get_text().replace(m.select(&quot;span&quot;)[0].get_text(), &quot;&quot;)  # 电影名称
     mov = mov.replace(&quot;/&quot;, &quot;&quot;).strip()  # 去掉不需要的字符
@@ -352,393 +100,49 @@ print(data_res)</code></pre>
     sco = s.get_text()
     comment = c.get_text()
     movie_data.update({mov: {&quot;poster&quot;: pos, &quot;movie_name&quot;: mov, &quot;other_name&quot;: other_name, &quot;release_time&quot;: release_time, &quot;actor&quot;: actor, &quot;score&quot;: sco, &quot;comment&quot;: comment}})
-print(movie_data)</code></pre>
-<pre><code>    {
+print(movie_data)</code></pre><pre><code>    {
     &#39;辛德勒的名单&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p492406163.jpg&#39;, &#39;movie_name&#39;: &#39;辛德勒的名单&#39;, &#39;other_name&#39;: &#39;舒特拉的名单(港) / 辛德勒名单&#39;, &#39;release_time&#39;: [&#39;1993-11-30(华盛顿首映)&#39;, &#39;1994-02-04(美国)&#39;], &#39;actor&#39;: [&#39;连姆·尼森&#39;, &#39;本·金斯利&#39;, &#39;拉尔夫·费因斯&#39;, &#39;卡罗琳·古多尔&#39;, &#39;乔纳森·萨加尔&#39;, &#39;艾伯丝·戴维兹&#39;, &#39;马尔戈萨·格贝尔&#39;, &#39;马克·伊瓦涅&#39;, &#39;碧翠斯·马科拉&#39;, &#39;安德烈·瑟韦林&#39;, &#39;弗里德里希·冯·图恩&#39;, &#39;克齐斯茨托夫·拉夫特...&#39;], &#39;score&#39;: &#39;9.5&#39;, &#39;comment&#39;: &#39;(571888人评价)&#39;}, &#39;狩猎&#39;: {&#39;poster&#39;: &#39;https://img1.doubanio
     ......
-    }</code></pre><h2 id="3-Xpath-提取"><a href="#3-Xpath-提取" class="headerlink" title="3. Xpath 提取"></a>3. Xpath 提取</h2><pre><code class="python">&gt;&gt;&gt; from lxml import etree  # 导入xpath模块</code></pre>
-<pre><code class="python">&gt;&gt;&gt; xpath_data = etree.HTML(data)  # 初始化xpath结构</code></pre>
-<p>可以直接在浏览器中试xpath表达式,如下图:<br>[外链图片转存失败(img-y8TSyP0X-1567474955837)(./images/xpath1.png)]<br><strong>下例用到的xpath语法解释:</strong>  </p>
-<ul>
-<li>“//“  # 代表从根节点搜索</li>
-<li>“//a”  # 搜索根节点的所有a标签</li>
-<li>“//a[@class=”nbg]”  # 搜索class=”nbg”的a标签</li>
-<li>“…/a”  # 搜索从…节点开始的子a标签</li>
-<li>“…/img/@src”  # 获取当前img标签的src属性</li>
-<li>“…/p/text()”  # 获取当前p标签下的文本</li>
-<li>“…/p//text()”  # 获取当前p标签后的所有文本(子孙文本)</li>
-</ul>
-<pre><code class="python">&gt;&gt;&gt; poster = xpath_data.xpath(&#39;//a[@class=&quot;nbg&quot;]/img/@src&#39;)  # 获取海报
+    }</code></pre><h2 id="3-Xpath-提取"><a href="#3-Xpath-提取" class="headerlink" title="3. Xpath 提取"></a>3. Xpath 提取</h2><pre><code class="python">&gt;&gt;&gt; from lxml import etree  # 导入xpath模块</code></pre><pre><code class="python">&gt;&gt;&gt; xpath_data = etree.HTML(data)  # 初始化xpath结构</code></pre><p>可以直接在浏览器中试xpath表达式,如下图:<br>[外链图片转存失败(img-y8TSyP0X-1567474955837)(./images/xpath1.png)]<br><strong>下例用到的xpath语法解释:</strong></p><ul><li>“//“ # 代表从根节点搜索</li><li>“//a” # 搜索根节点的所有a标签</li><li>“//a[@class=”nbg]” # 搜索class=”nbg”的a标签</li><li>“…/a” # 搜索从…节点开始的子a标签</li><li>“…/img/@src” # 获取当前img标签的src属性</li><li>“…/p/text()” # 获取当前p标签下的文本</li><li>“…/p//text()” # 获取当前p标签后的所有文本(子孙文本)</li></ul><pre><code class="python">&gt;&gt;&gt; poster = xpath_data.xpath(&#39;//a[@class=&quot;nbg&quot;]/img/@src&#39;)  # 获取海报
 &gt;&gt;&gt; movie_name = xpath_data.xpath(&#39;//div[@class=&quot;pl2&quot;]/a/text()&#39;)  # 获取电影名
 &gt;&gt;&gt; other_name = xpath_data.xpath(&#39;//div[@class=&quot;pl2&quot;]/a/span/text()&#39;)  # 获取电影别名
 &gt;&gt;&gt; time_actor = xpath_data.xpath(&#39;//div[@class=&quot;pl2&quot;]/p/text()&#39;)  # 获取时间和演员
 &gt;&gt;&gt; score = xpath_data.xpath(&#39;//span[@class=&quot;rating_nums&quot;]/text()&#39;)  # 获取评分
 &gt;&gt;&gt; comment_people = xpath_data.xpath(&#39;//span[@class=&quot;pl&quot;]/text()&#39;)  # 评分人数
-&gt;&gt;&gt; movie_data = {}</code></pre>
-<h4 id="同样进行数据收集"><a href="#同样进行数据收集" class="headerlink" title="同样进行数据收集"></a>同样进行数据收集</h4><pre><code class="python">for p, m, o, t, s, c in zip(poster, movie_name, other_name, time_actor, score, comment_people):
+&gt;&gt;&gt; movie_data = {}</code></pre><h4 id="同样进行数据收集"><a href="#同样进行数据收集" class="headerlink" title="同样进行数据收集"></a>同样进行数据收集</h4><pre><code class="python">for p, m, o, t, s, c in zip(poster, movie_name, other_name, time_actor, score, comment_people):
     m = m.replace(&quot;/&quot;, &quot;&quot;).strip()
     release_time, actor = get_time_actor(t)
     movie_data.update({m: {&quot;poster&quot;: p, &quot;movie_name&quot;: m, &quot;other_name&quot;: t, &quot;release_time&quot;: release_time, &quot;actor&quot;: actor, &quot;score&quot;: s, &quot;comment&quot;: c}})
-print(movie_data)</code></pre>
-<pre><code>    {
+print(movie_data)</code></pre><pre><code>    {
     &#39;辛德勒的名单&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p492406163.jpg&#39;, &#39;movie_name&#39;: &#39;辛德勒的名单&#39;, &#39;other_name&#39;: &#39;1993-11-30(华盛顿首映) / 1994-02-04(美国) / 连姆·尼森 / 本·金斯利 / 拉尔夫·费因斯 / 卡罗琳·古多尔 /
     ......
-    }</code></pre><h2 id="4-Pyquery-的数据提取"><a href="#4-Pyquery-的数据提取" class="headerlink" title="4. Pyquery 的数据提取"></a>4. Pyquery 的数据提取</h2><p>主要利用jquery的定位方式，<br>如 “.name” 表示 class=”name”<br>“#name” 表示 id=”name”<br>以下例子中:</p>
-<ul>
-<li>“a.nbg”  # 表示 a class=”nbg”</li>
-<li>“a img”  # 表示 a标签的子孙img标签</li>
-<li>.remove()  # 表示移除该节点</li>
-<li>.items()  # 当选中多个节点时,需要使用.items() 生成可遍历对象再进行提取</li>
-<li>.attr()  # 表示获取标签</li>
-<li>.text()  # 表示获取文本</li>
-</ul>
-<pre><code class="python">&gt;&gt;&gt; from pyquery import PyQuery as pq</code></pre>
-<pre><code class="python">&gt;&gt;&gt; query_data = pq(data[:])  # 因为为了便于提取,需要删除节点,避免破坏元数据,拷贝一份</code></pre>
-<pre><code class="python">&gt;&gt;&gt; poster = (i.attr[&quot;src&quot;] for i in query_data(&quot;a.nbg img&quot;).items())  # 获取海报
+    }</code></pre><h2 id="4-Pyquery-的数据提取"><a href="#4-Pyquery-的数据提取" class="headerlink" title="4. Pyquery 的数据提取"></a>4. Pyquery 的数据提取</h2><p>主要利用jquery的定位方式，<br>如 “.name” 表示 class=”name”<br>“#name” 表示 id=”name”<br>以下例子中:</p><ul><li>“a.nbg” # 表示 a class=”nbg”</li><li>“a img” # 表示 a标签的子孙img标签</li><li>.remove() # 表示移除该节点</li><li>.items() # 当选中多个节点时,需要使用.items() 生成可遍历对象再进行提取</li><li>.attr() # 表示获取标签</li><li>.text() # 表示获取文本</li></ul><pre><code class="python">&gt;&gt;&gt; from pyquery import PyQuery as pq</code></pre><pre><code class="python">&gt;&gt;&gt; query_data = pq(data[:])  # 因为为了便于提取,需要删除节点,避免破坏元数据,拷贝一份</code></pre><pre><code class="python">&gt;&gt;&gt; poster = (i.attr[&quot;src&quot;] for i in query_data(&quot;a.nbg img&quot;).items())  # 获取海报
 &gt;&gt;&gt; other_name = [i.text() for i in query_data(&quot;div.pl2 a span&quot;).items()]  # 获取别名
 &gt;&gt;&gt; query_data(&quot;div.pl2 a span&quot;).remove()  # 移除别名节点
 &gt;&gt;&gt; movie_name = (i.text().strip(&quot;/&quot;).strip() for i in query_data(&quot;div.pl2 a&quot;).items())  # 获取电影名
 &gt;&gt;&gt; time_actor =  (i.text() for i in query_data(&quot;div.pl2 p&quot;).items())  # 获取上映时间和演员
 &gt;&gt;&gt; score = (i.text() for i in query_data(&quot;span.rating_nums&quot;).items())  # 获取评分
 &gt;&gt;&gt; comment_people = (i.text() for i in query_data(&quot;span.pl&quot;).items())  # 获取评价人数
-&gt;&gt;&gt; movie_data = {}</code></pre>
-<pre><code class="python">for p, m, o, t, s, c in zip(poster, movie_name, other_name, time_actor, score, comment_people):
+&gt;&gt;&gt; movie_data = {}</code></pre><pre><code class="python">for p, m, o, t, s, c in zip(poster, movie_name, other_name, time_actor, score, comment_people):
     release_time, actor = get_time_actor(t)
     movie_data.update({m: {&quot;poster&quot;: p, &quot;movie_name&quot;: m, &quot;other_name&quot;: t, &quot;release_time&quot;: release_time, &quot;actor&quot;: actor, &quot;score&quot;: s, &quot;comment&quot;: c}})
-print(movie_data)</code></pre>
-<pre><code>    {
+print(movie_data)</code></pre><pre><code>    {
     &#39;辛德勒的名单&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p492406163.jpg&#39;, &#39;movie_name&#39;: &#39;辛德勒的名单&#39;, &#39;other_name&#39;: &#39;1993-11-30(华盛顿首映) / 1994-02-04(美国) / 连姆·尼森 / 本·金斯利 / 拉尔夫·费因斯 / 卡罗琳·古多尔 / 乔纳森·萨加尔 / 艾伯丝·戴维兹 / 马尔戈萨·格贝尔 / 马克·伊瓦涅 / 碧翠斯·马科拉 / 安德烈·瑟韦林 / 弗里德里希·冯·图恩 / 克齐斯茨托夫·拉夫特...&#39;, &#39;release_time&#39;:
     ......
-    }</code></pre><h2 id="5-scrapy-parsel-混合提取"><a href="#5-scrapy-parsel-混合提取" class="headerlink" title="5. scrapy/parsel 混合提取"></a>5. scrapy/parsel 混合提取</h2><blockquote>
-<p>parsel已经分离出来，可以直接 pip install 效果一样。</p>
-</blockquote>
-<pre><code class="python">&gt;&gt;&gt; from scrapy import Selector  # 导入scrapy的选择器
-&gt;&gt;&gt; # from parsel import Selector</code></pre>
-<pre><code class="python">&gt;&gt;&gt; se = Selector(text=data)</code></pre>
-<h4 id="提取规则说明-从下方案例可以看出-scrapy的提取器-css和xpath-以及正则提取都是支持的-我们可以混用"><a href="#提取规则说明-从下方案例可以看出-scrapy的提取器-css和xpath-以及正则提取都是支持的-我们可以混用" class="headerlink" title="提取规则说明 从下方案例可以看出,scrapy的提取器,css和xpath,以及正则提取都是支持的,我们可以混用"></a>提取规则说明 从下方案例可以看出,scrapy的提取器,css和xpath,以及正则提取都是支持的,我们可以混用</h4><ul>
-<li>.css()  # 就是css规则的提取</li>
-<li>.xpath()  # 就是xpath规则的提取,需要注意的是,因为scrapy的Selector支持混用,如果xpath是在某个提取器之后,那么必须使用”./“来跟进上个提取器的提取点,不能使用”//“, 因为Selector 的xapth提取器的”//“永远代表根节点<ul>
-<li>response.css(“#id”).xpath(“./a”)  # 该规则表示id=”id” 的节点<strong>之后</strong>的所有a标签节点</li>
-<li>response.css(“#id”).xpath(“//a”)  # 改规则就变成了提取所有的a标签节点,前面的css选择器的结果失效.</li>
-</ul>
-</li>
-<li>.re()  # 就是正则的提取, 正则提取后,不需要用extract()来转化成str类型</li>
-<li>extract()  # 将当前的选择结果转化成str类型  </li>
-</ul>
-<pre><code class="python">&gt;&gt;&gt; poster = se.css(&quot;.nbg img&quot;).xpath(&quot;./@src&quot;).extract()  # 获取海报
+    }</code></pre><h2 id="5-scrapy-parsel-混合提取"><a href="#5-scrapy-parsel-混合提取" class="headerlink" title="5. scrapy/parsel 混合提取"></a>5. scrapy/parsel 混合提取</h2><blockquote><p>parsel已经分离出来，可以直接 pip install 效果一样。</p></blockquote><pre><code class="python">&gt;&gt;&gt; from scrapy import Selector  # 导入scrapy的选择器
+&gt;&gt;&gt; # from parsel import Selector</code></pre><pre><code class="python">&gt;&gt;&gt; se = Selector(text=data)</code></pre><h4 id="提取规则说明-从下方案例可以看出-scrapy的提取器-css和xpath-以及正则提取都是支持的-我们可以混用"><a href="#提取规则说明-从下方案例可以看出-scrapy的提取器-css和xpath-以及正则提取都是支持的-我们可以混用" class="headerlink" title="提取规则说明 从下方案例可以看出,scrapy的提取器,css和xpath,以及正则提取都是支持的,我们可以混用"></a>提取规则说明 从下方案例可以看出,scrapy的提取器,css和xpath,以及正则提取都是支持的,我们可以混用</h4><ul><li>.css() # 就是css规则的提取</li><li>.xpath() # 就是xpath规则的提取,需要注意的是,因为scrapy的Selector支持混用,如果xpath是在某个提取器之后,那么必须使用”./“来跟进上个提取器的提取点,不能使用”//“, 因为Selector 的xapth提取器的”//“永远代表根节点<ul><li>response.css(“#id”).xpath(“./a”) # 该规则表示id=”id” 的节点<strong>之后</strong>的所有a标签节点</li><li>response.css(“#id”).xpath(“//a”) # 改规则就变成了提取所有的a标签节点,前面的css选择器的结果失效.</li></ul></li><li>.re() # 就是正则的提取, 正则提取后,不需要用extract()来转化成str类型</li><li>extract() # 将当前的选择结果转化成str类型</li></ul><pre><code class="python">&gt;&gt;&gt; poster = se.css(&quot;.nbg img&quot;).xpath(&quot;./@src&quot;).extract()  # 获取海报
 &gt;&gt;&gt; movie_name = se.css(&quot;div.pl2&quot;).xpath(&quot;./a/text()&quot;).re(&quot;\w+&quot;)  # 获取电影名
 &gt;&gt;&gt; other_name = se.css(&quot;div.pl2&quot;).xpath(&quot;./a/span/text()&quot;).extract()  # 获取电影别名
 &gt;&gt;&gt; time_actor = se.css(&quot;div.pl2&quot;).xpath(&quot;./p/text()&quot;).extract()  # 获取上映日期和演员
 &gt;&gt;&gt; score = se.css(&quot;span.rating_nums::text&quot;).extract()  # 获取评分
 &gt;&gt;&gt; comment_people = se.xpath(&#39;//span[@class=&quot;pl&quot;]/text()&#39;).extract()  # 获取评分人数
-&gt;&gt;&gt; movie_data = {}</code></pre>
-<pre><code class="python">for p, m, o, t, s, c in zip(poster, movie_name, other_name, time_actor, score, comment_people):
+&gt;&gt;&gt; movie_data = {}</code></pre><pre><code class="python">for p, m, o, t, s, c in zip(poster, movie_name, other_name, time_actor, score, comment_people):
     release_time, actor = get_time_actor(t)
     movie_data.update({m: {&quot;poster&quot;: p, &quot;movie_name&quot;: m, &quot;other_name&quot;: t, &quot;release_time&quot;: release_time, &quot;actor&quot;: actor, &quot;score&quot;: s, &quot;comment&quot;: c}})
-print(movie_data)</code></pre>
-<pre><code>    {
+print(movie_data)</code></pre><pre><code>    {
     &#39;辛德勒的名单&#39;: {&#39;poster&#39;: &#39;https://img3.doubanio.com/view/photo/s_ratio_poster/public/p492406163.jpg&#39;, &#39;movie_name&#39;: &#39;辛德勒的名单&#39;, &#39;other_name&#39;: &#39;1993-11-30(华盛顿首映) / 1994-02-04(美国) / 连姆·尼森 / 本·金斯利 / 拉尔夫·费因斯 / 卡罗琳·古多尔 / 乔纳森·萨加尔 / 艾伯丝·戴维兹 / 马尔戈萨·格贝尔 / 马克·伊瓦涅 / 碧翠斯·马科拉 / 安德烈·瑟韦林 / 弗里德里希·冯·图恩 / 克齐斯茨托夫·拉夫特...&#39;, &#39;release_time&#39;: [&#39;1993-11-30(华盛顿首映)&#39;, &#39;1994-02-04(美国)&#39;], &#39;actor&#39;: [&#39;连姆·尼森&#39;, &#39;本·金斯利&#39;, &#39;拉尔夫·费因斯&#39;,
     ......
-    }</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>以上就是我们该次提取练习的所有内容,以豆瓣电影top100的响应为例,我们讲解了常用的5种提取器.<br><strong>1. 正则</strong>  </p>
-<ul>
-<li>“.” 表示任意非空格换行等字符</li>
-<li>“.*?”  表示贪婪匹配,最少匹配一次</li>
-<li>“()”  表示提取()中的内容</li>
-<li>“\w” 表示正常字符,比如英文字母,中文等常见文字</li>
-<li>“.+”  表示至少匹配一次任意字符  </li>
-</ul>
-<p><strong>2. css</strong>  </p>
-<ul>
-<li>“.” 表示class </li>
-<li>“ “表示子孙节点  </li>
-<li>img 就是img节点  </li>
-<li>a 就是a节点</li>
-<li>“#abd” 表示 id=”abc”的节点</li>
-</ul>
-<p><strong>3. xpath</strong>  </p>
-<ul>
-<li>“//“  # 代表从根节点搜索</li>
-<li>“//a”  # 搜索根节点的所有a标签</li>
-<li>“//a[@class=”nbg]”  # 搜索class=”nbg”的a标签</li>
-<li>“…/a”  # 搜索从…节点开始的子a标签</li>
-<li>“…/img/@src”  # 获取当前img标签的src属性</li>
-<li>“…/p/text()”  # 获取当前p标签下的文本</li>
-<li>“…/p//text()”  # 获取当前p标签后的所有文本(子孙文本)</li>
-</ul>
-<p><strong>4. pyquery</strong>  </p>
-<ul>
-<li>“a.nbg”  # 表示 a class=”nbg”</li>
-<li>“a img”  # 表示 a标签的子孙img标签</li>
-<li>.remove()  # 表示移除该节点</li>
-<li>.items()  # 当选中多个节点时,需要使用.items() 生成可遍历对象再进行提取</li>
-<li>.attr()  # 表示获取标签</li>
-<li>.text()  # 表示获取文本</li>
-</ul>
-<p><strong>5. 混合提取</strong>  </p>
-<ul>
-<li>.css()  # 就是css规则的提取</li>
-<li>.xpath()  # 就是xpath规则的提取,需要注意的是,因为scrapy的Selector支持混用,如果xpath是在某个提取器之后,那么必须使用”./“来跟进上个提取器的提取点,不能使用”//“, 因为Selector 的xapth提取器的”//“永远代表根节点<ul>
-<li>response.css(“#id”).xpath(“./a”)  # 该规则表示id=”id” 的节点<strong>之后</strong>的所有a标签节点</li>
-<li>response.css(“#id”).xpath(“//a”)  # 改规则就变成了提取所有的a标签节点,前面的css选择器的结果失效.</li>
-</ul>
-</li>
-<li>.re()  # 就是正则的提取, 正则提取后,不需要用extract()来转化成str类型</li>
-<li>extract()  # 将当前的选择结果转化成str类型  <h4 id="完整代码-1"><a href="#完整代码-1" class="headerlink" title="完整代码"></a><a href="https://github.com/Dustyposa/goSpider/blob/master/spider_project/douban_movie/douban_spider.ipynb" target="_blank" rel="noopener">完整代码</a></h4></li>
-</ul>
-
-            </div>
-            <hr>
-            <div>
-              <p>
-                
-                  <span>
-                <i class="iconfont icon-inbox"></i>
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/%E6%8A%93%E5%8F%96/">抓取</a>
-                      &nbsp;
-                    
-                      <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/%E6%8A%93%E5%8F%96/python/">python</a>
-                      &nbsp;
-                    
-                  </span>&nbsp;&nbsp;
-                
-                
-                  <span>
-                <i class="iconfont icon-tag"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/parser/">parser</a>
-                    
-                      <a class="hover-with-bg" href="/tags/spider/">spider</a>
-                    
-                  </span>
-                
-              </p>
-              
-                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
-              
-              
-                <div class="post-prevnext row">
-                  <div class="post-prev col-6">
-                    
-                    
-                      <a href="/2020/04/07/data-class/">
-                        <i class="fa fa-chevron-left"></i>
-                        <span class="hidden-mobile">奇妙的对象模型及存储数据模型的技巧</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </div>
-                  <div class="post-next col-6">
-                    
-                    
-                      <a href="/2020/04/06/python-server/">
-                        <span class="hidden-mobile">python 编写多进程 socket web静态服务器</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="fa fa-chevron-right"></i>
-                      </a>
-                    
-                  </div>
-                </div>
-              
-            </div>
-
-              
-                <!-- Comments -->
-                <div class="comments" id="comments">
-                  
-                  
-
-                </div>
-              
-          </div>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc-start"></div>
-<div id="toc">
-  <p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p>
-  <div id="tocbot"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-  </main>
-
-  
-    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
-      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
-    </a>
-  
-
-  
-    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-  
-
-  
-
-  
-
-  <footer class="mt-5">
-  <div class="text-center py-3">
-    <div>
-      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
-      <i class="iconfont icon-love"></i>
-      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
-    </div>
-    
-
-    
-
-    
-  </div>
-</footer>
-
-<!-- SCRIPTS -->
-<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
-<script  src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js" ></script>
-<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
-<script  src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js" ></script>
-<script  src="/js/main.js" ></script>
-
-
-  <script  src="/js/lazyload.js" ></script>
-
-
-
-  
-  <script  src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      var navHeight = $('#navbar').height();
-      var toc = $('#toc');
-      var boardCtn = $('#board-ctn');
-      var boardTop = boardCtn.offset().top;
-      var tocLimMax = 2 * boardTop + boardCtn.height();
-
-      $(window).scroll(function () {
-        var tocLimMin = $('#toc-start').offset().top - navHeight;
-        var scroH = document.body.scrollTop + document.documentElement.scrollTop;
-
-        if (tocLimMin <= scroH && scroH <= tocLimMax) {
-          toc.css({
-            'display': 'block',
-            'position': 'fixed',
-            'top': navHeight,
-          });
-        } else if (scroH <= tocLimMin) {
-          toc.css({
-            'position': '',
-            'top': '',
-          });
-        } else if (scroH > tocLimMax) {
-          toc.css('display', 'none');
-        }
-      });
-      tocbot.init({
-        tocSelector: '#tocbot',
-        contentSelector: '.post-content',
-        headingSelector: 'h1,h2,h3,h4,h5,h6',
-        linkClass: 'tocbot-link',
-        activeLinkClass: 'tocbot-active-link',
-        listClass: 'tocbot-list',
-        isCollapsedClass: 'tocbot-is-collapsed',
-        collapsibleClass: 'tocbot-is-collapsible',
-        scrollSmooth: true,
-        headingsOffset: -boardTop
-      });
-      if ($('.toc-list-item').length > 0) {
-        $('#toc > p').css('visibility', 'visible');
-      }
-      var offset = boardCtn.css('margin-right')
-      $('#toc-ctn').css({
-        'right': offset
-      })
-    });
-  </script>
-
-
-
-
-
-  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
-  <script  src="/js/clipboard-use.js" ></script>
-
-
-
-
-
-
-
-
-<!-- Plugins -->
-
-
-
-  <script  src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js" ></script>
-  <script>
-    $(document).ready(function () {
-      $('pre').addClass('prettyprint  ');
-      prettyPrint();
-    })
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
-  <script>
-    var typed = new Typed('#subtitle', {
-      strings: [
-        '  ',
-        "python 请求分析及多提取器 提取数据&nbsp;",
-      ],
-      cursorChar: "_",
-      typeSpeed: 70,
-      loop: false,
-    });
-    typed.stop();
-    $(document).ready(function () {
-      $(".typed-cursor").addClass("h2");
-      typed.start();
-    });
-  </script>
-
-
-
-  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
-  <script>
-    anchors.options = {
+    }</code></pre><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>以上就是我们该次提取练习的所有内容,以豆瓣电影top100的响应为例,我们讲解了常用的5种提取器.<br><strong>1. 正则</strong></p><ul><li>“.” 表示任意非空格换行等字符</li><li>“.*?” 表示贪婪匹配,最少匹配一次</li><li>“()” 表示提取()中的内容</li><li>“\w” 表示正常字符,比如英文字母,中文等常见文字</li><li>“.+” 表示至少匹配一次任意字符</li></ul><p><strong>2. css</strong></p><ul><li>“.” 表示class</li><li>“ “表示子孙节点</li><li>img 就是img节点</li><li>a 就是a节点</li><li>“#abd” 表示 id=”abc”的节点</li></ul><p><strong>3. xpath</strong></p><ul><li>“//“ # 代表从根节点搜索</li><li>“//a” # 搜索根节点的所有a标签</li><li>“//a[@class=”nbg]” # 搜索class=”nbg”的a标签</li><li>“…/a” # 搜索从…节点开始的子a标签</li><li>“…/img/@src” # 获取当前img标签的src属性</li><li>“…/p/text()” # 获取当前p标签下的文本</li><li>“…/p//text()” # 获取当前p标签后的所有文本(子孙文本)</li></ul><p><strong>4. pyquery</strong></p><ul><li>“a.nbg” # 表示 a class=”nbg”</li><li>“a img” # 表示 a标签的子孙img标签</li><li>.remove() # 表示移除该节点</li><li>.items() # 当选中多个节点时,需要使用.items() 生成可遍历对象再进行提取</li><li>.attr() # 表示获取标签</li><li>.text() # 表示获取文本</li></ul><p><strong>5. 混合提取</strong></p><ul><li>.css() # 就是css规则的提取</li><li>.xpath() # 就是xpath规则的提取,需要注意的是,因为scrapy的Selector支持混用,如果xpath是在某个提取器之后,那么必须使用”./“来跟进上个提取器的提取点,不能使用”//“, 因为Selector 的xapth提取器的”//“永远代表根节点<ul><li>response.css(“#id”).xpath(“./a”) # 该规则表示id=”id” 的节点<strong>之后</strong>的所有a标签节点</li><li>response.css(“#id”).xpath(“//a”) # 改规则就变成了提取所有的a标签节点,前面的css选择器的结果失效.</li></ul></li><li>.re() # 就是正则的提取, 正则提取后,不需要用extract()来转化成str类型</li><li>extract() # 将当前的选择结果转化成str类型<h4 id="完整代码-1"><a href="#完整代码-1" class="headerlink" title="完整代码"></a><a href="https://github.com/Dustyposa/goSpider/blob/master/spider_project/douban_movie/douban_spider.ipynb" target="_blank" rel="noopener">完整代码</a></h4></li></ul></div><hr><div><p><span><i class="iconfont icon-inbox"></i> <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a> &nbsp; <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/%E6%8A%93%E5%8F%96/">抓取</a> &nbsp; <a class="hover-with-bg" href="/categories/%E7%BD%91%E7%BB%9C/%E6%8A%93%E5%8F%96/python/">python</a> &nbsp; </span>&nbsp;&nbsp; <span><i class="iconfont icon-tag"></i> <a class="hover-with-bg" href="/tags/parser/">parser</a> <a class="hover-with-bg" href="/tags/spider/">spider</a></span></p><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"><a href="/2020/04/07/data-class/"><i class="fa fa-chevron-left"></i> <span class="hidden-mobile">奇妙的对象模型及存储数据模型的技巧</span> <span class="visible-mobile">上一篇</span></a></div><div class="post-next col-6"><a href="/2020/04/06/python-server/"><span class="hidden-mobile">python 编写多进程 socket web静态服务器</span> <span class="visible-mobile">下一篇</span> <i class="fa fa-chevron-right"></i></a></div></div></div><div class="comments" id="comments"></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc-start"></div><div id="toc"><p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div></main><a class="z-depth-1" id="scroll-top-button" href="#" role="button"><i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><b>Fluid</b></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js"></script><script>$(document).ready(function(){var s=$("#navbar").height(),c=$("#toc"),t=$("#board-ctn"),o=t.offset().top,i=2*o+t.height();$(window).scroll(function(){var t=$("#toc-start").offset().top-s,o=document.body.scrollTop+document.documentElement.scrollTop;t<=o&&o<=i?c.css({display:"block",position:"fixed",top:s}):o<=t?c.css({position:"",top:""}):i<o&&c.css("display","none")}),tocbot.init({tocSelector:"#tocbot",contentSelector:".post-content",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",scrollSmooth:!0,headingsOffset:-o}),0<$(".toc-list-item").length&&$("#toc > p").css("visibility","visible");var l=t.css("margin-right");$("#toc-ctn").css({right:l})})</script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js"></script><script>$(document).ready(function(){$("pre").addClass("prettyprint  "),prettyPrint()})</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","python 请求分析及多提取器 提取数据&nbsp;"],cursorChar:"_",typeSpeed:70,loop:!1});typed.stop(),$(document).ready(function(){$(".typed-cursor").addClass("h2"),typed.start()})</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options = {
       placement: "right",
       visible: "hover",
       
@@ -748,45 +152,4 @@ print(movie_data)</code></pre>
     for (item of el) {
       res.push(".markdown-body > " + item)
     }
-    anchors.add(res.join(", "))
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    var path = "/local-search.xml";
-    var inputArea = document.querySelector("#local-search-input");
-    inputArea.onclick = function () {
-      getSearchFile(path);
-      this.onclick = null
-    }
-  </script>
-
-
-
-  <script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
-  <script>
-    $("#post img:not(.no-zoom img, img[no-zoom])").each(
-      function () {
-        var element = document.createElement("a");
-        $(element).attr("data-fancybox", "images");
-        $(element).attr("href", $(this).attr("src"));
-        $(this).wrap(element);
-      }
-    );
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-</html>
+    anchors.add(res.join(", "))</script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){getSearchFile(path),this.onclick=null}</script><script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><script>$("#post img:not(.no-zoom img, img[no-zoom])").each(function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)})</script></body></html>
