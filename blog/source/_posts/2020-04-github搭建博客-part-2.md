@@ -17,17 +17,18 @@ date: 2020-04-09 10:28:39
 ## 自动化部署-CI/CD 
 ### 简介
 我们简述一下我们目前的部署流程：
-```mermaid
-在 writing 编写文章, 编写完成后，运行 
-$ hexo g & d
-长篇文章写好之后，这点操作没什么太大负担，但是如果进行小调整的话每次都要输这些命令，那就很麻烦了。
-那么我们思考一下，写完文章后输入命令发布，
-命令是不变的，那么我们这里肯定可以自动化。
-那么，关键问题是如何确定文章写完了？毕竟不可能每次写一半，或者写一点就自动发布，我们就需要一个发布触发点。
-git 比较好想，我们出发点使用 push 或者 分支更新即可。
-看起来很简单，如何实现呢？
-这时候就可以祭出我们的利器了 - Travis Ci！
-```
+> 在 writing 编写文章, 编写完成后，运行 
+    ```
+    $ hexo g & d
+    ```
+> 长篇文章写好之后，这点操作没什么太大负担，但是如果进行小调整的话每次都要输这些命令，那就很麻烦了。
+> 那么我们思考一下，写完文章后输入命令发布，
+> 命令是不变的，那么我们这里肯定可以**自动化**。
+> 那么，关键问题是如何确定文章写完了？毕竟不可能每次写一半，或者写一点就自动发布，我们就需要一个**自动发布触发点**。
+> `git` 比较好想，我们触发点使用 `push` 或者 分支更新即可。
+> 看起来很简单，如何实现呢？
+> 这时候就可以祭出我们的利器了 - `Travis Ci`！
+
 
 <details>
 <summary>
@@ -56,11 +57,13 @@ like this：
 </details>
 
 #### 安装
- - a. 把 `Travis CI` 添加到你的 `GitHub` 账户中。
+ - #### a. 把 `Travis CI` 添加到你的 `GitHub` 账户中。
     打开 [Travis CI](https://github.com/marketplace/travis-ci) 安装页面。
     选择免费安装（只适合于开源项目）
 ![image.png](https://i.loli.net/2020/04/09/HfkOcwTMa2sVWJ8.png)
-   b. 配置 `Travis CI` 权限。
+
+
+ - #### b. 配置 `Travis CI` 权限。
    前往 `GitHub` 的 [Applications settings](https://github.com/settings/installations)，配置 `Travis CI` 权限，使其能够访问你的 `repository`。
    > 待补图
                                                                                                                                                                                                                                                                                                                                                          
@@ -68,7 +71,9 @@ like this：
                                   
     在浏览器新建一个标签页，前往 GitHub 新建 [Personal Access Token](https://github.com/settings/tokens)，只勾选 `repo` 的权限并生成一个新的 Token。Token 生成后请复制并保存好。
     回到 Travis CI，前往你的 repository 的设置页面，在 **Environment Variables** 下新建一个环境变量，**Name** 为 `GH_TOKEN`，**Value** 为刚才你在 GitHub 生成的 Token。确保 **DISPLAY VALUE IN BUILD LOG** 保持 **不被勾选** 避免你的 Token 泄漏。点击 `Add` 保存。
-    c. 编写自动部署脚本
+    
+    
+- #### c. 编写自动部署脚本
     新建一个 `.travis.yml` 的文件:
     ```yaml
    sudo: false
@@ -119,12 +124,40 @@ language: zh-CN  # 指定语言，可不改
 ```
 这样我们重新运行
 ```hexo s```
-就能看到我们新的主题了！效果如下：
+就能看到我们新的主题了！参考效果如下：
 > 待补图
 
 整个操作也很简单，但是需要定制化操作的话，看[官方文档](https://hexo.fluid-dev.com/docs/guide)即可～非常详细。
 
-参考文献：
-> [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
+
+## 性能优化
+由于我们的带宽是有限的，那么如果传递的资源太大，响应就会很慢。大家可以测试一下，**更换一下** `banner` 图片，**部署**后再次访问，就会发现很慢很慢。这也非常影响用户体验。
+
+那么如何解决呢？
+很明显，我们至少有两种解决办法：
+
+- ~~a. 加带宽~~ （什么？加带宽？那是不可能的，服务器都是白嫖的，还想我加带宽？？？）
+- b. 减少从**自身**服务器传输的数据量（注意加粗部分）
+    这里我们可以再分出两种思路
+    - **1. 减少自身服务器传输的数据大小（例如: 文本文件数据，图片数据之类）**  
+    - **2. 将数据放到其他地方，远程获取（例如： CDN，文件服务器，图床等等）** 
+
+那么，我们就简单介绍一下这两种方法，顺便对我们的博客网站进行优化。
+### 文件压缩
+#### a. 文本文件压缩
+这个我们列举一种方式，用压缩插件完成即可。
+- 安装插件 `hexo-all-minifier`
+```
+npm install hexo-all-minifier --save
+```
+> mac 用户可能需要安装其他东西
+`brew install libtool automake autoconf nasm`
+
+
+### 图片生成
+https://favicon.io
+
+>参考资料：
+[hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
 [fluid 文档](https://hexo.fluid-dev.com/docs/guide/#%E5%85%B3%E4%BA%8E%E6%8C%87%E5%8D%97)
 
