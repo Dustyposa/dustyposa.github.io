@@ -96,11 +96,11 @@ So，我们开始吧。
      > node 版本推荐 10+
      
    - #### b. 初始化 `Hexo` 博客
-        ```bash
-        hexo init docs # docs 为文件夹名称
-        cd docs
-        npm install  # 安装相关依赖
-        ```
+    ```bash
+    hexo init docs # docs 为文件夹名称
+    cd docs
+    npm install  # 安装相关依赖
+    ```
     
      新建完成后，我们可以看到目录如下：
         ```
@@ -183,6 +183,24 @@ hexo generate # or hexo g
     ```
     就能一键部署完成了！
     一气呵成。
+> Notion: 问题思考，部署后，我们的`origin` 的 `master` 分支的内容都是 `pulic` 文件夹中的内容。也就是运行 `hexo g` 之后生成的内容。
+> 那么，本地的比如主题文件，博客文件之类怎么办呢？ 我换个环境怎么编写博客以及部署呢？
+
+    <details>
+        <summary>思考一下再看</summary>
+        
+        我们可以新建一个分支，专门用来写东西以及维护样式。
+        比如 `writing` 分支， 然后我们将 `docs` 文件夹及其下面的全部都传上去即可，(`node_modules` 之类的文件不用上传)~。
+        之后我们换个环境，只需要：
+        ```bash
+        git clone -b writing 仓库地址
+        cd 仓库文件夹/docs
+        npm i
+        ```
+        就能同步环境了。
+        之后 用 `hexo` 正常操作即可~
+        
+    </details>
 
 那么第一篇就到这里(第一步踩坑完成)，之后我们会出第二篇，会加上一些小操作～来让我们写博客更简单！
 > 详细文档

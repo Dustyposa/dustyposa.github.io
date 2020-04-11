@@ -11,7 +11,7 @@
 # 全局
 # Site
 #---------------------------
-favicon: /img/favicon.ico # 网站标签页的 icon
+favicon: /img/favicon.png # 网站标签页的 icon
 
 apple_touch_icon: /img/apple-touch-icon.png # 用于苹果设备的 icon
 

@@ -3,13 +3,13 @@ title: 从零开始搭建Github博客(其二)
 tags: [github_pages, hexo]
 category: [blog]
 date: 2020-04-09 10:28:39
-mermaid: false
+
 ---
 # 搭建 github 博客之旅 （Part 2）
 在第一部分，我们介绍了如何搭建一个免费博客并部署在 `Github` 上面，但是我们还有很多可以优化（更懒）的地方，例如：
 - [自动部署（非一键部署）](#自动化部署-CI-CD)
 - [主题更换（换个漂亮的皮肤）](#更换主题)
-- 性能优化（带宽，响应太慢？）
+- [性能优化（带宽，响应太慢？）](#性能优化)
 - 加点料
 - etc...
 
@@ -66,13 +66,14 @@ like this：
 
  - #### b. 配置 `Travis CI` 权限。
    前往 `GitHub` 的 [Applications settings](https://github.com/settings/installations)，配置 `Travis CI` 权限，使其能够访问你的 `repository`。
-   > 待补图
+   > ![image.png](https://i.loli.net/2020/04/11/aNkuiDx9AnSqdby.png)
                                                                                                                                                                                                                                                                                                                                                          
    你应该会被重定向到 `Travis CI` 的页面。如果没有，请 [手动前往](https://travis-ci.com/)。              
                                   
-    在浏览器新建一个标签页，前往 GitHub 新建 [Personal Access Token](https://github.com/settings/tokens)，只勾选 `repo` 的权限并生成一个新的 Token。Token 生成后请复制并保存好。
-    
-    回到 Travis CI，前往你的 repository 的设置页面，在 **Environment Variables** 下新建一个环境变量，**Name** 为 `GH_TOKEN`，**Value** 为刚才你在 GitHub 生成的 Token。确保 **DISPLAY VALUE IN BUILD LOG** 保持 **不被勾选** 避免你的 Token 泄漏。点击 `Add` 保存。
+    在浏览器新建一个标签页，前往 GitHub 新建 [Personal Access Token](https://github.com/settings/tokens)，只勾选 `repo` 的权限并保存。`Token` 生成后请复制并保存好。
+    > ![image.png](https://i.loli.net/2020/04/11/H5nNtPu8s6RVx3B.png)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 >
+    回到 `Travis CI`，前往你的 `repository` 的设置页面，在 **Environment Variables** 下新建一个环境变量，**Name** 为 `GH_TOKEN`，**Value** 为刚才你在 GitHub 生成的 Token。确保 **DISPLAY VALUE IN BUILD LOG** 保持 **不被勾选** 避免你的 Token 泄漏。点击 `Add` 保存。
     设置页面在这里进：
     ![image.png](https://i.loli.net/2020/04/10/A1ZGmkyTudVjWfz.png)
     
@@ -86,7 +87,7 @@ node_js:
       - 10 # use nodejs v10 LTS
 cache: npm
 install:
-      - cd blog && npm i
+      - cd docs && npm i
 # 限制使用 travis 的分支
 branches:
       only:
@@ -105,7 +106,9 @@ deploy:
       local-dir: docs/public  # 部署的文件夹
 
    ```
-    这样在我们的自动部署就差不多完成了，我们将配置好的文件 `push` 上去。稍等片刻，就能看到自动部署详情了。
+    这样在我们的自动部署就差不多完成了，我们将配置好的文件 `push` 上去。稍等片刻，就能看到自动部署详情了（可以到 `Travis CI` 中看详细日志）。
+在我们的 `master` 分支页面就能看到机器人了~
+> ![image.png](https://i.loli.net/2020/04/09/RkIPD9piuQjCfG3.png)
     
 ## 更换主题
 默认主题的 `hexo` 比较单调，一点都不炫酷。自然，换肤的需求就诞生了。到现在，`hexo` 也有了很多炫酷的主题可选，在这里，我推荐一个 `Material Design` 风格的主题 [`flud`](https://hexo.fluid-dev.com/docs/guide/#%E4%B8%BB%E9%A2%98%E7%AE%80%E4%BB%8B)
@@ -129,7 +132,7 @@ language: zh-CN  # 指定语言，可不改
 这样我们重新运行
 ```hexo s```
 就能看到我们新的主题了！参考效果如下：
-> 待补图
+> ![image.png](https://i.loli.net/2020/04/11/fvBIEbJsaukDd26.png)
 
 整个操作也很简单，但是需要定制化操作的话，看[官方文档](https://hexo.fluid-dev.com/docs/guide)即可～非常详细。
 
@@ -203,5 +206,5 @@ https://favicon.io
 
 >参考资料：
 [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
-[fluid 文档](https://hexo.fluid-dev.com/docs/guide/#%E5%85%B3%E4%BA%8E%E6%8C%87%E5%8D%97)
+[fluid 文档](https://hexo.fluid-dev.com/docs)
 [hexo_all_minifier 文档](https://github.com/chenzhutian/hexo-all-minifier)
