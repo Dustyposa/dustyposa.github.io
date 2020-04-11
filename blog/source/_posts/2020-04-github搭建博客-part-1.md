@@ -93,7 +93,7 @@ So，我们开始吧。
 ### 2. 安装并生成博客
    - #### a. 安装 `hexo`      
          npm install -g hexo-cli
-             
+     > node 版本推荐 10+
      
    - #### b. 初始化 `Hexo` 博客
         ```bash
