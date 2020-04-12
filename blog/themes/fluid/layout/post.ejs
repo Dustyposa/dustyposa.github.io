@@ -98,15 +98,12 @@ page.banner_img_height = theme.post.banner_img_height
 <% } %>
 
 <!-- Mermaid -->
-<% if(page.mermaid && theme.post.mermaid.enable) { %>
-    <script src="<%- url_for(theme.post.mermaid.cdn) %>"></script>
-    <script>
-
+<% if (page.mermaid && theme.post.mermaid.enable) { %>
+  <script src="<%- url_for(theme.post.mermaid.cdn) %>"></script>
+  <script>
     if (window.mermaid) {
-      mermaid.initialize({theme: 'forest'});
+      mermaid.initialize(<%- JSON.stringify(theme.post.mermaid.options) %>);
     }
-<!--     if (window.mermaid) { -->
-<!--       mermaid.initialize( <%- JSON.stringify(theme.post.mermaid.options) %>); -->
-<!--     } -->
-    </script>
+  </script>
 <% } %>
+

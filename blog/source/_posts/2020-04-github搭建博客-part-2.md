@@ -3,7 +3,7 @@ title: 从零开始搭建Github博客(其二)
 tags: [github_pages, hexo]
 category: [blog]
 date: 2020-04-09 10:28:39
-
+mermaid: true
 ---
 # 搭建 github 博客之旅 （Part 2）
 在第一部分，我们介绍了如何搭建一个免费博客并部署在 `Github` 上面，但是我们还有很多可以优化（更懒）的地方，例如：
@@ -193,7 +193,9 @@ all_minifier: true
 
 综上，合理**压缩和利用图床**等存储服务，能**极大的提升我们的博客响应速度**。降低服务器压力～将用户体验提升到极致。（当然任何服务都可以酌情应用该方案，不止博客！）
 
-### 小插曲
+
+
+## 小插曲
 **ちょっと待って，不对不对，你这不是套我嘛？浏览者的用户体验提升了，但是写作者的用户体验没提升呀，还要传来传去，跳来跳去，多麻烦。**
 没错！这个问题，我们当然也能优化！怎么做？
 **等下回咯**（逃，不要打我
@@ -201,10 +203,121 @@ all_minifier: true
 到这里结束了嘛？当然没有，我们再加一点其他的小插件。
 
 
-### 图片生成
-https://favicon.io
+## icon 生成
+不知道大家发现没有，我博客的 `icon` 变了！！
+**5分钟**搞定的。
+How to do?
+来试试我们的神奇的[网站](https://favicon.io), 网站比较简单，专门用来做 `icon`, 怎么使用网站就不介绍了，我们介绍一下如何替换自己网站的 `icon`。
+我们主要需要这个文件：
+```
+favicon.png
+```
+在网站生成的`压缩包`中可以找到。
+我们把它放入和 `_posts` 文件夹同级的 `img` 文件夹中即可。
+大概如下图：
+```
+├── _post
+├── img
+|   ├── favicon.png
+```
+就是这么简单～
+
+## 流程图支持
+为了增强文章的表达力，我们有时候也会在文章中加入一些**流程图**就像这样：
+<div class="mermaid"> 
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+</div>
+那么如何做呢？只需要 **4步**：
+
+#### 1. 安装 `hexo-filter-mermaid-diagrams` 插件
+```
+npm i hexo-filter-mermaid-diagrams # or yarn install hexo-filter-mermaid-diagrams
+```
+#### 2. 配置 `ejs`
+因为我们的流程图之类主要在文章中使用，所以我们只给文章页面配置该功能。
+找到该文件 `post.ejs`:
+```
+├── themes
+|    ├── fluid  # 你的使用的主题的文件夹
+|           ├── layout
+|                   ├── post.ejs
+```
+
+
+在文件末尾加上以下代码：
+
+```ejs
+<!-- Mermaid -->
+<% if (page.mermaid && theme.post.mermaid.enable) { %>
+  <script src="<%- url_for(theme.post.mermaid.cdn) %>"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize(<%- JSON.stringify(theme.post.mermaid.options) %>);
+    }
+  </script>
+<% } %>
+```
+在主题配置文件的 `post` 配置中，大概这个位置：
+![image.png](https://i.loli.net/2020/04/12/IrSOQmKZAujbW7x.png)
+
+加入以下代码：
+
+```yaml
+mermaid: ## mermaid url https://github.com/knsv/mermaid
+  enable: true  # default true
+  specific: false
+  cdn: https://cdn.jsdelivr.net/npm/mermaid@7/dist/mermaid.min.js
+  options:  # find more api options from https://github.com/knsv/mermaid/blob/master/src/mermaidAPI.js
+    theme: forest
+```
+
+
+
+<p class="note note-info">
+<b>简单的性能优化</b>：
+<br>
+由于不是每篇文章都要流程图之类以及该功能需要<b>加载</b>额外的 <code>js</code> 文件，所以我们设置了一个开关，来让文章决定是否开启加载。
+</p>
+
+#### 3. 开启 mermaid 渲染
+主要要在文章文件 `xxx.md` 的顶部加上：
+```yaml
+mermaid: true
+```
+这样我们的这篇文章就会**加载**渲染流程图需要的 `js` 文件， 如果不设置，文章就**不会加载**相关 `js` 文件。
+
+`md` 文件的参考头部如下：
+> \---
+> title: 从零开始搭建Github博客(其二)
+> tags: [github_pages, hexo]
+> category: [blog]
+> date: 2020-04-09 10:28:39
+> **mermaid: true**
+> \---
+
+#### 4. 在文章中加入流程图语法
+完成上面的设置之后，就完成了大半了，但是我们的 `md` 文件中中还没有流程图语法。
+流程图语法也比较简单，**`md`** 文件中的任意位置加入以下代码即可：
+```html
+<div class="mermaid"> 
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+</div>
+```
+这样就更能增强文章的表达力了～赶快试一试吧！
+
 
 >参考资料：
 [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
 [fluid 文档](https://hexo.fluid-dev.com/docs)
 [hexo_all_minifier 文档](https://github.com/chenzhutian/hexo-all-minifier)
+[hexo-filter-mermaid-diagrams](https://github.com/webappdevelp/hexo-filter-mermaid-diagrams)
+
+

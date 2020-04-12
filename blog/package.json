@@ -15,6 +15,7 @@
     "hexo": "^4.0.0",
     "hexo-all-minifier": "^0.5.3",
     "hexo-cli": "^3.1.0",
+    "hexo-filter-mermaid-diagrams": "^1.0.5",
     "hexo-generator-archive": "^1.0.0",
     "hexo-generator-category": "^1.0.0",
     "hexo-generator-index": "^1.0.0",

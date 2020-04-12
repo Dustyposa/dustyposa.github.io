@@ -222,7 +222,7 @@ post:
 #    cdn: https://cdn.bootcss.com/mermaid/8.4.8/mermaid.min.js
     cdn: https://cdn.jsdelivr.net/npm/mermaid@7/dist/mermaid.min.js
     options:  # find more api options from https://github.com/knsv/mermaid/blob/master/src/mermaidAPI.js
-      theme: default
+      theme: forest
 #---------------------------
 # 评论
 # Comments
