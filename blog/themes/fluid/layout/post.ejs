@@ -68,8 +68,7 @@ page.banner_img_height = theme.post.banner_img_height
                 </div>
               <% } %>
             </div>
-
-              <% if(page.comments && theme.post.comments.enable) { %>
+              <% if((!theme.post.comments.postCheck || page.comments) && theme.post.comments.enable) { %>
                 <!-- Comments -->
                 <div class="comments" id="comments">
                   <% var type = '_partial/comments/' + theme.post.comments.type %>

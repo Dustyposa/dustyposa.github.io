@@ -11,7 +11,9 @@ mermaid: true
 - [主题更换（换个漂亮的皮肤）](#更换主题)
 - [性能优化（带宽，响应太慢？）](#性能优化)
 - 加点料
-- etc...
+    - [icon 制作](#icon-生成)
+    - [增强表现力-流程图支持](#流程图支持)
+    - [来点评论](#评论支持)
 
 那么，话不多说，开始正题。
 
@@ -195,7 +197,7 @@ all_minifier: true
 
 
 
-## 小插曲
+### 小插曲
 **ちょっと待って，不对不对，你这不是套我嘛？浏览者的用户体验提升了，但是写作者的用户体验没提升呀，还要传来传去，跳来跳去，多麻烦。**
 没错！这个问题，我们当然也能优化！怎么做？
 **等下回咯**（逃，不要打我
@@ -313,11 +315,66 @@ graph TD;
 ```
 这样就更能增强文章的表达力了～赶快试一试吧！
 
+## 评论支持
+评论支持比较简单，参考这篇文章就行。
+[评论支持](https://litstronger.github.io/2020/04/03/hexo-fluid%E6%B7%BB%E5%8A%A0utterances%E8%AF%84%E8%AE%BA%E5%8A%9F%E8%83%BD/)
+
+<p class="note note-danger">
+<b>下面部分请根据自己的主题及参考代码酌情设置!!!!</b>
+</p>
+
+但是开启评论的话参考 `post.ejs` 部分，具体代码如下(主要是**第一行**)：
+
+```js
+<% if(page.comments && theme.post.comments.enable) { %>
+                <!-- Comments -->
+                <div class="comments" id="comments">
+                  <% var type = '_partial/comments/' + theme.post.comments.type %>
+                  <%- partial(type) %>
+                </div>
+              <% } %>
+```
+
+由上面代码可得，如果要开启评论还需要在每篇文章的头部加上
+```
+comments: true
+```
+才会开启，不是很方便，所以我们做一下粒度控制。
+### 粒度控制
+
+<p class="note note-info">
+主要是方便我们开启全局都允许评论，忽略文章头部的设置。因为大多数文章都是开启评论，小部分可能需要关闭评论，所以我们就用来用代码控制这小部分情况。
+</p>
+
+#### 1. 在主题配置文件中的 `post.comments` 中加入一个粒度开关 `postCheck`：
+```yaml
+post:
+  ...
+    comments:  
+        ...
+        postCheck: false
+```
+
+#### 2. 更改 `post.ejs` 配置
+更改参考如下：
+```js
+<% if((!theme.post.comments.postCheck || page.comments) && theme.post.comments.enable) { %>
+```
+
+这样，当我们设置 `postCheck: false` 时，所有文章都会**开启评论**。
+而当我们设置 `postCheck: true` 同时如果文章头部设置了: `comments: false` 时，该篇文章就会**禁用**评论功能了~
+
+
+
+
+
+
+主要是 
 
 >参考资料：
 [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
 [fluid 文档](https://hexo.fluid-dev.com/docs)
 [hexo_all_minifier 文档](https://github.com/chenzhutian/hexo-all-minifier)
 [hexo-filter-mermaid-diagrams](https://github.com/webappdevelp/hexo-filter-mermaid-diagrams)
-
+[评论支持](https://litstronger.github.io/2020/04/03/hexo-fluid%E6%B7%BB%E5%8A%A0utterances%E8%AF%84%E8%AE%BA%E5%8A%9F%E8%83%BD/)
 

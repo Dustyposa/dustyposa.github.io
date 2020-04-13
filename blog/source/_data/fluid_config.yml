@@ -205,9 +205,8 @@ post:
     content: '<img src="https://octodex.github.com/images/jetpacktocat.png" class="rounded mx-auto d-block mt-5" style="width:150px; height:150px;">' # 自定义区域，支持 HTML，可自行插入赞赏码、公众号二维码等内容
   comments:  # 评论
     enable: true  # 开启评论
+    postCheck: true  # 粒度控制
     type: utterances  # 指定使用的评论模块  available: disqus | valine | gitalk | utterances | changyan | livere  推荐 utterances
-  utterances:
-    shortname: fluid
   image_zoom:  # 文章图片可点击放大
     enable: true
   math:  # 数学公式，开启之前需要更换 Markdown 渲染器，否则复杂公式会有兼容问题，具体请见 https://hexo.fluid-dev.com/docs/guide/#数学公式
@@ -233,11 +232,12 @@ post:
 # utterances
 # You can install utterances with https://utteranc.es/ and generate your configuration
 utterances:
-  repo:
-  issue_term:
-  label: utterances
-  theme: github-light
-  crossorigin: anonymous
+  repo: "Dustyposa/utterances_comments"
+  issue_term: "pathname"
+  label: "✨💬✨"
+  theme: "github-light"
+  crossorigin: "anonymous"
+
 
 # Disqus
 # 国内用户不要用，已被墙
