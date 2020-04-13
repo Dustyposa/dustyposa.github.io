@@ -1,9 +1,13 @@
 ---
 title: 从零开始搭建Github博客(其二)
-tags: [github_pages, hexo]
-category: [blog]
-date: 2020-04-09 10:28:39
+tags:
+  - github_pages
+  - hexo
+category:
+  - blog
 mermaid: true
+abbrlink: e575718e
+date: 2020-04-09 10:28:39
 ---
 # 搭建 github 博客之旅 （Part 2）
 在第一部分，我们介绍了如何搭建一个免费博客并部署在 `Github` 上面，但是我们还有很多可以优化（更懒）的地方，例如：
@@ -365,7 +369,14 @@ post:
 而当我们设置 `postCheck: true` 同时如果文章头部设置了: `comments: false` 时，该篇文章就会**禁用**评论功能了~
 
 
+## 增加看盘娘
+...
 
+## 增加永久链接
+...
+
+## 音乐播放器
+[WAITING TO SET](https://github.com/MoePlayer/hexo-tag-aplayer/blob/master/docs/README-zh_cn.md)
 
 
 

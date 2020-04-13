@@ -1,7 +1,11 @@
 ---
 title: 从requests请求重试到万能重试装饰器
-tags: [python,decorator]
-category: [advance]
+tags:
+  - python
+  - decorator
+category:
+  - advance
+abbrlink: f03dc1ff
 date: 2020-04-07 10:02:08
 ---
 

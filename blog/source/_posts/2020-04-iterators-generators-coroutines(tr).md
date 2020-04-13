@@ -1,7 +1,16 @@
 ---
 title: 'iterators,generators,coroutines'
-tags: [python,async,generator,iterator]
-category: [翻译,advance,网络,异步]
+tags:
+  - python
+  - async
+  - generator
+  - iterator
+category:
+  - 翻译
+  - advance
+  - 网络
+  - 异步
+abbrlink: a858f80b
 date: 2020-04-07 10:10:48
 ---
 ## Python 101: iterators,generators,coroutines

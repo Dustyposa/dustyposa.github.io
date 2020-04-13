@@ -1,7 +1,13 @@
 ---
 title: python 请求分析及多提取器 提取数据
-tags: [parser,spider]
-category: [网络,抓取,python]
+tags:
+  - parser
+  - spider
+category:
+  - 网络
+  - 抓取
+  - python
+abbrlink: 841d9ffa
 date: 2020-04-07 09:15:13
 ---
 

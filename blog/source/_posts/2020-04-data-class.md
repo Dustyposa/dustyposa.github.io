@@ -1,7 +1,11 @@
 ---
 title: 奇妙的对象模型及存储数据模型的技巧
-tags: [python,advance]
-category: [数据结构]
+tags:
+  - python
+  - advance
+category:
+  - 数据结构
+abbrlink: 6f4644c4
 date: 2020-04-07 09:43:13
 ---
 

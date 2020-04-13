@@ -1,9 +1,13 @@
 ---
-layout: python
-title: "python requests 代理和重定向信息"
+title: python requests 代理和重定向信息
+tags:
+  - python
+  - requests
+category:
+  - tips
+  - advance
+abbrlink: 2fb7c15d
 date: 2020-04-07 09:57:51
-tags: [python,requests]
-category: [tips,advance]
 ---
 在使用 `requests`的途中，我们经常会有使用代理的需求。那么如何使用代理呢？
 使用起来是和简单的，话不多说，直接上代码：

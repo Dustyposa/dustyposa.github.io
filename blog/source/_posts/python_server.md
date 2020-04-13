@@ -1,8 +1,14 @@
 ---
 title: python 编写多进程 socket web静态服务器
+tags:
+  - python3
+  - server
+  - socket
+category:
+  - 网络
+  - 服务器
+abbrlink: 6e9446e6
 date: 2020-04-06 11:12:42
-tags: [python3,server,socket]
-category: [网络,服务器]
 ---
 ### 服务器模型 C/S模型
 

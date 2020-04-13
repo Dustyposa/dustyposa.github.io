@@ -1,7 +1,11 @@
 ---
 title: 从零开始搭建Github博客(其一)
-tags: [github_pages, hexo]
-category: [blog]
+tags:
+  - github_pages
+  - hexo
+category:
+  - blog
+abbrlink: 4a44eaec
 date: 2020-04-07 18:03:30
 ---
 # 搭建 github 博客之旅 （Part 1）
