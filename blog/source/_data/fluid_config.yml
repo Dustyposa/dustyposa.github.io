@@ -180,7 +180,7 @@ page:
 # Post Page
 #---------------------------
 post:
-  banner_img: /img/default.png
+  banner_img: https://i.loli.net/2020/04/14/smYH5uD8Pb7k4oI.png
   banner_img_height: 70  # available: 0 - 100
   meta:  # 文章标题下方的信息
     date:  # 文章日期
