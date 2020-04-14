@@ -18,6 +18,8 @@ date: 2020-04-09 10:28:39
     - [icon 制作](#icon-生成)
     - [增强表现力-流程图支持](#流程图支持)
     - [来点评论](#评论支持)
+    - [看板娘来了](#增加看板娘)
+    - [永久链接](#增加永久链接)
 
 那么，话不多说，开始正题。
 
@@ -319,7 +321,7 @@ graph TD;
 ```
 这样就更能增强文章的表达力了～赶快试一试吧！
 
-## 评论支持
+## `utterances` 评论支持
 评论支持比较简单，参考这篇文章就行。
 [评论支持](https://litstronger.github.io/2020/04/03/hexo-fluid%E6%B7%BB%E5%8A%A0utterances%E8%AF%84%E8%AE%BA%E5%8A%9F%E8%83%BD/)
 
@@ -404,7 +406,7 @@ hexo s # 重启服务
 </p>
 
 
-## 音乐播放器
+## 下一章混入：音乐播放器
 [WAITING TO SET](https://github.com/MoePlayer/hexo-tag-aplayer/blob/master/docs/README-zh_cn.md)
 next part
 
