@@ -369,18 +369,47 @@ post:
 而当我们设置 `postCheck: true` 同时如果文章头部设置了: `comments: false` 时，该篇文章就会**禁用**评论功能了~
 
 
-## 增加看盘娘
-...
+## 增加看板娘
+就是我的博客右下角那 **萌小子**
+实现也很简单，参考 [这里](https://github.com/EYHN/hexo-helper-live2d)即可
+<p class="note note-info">有一点需要注意:可以将官方的两种配置混合使用</p>
 
 ## 增加永久链接
-...
+因为目前我们的文章链接**不是固定的**，所以分享给别人的时候链接会**失效**，所以有了这个插件，就可以**固定**住我们的文章链接了。
+安装模块：
+```bash
+npm install hexo-abbrlink --save
+```
+更改配置:
+全局搜索 `permalink`,然后更改为
+```yml
+permalink: posts/:abbrlink/
+# 下面的为需要添加的
+abbrlink:
+  alg: crc32  # support crc16(default) and crc32
+  rep: hex  # Represent (the generated link could be presented in hex or dec value)
+```
+
+*具体作用可以参看[文档](https://github.com/rozbo/hexo-abbrlink)*
+
+开启测试：
+命令行界面输入 
+```bash
+hexo clean  # 这部比较关键
+hexo s # 重启服务
+```
+就可以看到我们的网站链接都变成了固定的短链接了。
+<p class="note note-info">
+可能遇到的情况是文章没有生成短链接，那是由于文章头部加了 <code>layout: xxx</code>，<b>删除</b>该配置即可。
+</p>
+
 
 ## 音乐播放器
 [WAITING TO SET](https://github.com/MoePlayer/hexo-tag-aplayer/blob/master/docs/README-zh_cn.md)
+next part
 
 
 
-主要是 
 
 >参考资料：
 [hexo 文档](https://hexo.io/zh-cn/docs/github-pages)
@@ -388,4 +417,5 @@ post:
 [hexo_all_minifier 文档](https://github.com/chenzhutian/hexo-all-minifier)
 [hexo-filter-mermaid-diagrams](https://github.com/webappdevelp/hexo-filter-mermaid-diagrams)
 [评论支持](https://litstronger.github.io/2020/04/03/hexo-fluid%E6%B7%BB%E5%8A%A0utterances%E8%AF%84%E8%AE%BA%E5%8A%9F%E8%83%BD/)
+[固定链接](https://github.com/rozbo/hexo-abbrlink)
 

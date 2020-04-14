@@ -139,6 +139,8 @@ live2d:
     opacityDefault: 0.7
     opacityOnHover: 0.2
 
+# 永久链接
+
 addlink:
   before_text: <b>本文地址： # text before the post link
   after_text:  </b> # text after the post link
