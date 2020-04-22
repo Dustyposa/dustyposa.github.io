@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>pytest 之旅(Part:1)</title>
+    <link href="/posts/173aa14f/"/>
+    <url>/posts/173aa14f/</url>
+    
+    <content type="html"><![CDATA[<h2 id="从零开始使用-Pytest"><a href="#从零开始使用-Pytest" class="headerlink" title="从零开始使用 Pytest"></a>从零开始使用 Pytest</h2><h3 id="install"><a href="#install" class="headerlink" title="install"></a>install</h3><p>安装比较简单，我们使用：</p><pre><code>python3 -m pip install pytest</code></pre><p>即可。</p><details><summary>venv 安装方式<b style="color:#8b0000">（推荐）</b></summary><pre><code class="bash">python -m venv env  # 创建 虚拟环境文件夹source env/bin/activate  # 激活虚拟环境，windows 请自己寻找 activate.exepip install pytest# else commanddeactivate # 退出虚拟环境</code></pre></details><h3 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h3><p><b>本文地址： <a href="https://dustyposa.github.com/posts/173aa14f/">https://dustyposa.github.com/posts/173aa14f/</a></b></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>advance</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>python</tag>
+      
+      <tag>test</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>从零开始搭建Github博客(其二)</title>
     <link href="/posts/e575718e/"/>
     <url>/posts/e575718e/</url>
