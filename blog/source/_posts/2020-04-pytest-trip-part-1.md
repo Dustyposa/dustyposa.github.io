@@ -34,3 +34,18 @@ deactivate # 退出虚拟环境
 </details>
 
 ### 基本使用
+我们建立一个 `test_a,py` 文件，编写一些测试代码:
+```python
+import pytest
+
+def test_bool() -> None:
+    assert bool(1) == True
+    assert 2 > 1
+    with pytest.raises(ZeroDivisionError):
+        1 / 0
+```
+**运行测试文件：**
+```bash
+$ pytest test_a.py
+```
+
