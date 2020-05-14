@@ -15,12 +15,16 @@
       
       <category>middleware</category>
       
+      <category>mq</category>
+      
     </categories>
     
     
     <tags>
       
       <tag>python</tag>
+      
+      <tag>celery</tag>
       
     </tags>
     
