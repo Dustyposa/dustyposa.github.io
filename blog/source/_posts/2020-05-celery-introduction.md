@@ -2,8 +2,10 @@
 title: Celery 简介、测试环境搭建（Docker）及使用
 tags:
   - python
+  - celery
 category:
   - middleware
+  - mq
 mermaid: false
 abbrlink: feca44b4
 date: 2020-05-13 21:50:12
