@@ -91,7 +91,7 @@ $ docker run -d --name rq -p 5462:5462 rabbitmq  # 取名为 rq （没错，就�
 
 ```bash
 $ docker pull redis
-$ docker run -d --name rd -p 6379:6379 redis  # 取名为 rq （没错，就是太懒了,这名字有什么用？ 不急！后面还有用！
+$ docker run -d --name rd -p 6379:6379 redis  # 取名为 rd （没错，就是太懒了,这名字有什么用？ 不急！后面还有用！
 ```
 
 我们的依赖就安装好了，看看目前的状态：
@@ -99,7 +99,7 @@ $ docker run -d --name rd -p 6379:6379 redis  # 取名为 rq （没错，就是�
 ```bash
 $ docker ps
 CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS              PORTS                                                        NAMES
-655908bd8ae1        python:3.7-slim            "python3"                2 minutes ago       Up 2 minutes                                                                    celery
+655908bd8ae1        python:3.7-slim            "bash"                   2 minutes ago       Up 2 minutes                                                                    celery
 047191725a73        redis                      "docker-entrypoint.s…"   1 minutes ago       Up 1 minutes         0.0.0.0:6379->6379/tcp                                       rd
 a8766c15631f        rabbitmq                   "docker-entrypoint.s…"   1 minutes ago       Up 1 minutes         4369/tcp, 5671-5672/tcp, 25672/tcp, 0.0.0.0:5462->5462/tcp   rq
 
@@ -254,7 +254,7 @@ True
 
 > Q：
 >
-> 每次清掉测试环境之后，**再启动步骤很多**，比较麻烦，有没有什么简单的方法呢？
+> 每次清掉测试环境之后，**再启动步骤很多，关闭操作也很多。**，比较麻烦，有没有什么简单的方法呢？
 >
 > A：
 >
@@ -299,41 +299,95 @@ True
 touch docker-compose.yml
 ```
 
-编写 `yml` 文件（**未完。。待续。**）：
+编写 `yml` 文件：
 
 ```yaml
-version: '0.1'
+version: '2'
 services:
   celery:
-    build: .
+    image: python:3.7-slim
+    container_name: 'celery'
     volumes:
-      - /home/data:/home/data
+      - /tmp/celery_data:/tmp/celery_data
     depends_on:
       - redis
       - rabbitmq
     networks:
-      - msg
+      - msg_middleware
+    working_dir: /tmp/celery_data
+    command: ["bash", "celery.sh"]
   redis:
-    image: "redis"
+    image: redis
+    container_name: 'rd'
     ports:
       - 6379:6379
     networks:
-      - msg
+      - msg_middleware
   rabbitmq:
-    image: "rabbitmq"
+    container_name: 'rq'
+    image: rabbitmq
     ports:
       - 5462:5462
     networks:
-      - msg
-
+      - msg_middleware
 networks:
-  msg:
-     name: msg_middleware
+  msg_middleware:
 ```
 
+细心的你会发现，我们有一个 `celery.sh`，其实脚本也比较简单，如下：
+```bash
+$ vim celery.sh
+pip install celery redis -i https://pypi.tuna.tsinghua.edu.cn/simple
+celery -A tasks worker --loglevel=info
+```
+把之前的命令行全放进来就行了（`pip` 这里不标准，应该放到 `dockerfile` 中的，便于演示，就直接这样了。）
+运行我们的 `docker-compose` 就可以啦！
+#### 启动 测试集,，并在后台运行
+
+```bash
+$ docker-compose up -d
+Creating network "data_msg_middleware" with the default driver
+Creating rq ... done
+Creating rd ... done
+Creating celery ... done
+```
+
+检测是否运行成功，我们在宿主机测试，参照之前的方式即可：
+
+```bash
+docker exec -w /tmp/celery_data/ -it celery python
+Python 3.7.4 (default, Oct 17 2019, 06:10:02)
+[GCC 8.3.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from tasks import add
+>>> res = add.delay(4, 4)
+>>> res.ready()
+True
+>>> res.get()
+8
+```
+#### 关闭 测试集
+```bash
+$ docker-compose down
+Stopping rd ... done
+Stopping rq ... done
+Removing celery ... done
+Removing rd     ... done
+Removing rq     ... done
+Removing network data_msg_middleware
+```
+#### 其他命令
+- 停止 `docker-compose stop`
+- 重启 `docker-compose restart`
+- 启动子应用 `docker-compose up subapp_name`
+- 删除镜像及容器 `docker-compose rmi --all`
 
 
-
+#### 总结
+用 `docker` 来搭建 `celery` 测试环境的文章就到这里啦。相信大家对 `docker` 也有了一定的认识。至少用来做环境管理是非常方便的！
+从 `docker` 创建我们所需的环境，再到 `docker-compose` 一键管理我们的环境，相信你也学到了很多。
+至少再也不用担心的环境问题了！
+今天就到这里，下次我们会对 `celery` 进行深入使用哦，敬请期待。
 
 > 参考资料：
 >
