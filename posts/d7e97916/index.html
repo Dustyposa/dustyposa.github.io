@@ -1,0 +1,202 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png"><link rel="icon" type="image/png" href="/img/favicon.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta name="theme-color" content="#2f4154"><meta name="description" content="一些经验的记录。"><meta name="author" content="Dusty Posa"><meta name="keywords" content="python,python3,process,script"><title>基于 rasa 的语音助手搭建 - Posaのにわ</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.1"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>Posaのにわ</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(https://i.loli.net/2020/04/14/smYH5uD8Pb7k4oI.png) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期三, 一月 13日 2021, 12:03 中午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 3k 字 </span><span class="post-meta"><i class="far fa-clock"></i> 13 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><p class="note note-warning">本文最后更新于：星期三, 一月 13日 2021, 10:56 上午</p><div class="markdown-body"><h2 id="为什么写本文？"><a href="#为什么写本文？" class="headerlink" title="为什么写本文？"></a>为什么写本文？</h2><p>在工业级的开源对话系统系统中，<a href="https://rasa.com/" target="_blank" rel="noopener">RASA</a> 是不二之选。<br>基于 <code>RASA</code> 的简单的对话系统文章有很多，本文就不在赘述。但是基于 <code>RASA</code> 语音对话的文章很少。<br>所以，本文主要是搭建一个基于 <code>RASA 的语音</code> 对话系统。<br>基本资料参考于 <a href="https://blog.rasa.com/how-to-build-a-voice-assistant-with-open-source-rasa-and-mozilla-tools/" target="_blank" rel="noopener"><code>这篇文章</code></a>。<br>简单的说就是踩坑避险记。</p><h2 id="你能学到什么？"><a href="#你能学到什么？" class="headerlink" title="你能学到什么？"></a>你能学到什么？</h2><ul><li><ol><li><code>RASA</code> 的一些相关知识</li></ol></li><li><ol start="2"><li>如何在 <code>RASA</code> 中自定义 <code>channel</code></li></ol></li><li><ol start="3"><li>如何使用 <code>deepspeech</code> 实现 <code>STT(语音转文字)</code></li></ol></li><li><ol start="4"><li>如何使用 <code>TTS(文字转语音)</code></li></ol></li></ul><h2 id="最终呈现是什么"><a href="#最终呈现是什么" class="headerlink" title="最终呈现是什么?"></a>最终呈现是什么?</h2><p>看看这里:</p><blockquote><iframe width="650" height="366" src="https://www.youtube.com/embed/n2pdLv8cGH0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></blockquote><h2 id="一些基础介绍"><a href="#一些基础介绍" class="headerlink" title="一些基础介绍"></a>一些基础介绍</h2><h4 id="实现语音助手需要什么"><a href="#实现语音助手需要什么" class="headerlink" title="实现语音助手需要什么"></a>实现语音助手需要什么</h4><div class="mermaid">graph LR; 语音输入-- STT -->文字输入; 文字输入-- text -->对话模块; 对话模块-- text -->文字输出; 文字输出-- TTS -->语音输出;</div><p>再来个具象一点的图</p><blockquote><p><img src="https://i.loli.net/2021/01/13/TLjEoIgh3MYx7G2.png" srcset="/img/loading.gif" alt=""></p></blockquote><p>从上图我们可以看出，我们核心要解决的即是 <code>SST、对话模块以及TTS</code><br><strong>对话模块</strong>，我们有了 <code>rasa</code> 来作为实现。<br>其余两个我们选择开源工具来实现。</p><ul><li><code>STT</code><ul><li><a href="https://github.com/mozilla/DeepSpeech" target="_blank" rel="noopener">DeepSpeech</a></li></ul></li><li><code>TTS</code><ul><li><a href="https://github.com/mozilla/TTS" target="_blank" rel="noopener">TTS</a></li></ul></li></ul><p>我们思考一下够了吗? 当然不够！<br><strong>语音</strong>从哪里来?到哪里去?<br>没错，我们还少一个 <code>UI</code>，作为与用户交互的接口。<br>这里我们选用: <a href="https://github.com/RasaHQ/rasa-voice-interface" target="_blank" rel="noopener">rasa-voice-interface</a><br>有了这4个神器，基础版本的需求我们应该能满足了。我们来看一下我们的架构:</p><blockquote><p><img src="https://i.loli.net/2021/01/13/iHSXyRpKDgvC3cm.png" srcset="/img/loading.gif" alt=""><br>注意:<br>右边 <code>rasa</code> 的图为 <code>1.x</code> 版本的结构， <code>2.x</code> 应该为 <code>NLU（自然语言理解）</code> 和 <code>DM（对话管理）</code><br>合起来就能实现整个对话。</p></blockquote><p>好了，这就是我们所需要的全部内容，看起来也不太复杂对吧。（嗯！的确不太<em>复杂</em>。）</p><h2 id="我们应该思考一些什么"><a href="#我们应该思考一些什么" class="headerlink" title="我们应该思考一些什么"></a>我们应该思考一些什么</h2><h4 id="各部分如何连接"><a href="#各部分如何连接" class="headerlink" title="各部分如何连接?"></a>各部分如何连接?</h4><p>拆成 <code>4</code> 部分后，其实我们的每一部分都可以替换，<br>比如:</p><ul><li><code>STT</code> 替换为接口请求服务（<code>CRUD</code> 大法好）</li><li><code>TTS</code> 替换为借口请求服务（<code>CRUD</code> 大法好得不得了）</li><li><code>RASA</code> 替换为 <code>Google Dialogflow、Wit.ai、Microsoft LUIS、IBM Watson</code> 等</li></ul><p>但是 <code>UI</code> 的替换稍微麻烦一些，那我们就假定 <code>UI</code> 的逻辑是不变的，看看我们应该怎么办。<br>我们先想一下各部分的输入输出:</p><ul><li><p><code>UI</code>:</p><div class="mermaid">graph LR; 输入 --- id1>语音]; 输出 --- id1;</div><p>都是<code>语音</code>的输入输出，那么要么是文件传输，要么是源数据传输。<br>从 <code>UI</code> 的<a href="https://github.com/RasaHQ/rasa-voice-interface" target="_blank" rel="noopener">源码</a>中我们可以看出，用户<strong>输入</strong>语音后，通过 <code>socket</code> 传输 <code>base64</code> 编码的语音数据，传给 <code>5005</code> 端口。<strong>输出</strong>语音通过一个连接下载语音，然后播放。</p></li><li><p><code>STT</code>:</p><div class="mermaid">graph LR; 输入 --- id1>语音]; 输出 --- id2>文本];</div></li><li><p><code>TTS</code>:</p><div class="mermaid">graph LR; 输入 --- id1>文本]; 输出 --- id2>语音];</div></li><li><p><code>RASA</code>:</p><div class="mermaid">graph LR; 输入 --- id1>文本]; 输出 --- id1;</div><p>通过以上的输入输出，我们可以看出，我们主要需要实现一个中间件，实现各部分数据的流转。<br>这个中间件的功能主要是:<br>实现 <code>文本语音</code> 的互转，并控制 <code>文本</code> 数据在 <code>RASA</code> 中流转。<br>就像这样:</p><div class="mermaid">graph LR; 语音-- middleware --> rasa; rasa -- middleware --> 语音;</div></li></ul><p>于是，我们选择的目标变成了制作一个控制 <em>语音文本</em> 转换的 <code>middleware</code> 。</p><h4 id="制作-middleware"><a href="#制作-middleware" class="headerlink" title="制作 middleware"></a>制作 <code>middleware</code></h4><p>怎么做?怎么结合?说那么干嘛，直接做呀。<br>别急，我们看看 <code>RASA</code> 的文档。</p><blockquote><p>…… 经过短暂的文档查阅</p></blockquote><p>好家伙，搜到 <a href="https://rasa.com/docs/rasa/connectors/telegram" target="_blank" rel="noopener">voice</a> 了。<br>看看源码（源码阅读中…原来如此原来如此…, <code>OutputChannel</code> 获得， <code>InputChanel</code> 获得)。<br>从源码中，我们发现虽然只有 <code>发送 audio</code> 的功能是我们需要的功能的一部分，但是至少我们知道了 <code>Rasa</code> 中有一个 <a href="https://rasa.com/docs/rasa/connectors/your-own-website#websocket-channel" target="_blank" rel="noopener"><code>Channel Conncetor</code></a> 的东西，能帮我们进行输入输出的调整，连接到不同的地方（相当于匹配不同的 <code>UI</code>， 例如: <code>Slack、Facebook ...</code>）。</p><p>于是，我们新的目标，有了！<br><strong>制作我们自己的 <code>Channel</code>。</strong></p><h2 id="开始制作-Channel"><a href="#开始制作-Channel" class="headerlink" title="开始制作 Channel"></a>开始制作 <code>Channel</code></h2><h4 id="选择基础-Channel"><a href="#选择基础-Channel" class="headerlink" title="选择基础 Channel"></a>选择基础 <code>Channel</code></h4><p>目前有两种 <code>Channel</code> 可以选择， <code>Rest Channel</code> 以及 <code>WebSocket Channel</code><br>这里我们选择 <code>WebSocket Channel</code> (因为 <code>UI</code> 的接口是 <code>WebSocket</code>)</p><h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><p>编写 <code>voice_connector.py</code> 。<br>等等，太快了。我们先看一下整体结构，整理一下。根据 <code>Channel</code> 的示例。<br>我们需要两个类 <code>VoiceInput, VoiceOutput</code>, 分别对应 <code>Channel</code> 的 <code>输入和输出</code>。</p><p><code>VoiceInput</code> 中需要实现:</p><ul><li>接收语音数据</li><li><code>STT</code></li></ul><p><code>VoiceOutput</code> 中需要实现:</p><ul><li><code>TTS</code></li><li>发送语音数据</li></ul><h4 id="开始-VoiceInput"><a href="#开始-VoiceInput" class="headerlink" title="开始 VoiceInput"></a>开始 <code>VoiceInput</code></h4><p>我们继承现有的 <code>SocketIOInput</code>，重写主要的部分，<code>blueprint</code> 方法，核心代码如下：</p><pre><code class="python">class VoiceInput(SocketIOInput):
+    def blueprint(
+            self, on_new_message: Callable[[UserMessage], Awaitable[Any]]
+    ) -&gt; Blueprint:
+        # Workaround so that socketio works with requests from other origins.
+        # https://github.com/miguelgrinberg/python-socketio/issues/205#issuecomment-493769183
+        sio = AsyncServer(async_mode=&quot;sanic&quot;, cors_allowed_origins=&quot;*&quot;)
+        socketio_webhook = SocketBlueprint(
+            sio, self.socketio_path, &quot;socketio_webhook&quot;, __name__
+        )
+
+        self.sio = sio
+        --- skip -- 
+        @sio.on(self.user_message_evt, namespace=self.namespace)
+        async def handle_message(sid: Text, data: Dict) -&gt; Any:
+            &quot;&quot;&quot;处理收到的客户端数据&quot;&quot;&quot;
+            output_channel = VoiceOutput(sio, self.bot_message_evt)  # 初始化 Output
+
+            message = data[&quot;message&quot;]
+            if message == &quot;/get_started&quot;:
+                message = data[&quot;message&quot;]
+            else:
+                &quot;处理发送过来的语音数据&quot;
+                bytes_data = base64.b64decode(message.split(&quot;,&quot;, maxsplit=1)[-1])  #  解码 base64 获取语音元数据
+                audio, fs = librosa.load(
+                    BytesIO(bytes_data), sr=None, dtype=&quot;int16&quot;, mono=False
+                )  # 获取声波数据
+                print(&quot;获取音频信息成功&quot;)
+                message = ds.predict_to_string(audio, fs)  # STT
+                print(f&quot;预测输出为: {message}&quot;)
+                await sio.emit(
+                    self.user_message_evt, {&quot;text&quot;: message}, room=sid
+                )  # 文本发给前端，用作显示
+
+            message = UserMessage(
+                message, output_channel, sid, input_channel=self.name()
+            )
+            await on_new_message(message)
+
+        return socketio_webhook
+</code></pre><p>代码也比较简单，模板其实没有变化，主要是 数据的处理逻辑发生改变。<br>需要注意的点:</p><ul><li><code>self.user_message_evt</code> 这个 <code>event</code> 会执行 <code>handle_message</code> 方法。<code>self.user_message_evt</code> 目前使用的默认值。</li><li>执行 <code>await on_new_message(message)</code> 的时候，就会执行 <code>RASA</code> 的 <code>NLU</code> 以及 <code>DM</code> 最终获得 一个输出的 <code>message</code>, 这个 <code>message</code> 的格式可以自定义的。</li><li><code>sio = AsyncServer(async_mode=&quot;sanic&quot;, cors_allowed_origins=&quot;*&quot;)</code>，这里 <code>cors_allowed_origins</code> 这样方便一些，否则跨域。</li></ul><h4 id="开始-VoiceOutput"><a href="#开始-VoiceOutput" class="headerlink" title="开始 VoiceOutput"></a>开始 <code>VoiceOutput</code></h4><p>同样，我们继承现有的 <code>SocketIOOutput</code>，重写主要的部分，<code>send_text_message</code> 方法，核心代码如下：</p><pre><code class="python">class VoiceOutput(SocketIOOutput):
+    async def send_text_message(
+            self, recipient_id: Text, text: Text, **kwargs: Any
+    ) -&gt; None:
+        &quot;&quot;&quot;Send a message through this channel.&quot;&quot;&quot;
+        print(&quot;开始发送信息&quot;)
+        await self._send_audio_message(socket_id=recipient_id, response={&quot;text&quot;: text})
+
+    async def _send_audio_message(self, socket_id: str, response: Any) -&gt; None:
+        &quot;&quot;&quot;Sends a message to the recipient using the bot event.&quot;&quot;&quot;
+
+        ts = time.time()
+        out_file_name = str(ts) + &quot;.wav&quot;
+        link = self.FILE_SERVER + out_file_name
+        tts_run(text=response[&quot;text&quot;], file_name=out_file_name)  # TTS 生成语音文件
+        await self._send_message(
+            response={&quot;text&quot;: response[&quot;text&quot;], &quot;link&quot;: link}, socket_id=socket_id
+        )  # 发送给前端
+</code></pre><p><code>VoiceOutput</code> 就更简单了。<br>需要注意的是:</p><ul><li>这里我们重写 <code>send_text_message</code> 方法，因为我们的机器人返回的为 <code>text</code> 的格式</li><li><code>{&quot;text&quot;: response[&quot;text&quot;], &quot;link&quot;: link}</code> 这个为固定格式，前端从 <code>link</code> 地址下载 音频文件并播放。</li><li><h2 id="SARA-机器人的准备"><a href="#SARA-机器人的准备" class="headerlink" title="SARA 机器人的准备"></a>SARA 机器人的准备</h2>这里我们使用官方的 <code>rasa-demo</code> 机器人做演示，其他机器人同理。<br><a href="https://github.com/RasaHQ/rasa-demo" target="_blank" rel="noopener">官方教程</a><h4 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h4><pre><code class="bash">git clone https://github.com/RasaHQ/rasa-demo.git --depth 1
+cd rasa-demo
+pip install -r requirements.txt
+pip install -e .</code></pre><h4 id="2-训练模型"><a href="#2-训练模型" class="headerlink" title="2. 训练模型"></a>2. 训练模型</h4><code>rasa train --augmentation 0 # 加速训练</code></li></ul><h4 id="3-更改-channel"><a href="#3-更改-channel" class="headerlink" title="3. 更改 channel"></a>3. 更改 <code>channel</code></h4><p>创建 <code>credentials.yml</code><br>内容如下:</p><pre><code class="yml">utils.voice_connector.VoiceInput:
+  bot_message_evt: bot_uttered
+  session_persistence: true
+  user_message_evt: user_uttered</code></pre><p><code>utils.voice_connector.VoiceInput</code> 为放我们编写的 <code>channel</code> 的地方，需制定到 <code>Input</code> 的 <code>class</code>。<code>utils</code> 为文件夹名字。</p><h4 id="4-运行（不是现在）"><a href="#4-运行（不是现在）" class="headerlink" title="4. 运行（不是现在）"></a>4. 运行（不是现在）</h4><ul><li><code>duckling</code><ul><li><code>docker run -p 8000:8000 rasa/duckling</code></li></ul></li><li><code>action server</code><ul><li><code>rasa run actions --actions actions.actions</code></li></ul></li><li><code>rasa api</code><ul><li><code>rasa run --enable-api -p 5005</code></li></ul></li></ul><p>但是我们可以体验一下，运行前两个服务后:<br><code>rasa shell --debug</code><br>本地启动 <code>rasa</code>，我们就可以开始和机器人对话了。</p><h2 id="其余剩余的部分"><a href="#其余剩余的部分" class="headerlink" title="其余剩余的部分"></a>其余剩余的部分</h2><p>剩下部分比较简单，替代性比较强，我就简单过一下了。</p><h3 id="STT"><a href="#STT" class="headerlink" title="STT"></a>STT</h3><h4 id="1-安装及模型下载"><a href="#1-安装及模型下载" class="headerlink" title="1. 安装及模型下载"></a>1. 安装及模型下载</h4><p><a href="https://deepspeech.readthedocs.io/en/latest/?badge=latest" target="_blank" rel="noopener">官方教程</a></p><pre><code class="bash"># Install DeepSpeech
+pip3 install deepspeech
+
+# Download pre-trained English model files
+curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.pbmm
+curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer</code></pre><h4 id="2-编写-STT-部分"><a href="#2-编写-STT-部分" class="headerlink" title="2. 编写 STT 部分"></a>2. 编写 <code>STT</code> 部分</h4><p><code>deepspeech.py</code> 使用起来相当简单。</p><pre><code class="python">from deepspeech import Model
+
+
+class DeepSpeechModel:
+    def __init__(self):
+        self.ds = self._load_model()
+
+    @staticmethod
+    def _load_model():
+        ds = Model(&quot;deepspeech-0.9.3-models.pbmm&quot;)
+        ds.enableExternalScorer(&quot;deepspeech-0.9.3-models.scorer&quot;)
+        return ds
+
+    def predict_to_string(self, audio, fs) -&gt; str:
+        return self._metadata_to_string(
+            self.ds.sttWithMetadata(audio, fs).transcripts[0]
+        )
+
+    @staticmethod
+    def _metadata_to_string(metadata):
+        return &quot;&quot;.join(token.text for token in metadata.tokens)</code></pre><p>我们的 <code>ds</code> 有了。</p><h3 id="TTS"><a href="#TTS" class="headerlink" title="TTS"></a>TTS</h3><p><a href="https://github.com/mozilla/TTS" target="_blank" rel="noopener">官方教程</a></p><h4 id="1-安装及模型下载-1"><a href="#1-安装及模型下载-1" class="headerlink" title="1. 安装及模型下载"></a>1. 安装及模型下载</h4><p><a href="https://colab.research.google.com/drive/1tKHSI20kRlOL0PSA8mCVJQIrgRIswg0F?usp=sharing" target="_blank" rel="noopener">参考教程</a><br>使用到的模型:</p><pre><code class="bash">curl -LO https://drive.google.com/uc?id=1dntzjWFg7ufWaTaFy80nRz-Tu02xWZos tts_model.pth.tar
+curl -LO https://drive.google.com/uc?id=18CQ6G6tBEOfvCHlPqP8EBI4xWbrr9dBc config.json
+curl -LO https://drive.google.com/uc?id=1Ty5DZdOc0F7OTGj9oJThYbL5iVu_2G0K vocoder_model.pth.tar
+curl -LO https://drive.google.com/uc?id=1Rd0R_nRCrbjEdpOwq6XwZAktvugiBvmu config_vocoder.json
+curl -LO https://drive.google.com/uc?id=11oY3Tv0kQtxK_JPgxrfesa99maVXHNxU scale_stats.npy</code></pre><p>安装 <code>tts</code>:</p><pre><code class="bash">sudo apt-get install espeak
+git clone https://github.com/mozilla/TTS.git
+git checkout b1935c97
+pip install -r requirements.txt
+python setup.py install</code></pre><h4 id="2-编写代码"><a href="#2-编写代码" class="headerlink" title="2. 编写代码"></a>2. 编写代码</h4><p><code>tts.py</code>:</p><pre><code class="python">import time
+from functools import partial
+
+import torch
+import wavio
+from TTS.utils.audio import AudioProcessor
+from TTS.utils.generic_utils import setup_model
+from TTS.utils.io import load_config
+from TTS.utils.synthesis import synthesis
+from TTS.utils.text.symbols import phonemes, symbols
+from TTS.vocoder.utils.generic_utils import setup_generator
+
+# runtime settings
+use_cuda = False
+
+# model paths
+BASE_DIR = &quot;./&quot;
+TTS_MODEL = BASE_DIR + &quot;tts_model.pth.tar&quot;
+TTS_CONFIG = BASE_DIR + &quot;config.json&quot;
+VOCODER_MODEL = BASE_DIR + &quot;vocoder_model.pth.tar&quot;
+VOCODER_CONFIG = BASE_DIR + &quot;config_vocoder.json&quot;
+
+# 读取配置文件
+TTS_CONFIG = load_config(TTS_CONFIG)
+VOCODER_CONFIG = load_config(VOCODER_CONFIG)
+
+# 加载 audio processor
+ap = AudioProcessor(**TTS_CONFIG.audio)
+# 加载 TTS MODEL
+# multi speaker
+speaker_id = None
+speakers = []
+
+# load the model
+num_chars = len(phonemes) if TTS_CONFIG.use_phonemes else len(symbols)
+model = setup_model(num_chars, len(speakers), TTS_CONFIG)
+
+# load model state
+cp = torch.load(TTS_MODEL, map_location=torch.device(&quot;cpu&quot;))
+
+# load the model
+model.load_state_dict(cp[&quot;model&quot;])
+if use_cuda:
+    model.cuda()
+model.eval()
+
+# set model stepsize
+if &quot;r&quot; in cp:
+    model.decoder.set_r(cp[&quot;r&quot;])
+
+# LOAD VOCODER MODEL
+vocoder_model = setup_generator(VOCODER_CONFIG)
+vocoder_model.load_state_dict(torch.load(VOCODER_MODEL, map_location=&quot;cpu&quot;)[&quot;model&quot;])
+vocoder_model.remove_weight_norm()
+vocoder_model.inference_padding = 0
+
+ap_vocoder = AudioProcessor(**VOCODER_CONFIG[&quot;audio&quot;])
+if use_cuda:
+    vocoder_model.cuda()
+vocoder_model.eval()
+
+
+def tts(model, text, file_name, CONFIG, use_cuda, ap, use_gl):
+    t_1 = time.time()
+    waveform, alignment, mel_spec, mel_postnet_spec, stop_tokens, inputs = synthesis(
+        model,
+        text,
+        CONFIG,
+        use_cuda,
+        ap,
+        truncated=False,
+        enable_eos_bos_chars=CONFIG.enable_eos_bos_chars,
+    )
+    if not use_gl:
+        waveform = vocoder_model.inference(
+            torch.FloatTensor(mel_postnet_spec.T).unsqueeze(0)
+        )
+        waveform = waveform.flatten()
+    if use_cuda:
+        waveform = waveform.cpu()
+    waveform = waveform.numpy()
+    rtf = (time.time() - t_1) / (len(waveform) / ap.sample_rate)
+    tps = (time.time() - t_1) / len(waveform)
+
+    print(waveform.shape)
+    print(&quot; &gt; Run-time: {}&quot;.format(time.time() - t_1))
+    print(&quot; &gt; Real-time factor: {}&quot;.format(rtf))
+    print(&quot; &gt; Time per step: {}&quot;.format(tps))
+    wavio.write(file_name, waveform, CONFIG.audio[&quot;sample_rate&quot;], sampwidth=2)  # 将 wav 写入文件
+    return alignment, mel_postnet_spec, stop_tokens, waveform
+
+
+tts_run = partial(
+    tts, model=model, CONFIG=TTS_CONFIG, use_cuda=use_cuda, ap=ap, use_gl=False
+)
+
+if __name__ == &quot;__main__&quot;:
+    sentence = &quot;Bill got in the habit of asking himself “Is that thought true?” and if he wasn’t absolutely certain it was, he just let it go.&quot;
+    file_name = &quot;myfile.wav&quot;
+    align, spec, stop_tokens, wav = tts(
+        model, sentence, file_name, TTS_CONFIG, use_cuda, ap, use_gl=False
+    )
+</code></pre><p>这样我们的 <code>tts_run</code> 也有了。 拼图就凑齐了。</p><h3 id="UI-服务"><a href="#UI-服务" class="headerlink" title="UI 服务"></a>UI 服务</h3><h4 id="1-安装-1"><a href="#1-安装-1" class="headerlink" title="1. 安装"></a>1. 安装</h4><pre><code class="bash">git clone https://github.com/RasaHQ/rasa-voice-interface.git --depth 1
+cd rasa-voice-interface
+npm install</code></pre><h4 id="2-运行"><a href="#2-运行" class="headerlink" title="2. 运行"></a>2. 运行</h4><pre><code class="bash">npm run serve</code></pre><p>成功启动时的界面:</p><blockquote><p><img src="https://i.loli.net/2021/01/13/qZVTdsGMCAtaISk.gif" srcset="/img/loading.gif" alt="ezgif.com-video-to-gif.gif"></p></blockquote><p>和 <code>rasa</code> 连接成功时的界面:</p><blockquote><p><img src="https://i.loli.net/2021/01/13/5JoMd8pENA4OcLY.png" srcset="/img/loading.gif" alt="image.png"></p></blockquote><h3 id="还差一个，文件服务器"><a href="#还差一个，文件服务器" class="headerlink" title="还差一个，文件服务器"></a>还差一个，文件服务器</h3><p>这里我们使用最简单的，注意，需要在 <code>rasa-demo</code> 文件夹的根目录运行。<br><code>python3 -m http.server 8888</code><br>这样，我们所有的东西都有了。可以运行 <code>rasa</code> 部分的代码了～</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="RASA-总结"><a href="#RASA-总结" class="headerlink" title="RASA 总结"></a>RASA 总结</h3><ul><li>在对于仅需处理<strong>输入输出</strong>的时候，利用 <code>channel</code> 实现是最方便且最合理的。</li><li><code>rasa core</code> 已是过去式。</li><li><code>channel</code> 目前基于 <code>sanic</code>，能实现 <code>rest</code> 或者 <code>websocket</code>。</li></ul><h3 id="服务总结"><a href="#服务总结" class="headerlink" title="服务总结"></a>服务总结</h3><p>上面为所有的代码，以及模块的总结。但是，缺少一个服务间的调用，我们补一下。<br>先梳理一下，我们用到的服务。</p><ul><li><code>duckling</code> 文本提取</li><li><code>action server</code> <code>rasa</code> 自定义 <code>action</code> 的实现</li><li><code>rasa server</code> <code>rasa</code> 本身的服务</li><li><code>ui server</code> 前端 <code>UI</code> 服务</li><li><code>http.server</code> 文件下载服务</li></ul><p>服务调用关系如下:</p><div class="mermaid">graph LR; ui((ui server))-- 音频文件请求 --> fs((http.server)); fs-- response file -->ui; ui-- request 音频 -->rasa_s((rasa server)); rasa_s-- socket response-->ui; rasa_s-- nlu -->duckling((duckling)); rasa_s-- nlu -->action((action server)); duckling-- response -->rasa_s; action-- response -->rasa_s;</div><h3 id="用到的三方库的总结"><a href="#用到的三方库的总结" class="headerlink" title="用到的三方库的总结"></a>用到的三方库的总结</h3><ul><li><code>wavio</code> <code>wav</code>文件的读写</li><li><code>TTS</code> 的相关操作</li><li><code>librosa</code> 文件数据转音频波</li><li><code>socketio</code> <code>socket server</code></li><li><code>deepspeech</code> <code>STT</code></li></ul><h3 id="所有的代码"><a href="#所有的代码" class="headerlink" title="所有的代码"></a>所有的代码</h3><p><a href="">这里</a><br>主要是 <code>utils</code> 以及 <code>compoments</code>。</p><blockquote><p>参考资料：<br><a href="https://blog.rasa.com/how-to-build-a-voice-assistant-with-open-source-rasa-and-mozilla-tools/" target="_blank" rel="noopener"><code>用 mozilla 工具和 rasa 构建语音助手</code></a> (好看的图也引用的这里的（留下不学无术的泪水))<br><a href="https://github.com/mozilla/TTS" target="_blank" rel="noopener">TTS</a><br><a href="https://deepspeech.readthedocs.io/en/latest/?badge=latest" target="_blank" rel="noopener">DeepSpeech</a><br><a href="https://github.com/RasaHQ/rasa-voice-interface" target="_blank" rel="noopener">rasa voice ui</a></p></blockquote><p><b>本文地址： <a href="https://dustyposa.github.com/posts/d7e97916/">https://dustyposa.github.com/posts/d7e97916/</a></b></p></div><hr><div><p><span><i class="iconfont icon-inbox"></i> <a class="hover-with-bg" href="/categories/nlp/">nlp</a> &nbsp; <a class="hover-with-bg" href="/categories/nlp/ai/">ai</a> &nbsp; </span>&nbsp;&nbsp; <span><i class="iconfont icon-tag"></i> <a class="hover-with-bg" href="/tags/rasa/">rasa</a></span></p><p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p><div class="post-prevnext row"><div class="post-prev col-6"></div><div class="post-next col-6"><a href="/posts/feca44b4/"><span class="hidden-mobile">Celery 简介、测试环境搭建（Docker）及使用</span> <span class="visible-mobile">下一篇</span> <i class="fa fa-chevron-right"></i></a></div></div></div><div class="comments" id="comments"><script defer src="https://utteranc.es/client.js" repo="Dustyposa/utterances_comments" issue-term="pathname" label="✨💬✨" theme="github-light" crossorigin="anonymous"></script></div></div></div></div></div><div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn"><div id="toc-start"></div><div id="toc"><p class="h5"><i class="far fa-list-alt"></i>&nbsp;目录</p><div id="tocbot"></div></div></div></div></div><script src="https://cdn.jsdelivr.net/npm/mermaid@7/dist/mermaid.min.js"></script><script>window.mermaid&&mermaid.initialize({theme:"forest"})</script></main><a class="z-depth-1" id="scroll-top-button" href="#" role="button"><i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i></a><div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable modal-lg" role="document"><div class="modal-content"><div class="modal-header text-center"><h4 class="modal-title w-100 font-weight-bold">搜索</h4><button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body mx-3"><div class="md-form mb-5"><input type="text" id="local-search-input" class="form-control validate"> <label data-error="x" data-success="v" for="local-search-input">关键词</label></div><div class="list-group" id="local-search-result"></div></div></div></div></div><footer class="mt-5"><div class="text-center py-3"><div><a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><b>Fluid</b></a></div></div></footer><script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script><script src="https://cdn.staticfile.org/popper.js/1.16.1/umd/popper.min.js"></script><script src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script><script src="https://cdn.staticfile.org/mdbootstrap/4.13.0/js/mdb.min.js"></script><script src="/js/main.js"></script><script src="/js/lazyload.js"></script><script src="https://cdn.staticfile.org/tocbot/4.10.0/tocbot.min.js"></script><script>$(document).ready((function(){var t=$("#navbar").height(),o=$("#toc"),s=$("#board-ctn"),c=s.offset().top,i=2*c+s.height();$(window).scroll((function(){var s=$("#toc-start").offset().top-t,c=document.body.scrollTop+document.documentElement.scrollTop;s<=c&&c<=i?o.css({display:"block",position:"fixed",top:t}):c<=s?o.css({position:"",top:""}):c>i&&o.css("display","none")})),tocbot.init({tocSelector:"#tocbot",contentSelector:".post-content",headingSelector:"h1,h2,h3,h4,h5,h6",linkClass:"tocbot-link",activeLinkClass:"tocbot-active-link",listClass:"tocbot-list",isCollapsedClass:"tocbot-is-collapsed",collapsibleClass:"tocbot-is-collapsible",scrollSmooth:!0,headingsOffset:-c}),$(".toc-list-item").length>0&&$("#toc > p").css("visibility","visible");var l=s.css("margin-right");$("#toc-ctn").css({right:l})}))</script><script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js"></script><script src="/js/clipboard-use.js"></script><script defer>!function(e,a,t,n,g,c,o){e.GoogleAnalyticsObject="ga",e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,c=a.createElement(t),o=a.getElementsByTagName(t)[0],c.async=1,c.src="https://www.google-analytics.com/analytics.js",o.parentNode.insertBefore(c,o)}(window,document,"script"),ga("create","UA-163481315-1","auto"),ga("send","pageview")</script><script src="https://cdn.staticfile.org/prettify/188.0.0/prettify.min.js"></script><script>$(document).ready((function(){$("pre").addClass("prettyprint  "),prettyPrint()}))</script><script src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js"></script><script>var typed=new Typed("#subtitle",{strings:["  ","基于 rasa 的语音助手搭建&nbsp;"],cursorChar:"_",typeSpeed:70,loop:!1});typed.stop(),$(document).ready((function(){$(".typed-cursor").addClass("h2"),typed.start()}))</script><script src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js"></script><script>anchors.options={placement:"right",visible:"hover",icon:"❡"};var el="h1,h2,h3,h4,h5,h6".split(","),res=[];for(item of el)res.push(".markdown-body > "+item);anchors.add(res.join(", "))</script><script src="/js/local-search.js"></script><script>var path="/local-search.xml",inputArea=document.querySelector("#local-search-input");inputArea.onclick=function(){getSearchFile(path),this.onclick=null}</script><script defer src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js"></script><script>$("#post img:not(.no-zoom img, img[no-zoom])").each((function(){var t=document.createElement("a");$(t).attr("data-fancybox","images"),$(t).attr("href",$(this).attr("src")),$(this).wrap(t)}))</script><script>!function(e,t,a){function r(e){var a=t.createElement("div");a.className="heart",n.push({el:a,x:e.clientX-5,y:e.clientY-5,scale:1,alpha:1,color:"rgb("+~~(255*Math.random())+","+~~(255*Math.random())+","+~~(255*Math.random())+")"}),t.body.appendChild(a)}var n=[];e.requestAnimationFrame=e.requestAnimationFrame||e.webkitRequestAnimationFrame||e.mozRequestAnimationFrame||e.oRequestAnimationFrame||e.msRequestAnimationFrame||function(e){setTimeout(e,1e3/60)},function(e){var a=t.createElement("style");a.type="text/css";try{a.appendChild(t.createTextNode(e))}catch(t){a.styleSheet.cssText=e}t.getElementsByTagName("head")[0].appendChild(a)}(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"),function(){var t="function"==typeof e.onclick&&e.onclick;e.onclick=function(e){t&&t(),r(e)}}(),function e(){for(var a=0;a<n.length;a++)n[a].alpha<=0?(t.body.removeChild(n[a].el),n.splice(a,1)):(n[a].y--,n[a].scale+=.004,n[a].alpha-=.013,n[a].el.style.cssText="left:"+n[a].x+"px;top:"+n[a].y+"px;opacity:"+n[a].alpha+";transform:scale("+n[a].scale+","+n[a].scale+") rotate(45deg);background:"+n[a].color+";z-index:99999");requestAnimationFrame(e)}()}(window,document)</script><script src="https://cdn.jsdelivr.net/npm/live2d-widget@^3.1.3/lib/L2Dwidget.min.js"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/ni-j.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false});</script></body></html>
