@@ -488,8 +488,9 @@ graph LR;
 - `deepspeech`   `STT`
 
 ### 所有的代码
-[voice-demo分支](https://github.com/Dustyposa/rasa-demo/tree/voice_demo)
-主要是 `utils` 以及 `compoments`。
+代码仓库：
+[点击这里查看](https://github.com/Dustyposa/rasa-demo/tree/voice_demo)
+主要是 `utils` 以及 `compoments` 的代码。
 
 
 > 参考资料：
