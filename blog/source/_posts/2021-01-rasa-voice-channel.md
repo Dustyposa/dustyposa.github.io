@@ -21,7 +21,7 @@ date: 2021-01-13 12:03:14
 
 ## 最终呈现是什么?
 看看这里:
->  <iframe width="650" height="366" src="https://www.youtube.com/embed/n2pdLv8cGH0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+> <iframe src="//player.bilibili.com/player.html?bvid=BV1si4y1c7tF&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="650" height="366"> </iframe>
 
 ## 一些基础介绍
 #### 实现语音助手需要什么
@@ -443,6 +443,9 @@ npm run serve
 和 `rasa` 连接成功时的界面:
 >  ![image.png](https://i.loli.net/2021/01/13/5JoMd8pENA4OcLY.png)
 
+>  pint:
+> 点击 start 之后，会自动完成音频上传，不需要再做点击。
+
 ### 还差一个，文件服务器
 这里我们使用最简单的，注意，需要在 `rasa-demo` 文件夹的根目录运行。
 `python3 -m http.server 8888` 
@@ -485,7 +488,7 @@ graph LR;
 - `deepspeech`   `STT`
 
 ### 所有的代码
-[这里]()
+[voice-demo分支](https://github.com/Dustyposa/rasa-demo/tree/voice_demo)
 主要是 `utils` 以及 `compoments`。
 
 
