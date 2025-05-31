@@ -15,7 +15,7 @@
     "hexo": "^7.3.0",
     "hexo-abbrlink": "^2.0.5",
     "hexo-addlink": "^1.0.4",
-    "hexo-all-minifier": "^0.5.2",
+    "hexo-all-minifier": "^0.5.7",
     "hexo-cli": "^4.3.2",
     "hexo-filter-mermaid-diagrams": "^1.0.5",
     "hexo-generator-archive": "^1.0.0",
