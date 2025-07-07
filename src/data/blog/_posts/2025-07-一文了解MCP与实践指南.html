@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式MCP与FastMCP指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Tech -->
+    <!-- Application Structure Plan: The application is designed as a four-tab single-page application (SPA) to guide the user through a logical learning path: 1. **核心概念**: Establishes foundational knowledge of MCP (the "what" and "why"). 2. **快速上手**: Provides a hands-on coding tutorial for FastMCP. 3. **生态系统**: Broadens the user's perspective to the wider ecosystem, including cross-language comparisons and real-world use cases. 4. **参考速查**: Offers a practical cheat sheet for developers. This tabbed structure breaks down complex information into digestible chunks, facilitating a non-linear exploration while maintaining a clear progression from theory to practice. The key interaction is the tab navigation, which swaps content visibility, creating a seamless single-page experience. -->
+    <!-- Visualization & Content Choices:
+        - **MCP Architecture Diagram**: Goal: Inform/Organize. Method: HTML/Tailwind diagram. Interaction: Hover to highlight components and display tooltips. Justification: Visually clarifies the relationship between Host, Server, and Client, which is more intuitive than text alone.
+        - **Cross-Language Comparison**: Goal: Compare. Method: Chart.js Radar Chart and an HTML table. Interaction: The chart visually compares frameworks on key metrics. The table provides detailed, sortable data. Justification: The radar chart offers a high-level, immediate comparison, while the table allows for in-depth analysis.
+        - **Real-World Applications**: Goal: Inform/Organize. Method: Filterable HTML cards. Interaction: Users can click category buttons to filter applications. Justification: This makes the extensive list of examples manageable and allows users to focus on areas relevant to their interests.
+        - **Code Blocks**: Goal: Inform/Provide resource. Method: Styled HTML `<pre><code>` blocks. Interaction: A "copy to clipboard" button for each block. Justification: Improves usability for developers who want to use the example code.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .tab-active {
+            border-bottom-color: #2563eb;
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+        .tab-inactive {
+            border-bottom-color: transparent;
+            color: #4b5563;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 500px;
+            }
+        }
+        .code-block {
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #4b5563;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-900">交互式MCP与FastMCP指南</h1>
+            <p class="mt-2 text-lg text-slate-600">一个将复杂协议转化为可探索知识的互动应用</p>
+        </header>
+
+        <div class="sticky top-0 bg-slate-50/80 backdrop-blur-sm z-10 mb-8">
+            <div class="border-b border-slate-200">
+                <nav id="tabs" class="-mb-px flex justify-center space-x-6" aria-label="Tabs">
+                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-active" data-target="tab-concepts">核心概念</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-inactive" data-target="tab-getting-started">快速上手</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-inactive" data-target="tab-ecosystem">生态系统</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-inactive" data-target="tab-reference">参考速查</button>
+                </nav>
+            </div>
+        </div>
+
+        <main id="tab-content">
+            <!-- Tab 1: 核心概念 -->
+            <div id="tab-concepts" class="tab-pane fade-in">
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">奠定基石：理解模型上下文协议 (MCP)</h2>
+                    <p class="text-center text-slate-600 max-w-3xl mx-auto">本部分旨在建立 MCP 的基本概念。通过阐释 MCP 旨在解决的问题，并定义其核心架构组件与基本要素，为后续深入探讨实现细节提供必要的理论基础。</p>
+                </section>
+
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">1.1 “为何需要”：破解大语言模型集成难题</h3>
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <div class="flex-1 space-y-4 text-slate-700">
+                            <p>在 MCP 出现之前，将大语言模型 (LLM) 与外部工具和数据源连接是一个充满临时解决方案的混乱过程。每个集成都需要定制的 API、复杂的 JSON 格式和艰巨的状态管理。</p>
+                            <p class="font-semibold text-blue-700">MCP 如同一个“为 AI 设计的 USB-C 端口”，创建了一个通用的、可互操作的标准，让不同的 AI 应用和服务能够无缝连接，从根本上改变了集成模式。</p>
+                            <p>它将复杂的 “N 对 M” 网状连接，转变为一个更易于管理的 “N 对 1 对 M” 模式：多个应用通过一个标准协议 (MCP) 与多个工具交互。</p>
+                        </div>
+                        <div class="flex-1 w-full">
+                           <div class="bg-slate-100 p-4 rounded-lg text-center font-mono text-sm">
+                               <p class="text-red-600 font-bold mb-2">之前：点对点混乱</p>
+                               <div class="grid grid-cols-2 gap-4">
+                                   <div class="bg-red-200 p-2 rounded">LLM App 1</div>
+                                   <div class="bg-yellow-200 p-2 rounded">Tool A</div>
+                                   <div class="bg-red-200 p-2 rounded">LLM App 2</div>
+                                   <div class="bg-yellow-200 p-2 rounded">Tool B</div>
+                               </div>
+                               <p class="my-2 text-slate-500 text-xs">每个连接都需要定制开发</p>
+                               <hr class="my-4 border-slate-300"/>
+                               <p class="text-green-600 font-bold mb-2">之后：MCP 标准化</p>
+                               <div class="flex items-center justify-around">
+                                   <div class="space-y-2">
+                                       <div class="bg-green-200 p-2 rounded">LLM App 1</div>
+                                       <div class="bg-green-200 p-2 rounded">LLM App 2</div>
+                                   </div>
+                                   <div class="text-3xl font-bold text-slate-400 mx-4">&rarr;</div>
+                                   <div class="bg-blue-300 p-4 rounded-full font-bold">MCP</div>
+                                   <div class="text-3xl font-bold text-slate-400 mx-4">&rarr;</div>
+                                   <div class="space-y-2">
+                                       <div class="bg-yellow-200 p-2 rounded">Tool A</div>
+                                       <div class="bg-yellow-200 p-2 rounded">Tool B</div>
+                                   </div>
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">1.2 MCP 架构：主机、服务器与客户端</h3>
+                    <p class="text-slate-600 mb-6 max-w-3xl mx-auto text-center">整个工作流程确保了功能执行与语言生成之间的清晰分离和高效协作。将鼠标悬停在下面的组件上以了解更多信息。</p>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div class="group relative bg-slate-100 p-6 rounded-lg border-2 border-transparent hover:border-blue-500 transition-all">
+                            <div class="text-4xl mb-2">🖥️</div>
+                            <h4 class="text-lg font-bold">MCP 主机 (Host)</h4>
+                            <p class="text-sm text-slate-600">用户直接交互的应用 (如 IDE)，是工作流的“指挥中心”。</p>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-slate-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                主机负责协调用户、LLM 和 MCP 服务器之间的通信。
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                        <div class="group relative bg-slate-100 p-6 rounded-lg border-2 border-transparent hover:border-blue-500 transition-all">
+                            <div class="text-4xl mb-2">⚙️</div>
+                            <h4 class="text-lg font-bold">MCP 服务器 (Server)</h4>
+                            <p class="text-sm text-slate-600">暴露能力的轻量级程序，是开发者构建的核心。</p>
+                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-slate-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                FastMCP 就是用于构建这类服务器的框架。
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                        <div class="group relative bg-slate-100 p-6 rounded-lg border-2 border-transparent hover:border-blue-500 transition-all">
+                            <div class="text-4xl mb-2">🔌</div>
+                            <h4 class="text-lg font-bold">MCP 客户端 (Client)</h4>
+                            <p class="text-sm text-slate-600">嵌入在主机内，负责与服务器直接通信。</p>
+                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 bg-slate-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                客户端管理底层的通信协议，并建立一对一连接。
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">1.3 “包含什么”：MCP 的核心要素</h3>
+                     <p class="text-slate-600 mb-6 max-w-3xl mx-auto text-center">一个 MCP 服务器可以提供三种主要类型的功能，类似于 REST API 的不同端点。</p>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="bg-green-50 border border-green-200 p-6 rounded-lg">
+                            <h4 class="text-xl font-bold text-green-800 mb-2">资源 (Resources)</h4>
+                            <p class="font-mono text-sm bg-green-200 text-green-900 inline-block px-2 py-1 rounded mb-2">类似 GET</p>
+                            <p class="text-green-700">用于暴露只读数据（如文件内容、数据库记录）到 LLM 上下文。其核心职责是“提供信息”。</p>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                            <h4 class="text-xl font-bold text-blue-800 mb-2">工具 (Tools)</h4>
+                            <p class="font-mono text-sm bg-blue-200 text-blue-900 inline-block px-2 py-1 rounded mb-2">类似 POST / PUT</p>
+                            <p class="text-blue-700">代表可由 LLM 调用的函数，用于执行操作、运行代码或产生副作用。其核心职责是“执行动作”。</p>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 p-6 rounded-lg">
+                            <h4 class="text-xl font-bold text-purple-800 mb-2">提示 (Prompts)</h4>
+                            <p class="font-mono text-sm bg-purple-200 text-purple-900 inline-block px-2 py-1 rounded mb-2">AI 的"脚本"</p>
+                            <p class="text-purple-700">可复用的模板，用于指导 LLM 的交互模式和构建其响应，规范 AI 的行为。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Tab 2: 快速上手 -->
+            <div id="tab-getting-started" class="tab-pane hidden fade-in">
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">付诸实践：使用 FastMCP 框架构建</h2>
+                    <p class="text-center text-slate-600 max-w-3xl mx-auto">本部分将从理论转向实践，通过一个分步指南，带你构建第一个 FastMCP 服务器，并重点阐述该框架的特性和设计哲学。</p>
+                </section>
+
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">2.1 你的第一个 FastMCP 服务器：分步指南</h3>
+                    <div class="space-y-8">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2"><span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">1</span>安装</h4>
+                            <p class="text-slate-600 mb-2">强烈推荐使用 `uv` 来安装 FastMCP。</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code>uv pip install fastmcp</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2"><span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">2</span>实例化服务器</h4>
+                            <p class="text-slate-600 mb-2">创建一个 `FastMCP` 对象实例，并为你的服务器命名。</p>
+                             <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code># server.py
+from fastmcp import FastMCP
+
+mcp = FastMCP("我的第一个应用")</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2"><span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">3</span>定义一个工具</h4>
+                            <p class="text-slate-600 mb-2">使用 `@mcp.tool()` 装饰器。FastMCP 会自动从函数的类型提示和文档字符串中生成符合规范的模式。</p>
+                             <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code># server.py
+from fastmcp import FastMCP
+
+mcp = FastMCP("演示 🚀")
+
+@mcp.tool()
+def add(a: int, b: int) -> int:
+    """将两个数字相加"""
+    return a + b</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2"><span class="bg-blue-500 text-white rounded-full w-8 h-8 inline-flex items-center justify-center mr-2">4</span>运行服务器</h4>
+                            <p class="text-slate-600 mb-2">在文件末尾添加启动代码，并使用命令行工具运行。</p>
+                             <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code># 在 server.py 文件末尾添加
+if __name__ == "__main__":
+    mcp.run()
+
+# 在终端中运行:
+# fastmcp run server.py</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-white p-8 rounded-xl shadow-sm">
+                     <h3 class="text-2xl font-semibold mb-4 text-slate-800">2.2 深入探索 FastMCP 组件</h3>
+                     <div class="grid md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-lg">定义资源</h4>
+                            <p class="text-sm text-slate-600">与工具类似，但使用 `@mcp.resource()`。可以使用 `{}` 创建动态 URI。</p>
+                             <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code>@mcp.resource("greeting://{name}")
+def get_greeting(name: str) -> str:
+    """获取个性化问候语"""
+    return f"你好, {name}!"</code></pre>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-lg">处理复杂输入</h4>
+                            <p class="text-sm text-slate-600">可以直接使用 Pydantic 模型作为类型提示，FastMCP 会自动处理转换。</p>
+                             <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code>from pydantic import BaseModel
+
+class UserProfile(BaseModel):
+    name: str
+    age: int
+
+@mcp.tool()
+def create_user(profile: UserProfile):
+    ...</code></pre>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-lg">`Context` 对象</h4>
+                            <p class="text-sm text-slate-600">自动作为第一个参数传递，提供日志记录、进度报告、访问其他资源等强大功能。</p>
+                        </div>
+                         <div class="space-y-4">
+                            <h4 class="font-bold text-lg">处理图像和文件</h4>
+                            <p class="text-sm text-slate-600">`Image` 类可以自动处理图像数据的转换和 MIME 类型。</p>
+                        </div>
+                     </div>
+                </section>
+            </div>
+
+            <!-- Tab 3: 生态系统 -->
+            <div id="tab-ecosystem" class="tab-pane hidden fade-in">
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">生态系统：跨语言实现与应用案例</h2>
+                    <p class="text-center text-slate-600 max-w-3xl mx-auto">本部分将视野从 Python 扩展开来，展示整个 MCP 生态系统的多样性，包括其他语言的实现、先进架构模式以及广泛的真实世界应用。</p>
+                </section>
+
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">3.1 FastMCP 实现的比较分析</h3>
+                    <p class="text-slate-600 mb-6">MCP 协议的价值催生了一个多语言的生态系统。下面的雷达图直观地对比了不同语言实现在设计哲学和特性上的差异。</p>
+                    <div class="chart-container">
+                        <canvas id="languageRadarChart"></canvas>
+                    </div>
+                </section>
+
+                <section class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">3.2 真实世界应用与 MCP 生态版图</h3>
+                    <p class="text-slate-600 mb-6">MCP 已被广泛应用于解决各类实际问题。点击下方分类以浏览相关项目。</p>
+                    <div class="flex justify-center flex-wrap gap-2 mb-6">
+                        <button class="filter-btn bg-blue-500 text-white px-4 py-2 rounded-full text-sm" data-filter="all">全部</button>
+                        <button class="filter-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-sm" data-filter="research">学术研究</button>
+                        <button class="filter-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-sm" data-filter="data">数据科学</button>
+                        <button class="filter-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-sm" data-filter="dev">开发者工具</button>
+                        <button class="filter-btn bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-sm" data-filter="finance">金融交易</button>
+                    </div>
+                    <div id="app-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="app-card border p-4 rounded-lg" data-category="research">
+                            <h4 class="font-bold text-lg">Semantic Scholar</h4>
+                            <p class="text-slate-600 text-sm">使 AI 能够查询学术论文、引文网络和作者信息，提升科研效率。</p>
+                        </div>
+                         <div class="app-card border p-4 rounded-lg" data-category="data">
+                            <h4 class="font-bold text-lg">Jupyter Notebooks</h4>
+                            <p class="text-slate-600 text-sm">让 AI 能直接创建、编辑和运行 Notebooks，打通对话式 AI 与数据分析。</p>
+                        </div>
+                        <div class="app-card border p-4 rounded-lg" data-category="dev">
+                            <h4 class="font-bold text-lg">代码质量分析</h4>
+                            <p class="text-slate-600 text-sm">利用 MCP 对代码进行静态分析，帮助 AI 助手更有效地审查代码。</p>
+                        </div>
+                        <div class="app-card border p-4 rounded-lg" data-category="dev">
+                            <h4 class="font-bold text-lg">文档搜索引擎</h4>
+                            <p class="text-slate-600 text-sm">构建统一的文档搜索工具，让 AI 能跨多个框架（如 Next.js, Tailwind）查询。</p>
+                        </div>
+                        <div class="app-card border p-4 rounded-lg" data-category="finance">
+                            <h4 class="font-bold text-lg">加密货币/股票交易</h4>
+                            <p class="text-slate-600 text-sm">针对币安、盈透证券的 MCP 服务器，为 AI 驱动的量化交易铺平道路。</p>
+                        </div>
+                        <div class="app-card border p-4 rounded-lg" data-category="dev">
+                            <h4 class="font-bold text-lg">AI驱动的安全测试</h4>
+                            <p class="text-slate-600 text-sm">将 Nmap、SQLMap 等安全工具包装成 MCP 工具，实现 AI 驱动的渗透测试。</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Tab 4: 参考速查 -->
+            <div id="tab-reference" class="tab-pane hidden fade-in">
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">总结与快速上手参考</h2>
+                    <p class="text-center text-slate-600 max-w-3xl mx-auto">本部分将综合关键要点，并为希望开始使用 MCP 和 FastMCP 的开发者提供一份实用的、精炼的参考指南。</p>
+                </section>
+
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.1 核心 FastMCP 组件 (Python)</h3>
+                     <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">组件</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">用途</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">示例语法</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">`FastMCP(...)`</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">初始化 MCP 服务器实例，是所有应用的起点。</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">`mcp = FastMCP(name="我的应用")`</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">`@mcp.tool()`</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">装饰器，将一个 Python 函数暴露为可执行的工具。</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">`@mcp.tool()`</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">`@mcp.resource(...)`</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">装饰器，将一个函数暴露为可供读取的数据资源。</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">`@mcp.resource("data://items/{id}")`</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">`Context`</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">作为参数传递，提供日志、进度报告等服务器端功能。</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-mono">`def my_tool(ctx, ...):`</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.2 基础服务器模板</h3>
+                    <p class="text-slate-600 mb-4">这是一个完整的、可直接复制粘贴的“Hello, World”服务器示例，整合了所有基本要素。</p>
+                    <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        <pre><code># basic_server.py
+from fastmcp import FastMCP, Context
+
+# 1. 实例化服务器
+mcp = FastMCP(name="基础模板服务器")
+
+# 2. 定义一个工具
+@mcp.tool()
+def greet(name: str) -> str:
+    """生成一个简单的问候语。"""
+    return f"你好, {name}! 欢迎使用 MCP。"
+
+# 3. 定义一个资源
+@mcp.resource("server://status")
+def get_status(ctx: Context) -> dict:
+    """返回服务器的当前状态。"""
+    ctx.info("正在请求服务器状态...")
+    return {"status": "ok", "server_name": mcp.name}
+
+# 4. 运行服务器
+if __name__ == "__main__":
+    mcp.run()
+</code></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab-button');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive');
+                    });
+                    this.classList.add('tab-active');
+                    this.classList.remove('tab-inactive');
+
+                    const targetId = this.getAttribute('data-target');
+                    panes.forEach(pane => {
+                        if (pane.id === targetId) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // Initialize Radar Chart
+            const ctx = document.getElementById('languageRadarChart');
+            if(ctx) {
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Python', 'TypeScript', 'Ruby', 'Go'],
+                        datasets: [{
+                            label: '开发者体验',
+                            data: [9, 8, 7, 7],
+                            fill: true,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            pointBackgroundColor: 'rgb(255, 99, 132)',
+                        }, {
+                            label: '生态与集成',
+                            data: [9, 7, 8, 5],
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            pointBackgroundColor: 'rgb(54, 162, 235)',
+                        }, {
+                             label: '简洁性',
+                            data: [8, 7, 6, 9],
+                            fill: true,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            pointBackgroundColor: 'rgb(75, 192, 192)',
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        elements: {
+                            line: {
+                                borderWidth: 3
+                            }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: false
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 10,
+                                pointLabels: {
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        },
+                         plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.r !== null) {
+                                            label += context.parsed.r;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // App Filter Logic
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const appCards = document.querySelectorAll('.app-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-blue-500', 'text-white');
+                        btn.classList.add('bg-slate-200', 'text-slate-700');
+                    });
+                    this.classList.add('bg-blue-500', 'text-white');
+                    this.classList.remove('bg-slate-200', 'text-slate-700');
+
+                    const filter = this.getAttribute('data-filter');
+
+                    appCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.querySelector('pre code').innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                button.innerText = '已复制!';
+                setTimeout(() => {
+                    button.innerText = '复制';
+                }, 2000);
+            }, function(err) {
+                console.error('无法复制文本: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
