@@ -1,0 +1,59 @@
+---
+// src/components/TableOfContents.astro
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+
+// 只显示 h2 和 h3 标题，以保持目录的简洁性
+const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
+---
+
+<nav class="toc">
+  <h2 class="toc-title">文章大纲</h2>
+  <ul>
+    {filteredHeadings.map(heading => (
+      <li class:list={[`toc-item depth-${heading.depth}`]}>
+        <a href={`#${heading.slug}`}>{heading.text}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .toc {
+    width: 240px;
+    padding-left: 1rem;
+    border-left: 1px solid var(--gray-200);
+  }
+  .toc-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+  .toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .toc-item {
+    margin-bottom: 0.5rem;
+  }
+  .toc-item a {
+    color: var(--gray-500);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+  .toc-item a:hover {
+    color: var(--color-accent);
+  }
+  /* 为 h3 标题添加缩进 */
+  .toc-item.depth-3 {
+    padding-left: 1rem;
+  }
+</style>

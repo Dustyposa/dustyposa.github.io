@@ -14,7 +14,9 @@ import { slugifyStr } from "@/utils/slugify";
 import IconChevronLeft from "@/assets/icons/IconChevronLeft.svg";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { SITE } from "@/config";
-import Comments from "../components/Comments.astro";
+import Comments from "@/components/Comments.astro";
+// 新增：导入我们刚刚创建的目录组件
+import TableOfContents from "@/components/TableOfContents.astro";
 
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -36,7 +38,8 @@ const {
   hideEditPost,
 } = post.data;
 
-const { Content } = await render(post);
+// 修正：使用导入的 render 函数
+const { Content, headings } = await render(post);
 
 let ogImageUrl: string | undefined;
 
@@ -80,91 +83,156 @@ const currentPostIndex = allPosts.findIndex(a => a.id === post.id);
 
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
-  currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+  currentPostIndex !== allPosts.length - 1 ? allPosts[currentPostIndex + 1] : null;
 ---
 
 <Layout {...layoutProps}>
   <Header />
   <BackButton />
-  <main
-    id="main-content"
-    class:list={[
-      "mx-auto w-full max-w-app px-4 pb-12",
-      { "mt-8": !SITE.showBackButton },
-    ]}
-    data-pagefind-body
-  >
-    <h1
-      transition:name={slugifyStr(title)}
-      class="inline-block text-2xl font-bold text-accent sm:text-3xl"
+  <!-- 修改：用一个新的 div 包裹 main 和 aside，以实现双栏布局 -->
+  <div class="post-wrapper">
+    <main
+      id="main-content"
+      class:list={[
+        // 移除所有宽度和边距相关的工具类，由下方的 <style> 块统一控制
+        { "mt-8": !SITE.showBackButton },
+      ]}
+      data-pagefind-body
     >
-      {title}
-    </h1>
-    <div class="my-2 flex items-center gap-2">
-      <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-      <span aria-hidden="true" class="max-sm:hidden">|</span>
-      <EditPost {hideEditPost} {post} class="max-sm:hidden" />
-    </div>
-    <article
-      id="article"
-      class="app-prose mx-auto mt-8 max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
-    >
-      <Content />
-    </article>
+      <h1
+        transition:name={slugifyStr(title)}
+        class="inline-block text-2xl font-bold text-accent sm:text-3xl"
+      >
+        {title}
+      </h1>
+      <div class="my-2 flex items-center gap-2">
+        <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+        <span aria-hidden="true" class="max-sm:hidden">|</span>
+        <EditPost {hideEditPost} {post} class="max-sm:hidden" />
+      </div>
+      <article
+        id="article"
+        class="app-prose mt-8 w-full prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+      >
+        <Content />
+      </article>
 
-    <hr class="my-8 border-dashed" />
+      <hr class="my-8 border-dashed" />
 
-    <EditPost class="sm:hidden" {hideEditPost} {post} />
+      <EditPost class="sm:hidden" {hideEditPost} {post} />
 
-    <ul class="mt-4 mb-8 sm:my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
-    </ul>
+      <ul class="mt-4 mb-8 sm:my-8">
+        {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} />)}
+      </ul>
 
-    <BackToTopButton />
+      <BackToTopButton />
 
-    <ShareLinks />
+      <ShareLinks />
 
-    <hr class="my-6 border-dashed" />
+      <hr class="my-6 border-dashed" />
 
-    <!-- Previous/Next Post Buttons -->
-    <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={getPath(prevPost.id, prevPost.filePath)}
-            class="flex w-full gap-1 hover:opacity-75"
-          >
-            <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
-            <div>
-              <span>Previous Post</span>
-              <div class="text-sm text-accent/85">{prevPost.title}</div>
-            </div>
-          </a>
-        )
-      }
-      {
-        nextPost && (
-          <a
-            href={getPath(nextPost.id, nextPost.filePath)}
-            class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
-          >
-            <div>
-              <span>Next Post</span>
-              <div class="text-sm text-accent/85">{nextPost.title}</div>
-            </div>
-            <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
-          </a>
-        )
-      }
-    </div>
-  </main>
-  <Comments />
+      <!-- Previous/Next Post Buttons -->
+      <div data-pagefind-ignore class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {
+          prevPost && (
+            <a
+              href={getPath(prevPost.id, prevPost.filePath)}
+              class="flex w-full gap-1 hover:opacity-75"
+            >
+              <IconChevronLeft class="inline-block flex-none rtl:rotate-180" />
+              <div>
+                <span>Previous Post</span>
+                <div class="text-sm text-accent/85">{prevPost.title}</div>
+              </div>
+            </a>
+          )
+        }
+        {
+          nextPost && (
+            <a
+              href={getPath(nextPost.id, nextPost.filePath)}
+              class="flex w-full justify-end gap-1 text-end hover:opacity-75 sm:col-start-2"
+            >
+              <div>
+                <span>Next Post</span>
+                <div class="text-sm text-accent/85">{nextPost.title}</div>
+              </div>
+              <IconChevronRight class="inline-block flex-none rtl:rotate-180" />
+            </a>
+          )
+        }
+      </div>
+      <Comments />
+    </main>
+
+    <!-- 新增：侧边栏，用于放置目录导航 (仅在文章有标题时显示) -->
+    {
+      headings.length > 0 && (
+        <aside class="post-sidebar">
+          <TableOfContents headings={headings} />
+        </aside>
+      )
+    }
+  </div>
   <Footer />
 </Layout>
 
+<!-- 修正：为双栏布局添加样式，文章居中，大纲居右 -->
+<style>
+  .post-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 0 1rem;
+  }
+
+  main#main-content {
+    max-width: 75ch; /* 设定文章内容的最大宽度 */
+    margin: 0 auto; /* 文章内容居中 */
+    width: 100%;
+  }
+
+  .post-sidebar {
+    display: none; /* 移动端默认隐藏 */
+  }
+
+  @media (min-width: 1024px) {
+    .post-wrapper {
+      padding: 0 2rem;
+    }
+    
+    .post-sidebar {
+      display: block; /* 大屏幕上显示侧边栏 */
+      position: fixed; /* 固定定位 */
+      right: 2rem; /* 距离右边的距离 */
+      top: 50%; /* 垂直居中 */
+      transform: translateY(-50%); /* 垂直居中调整 */
+      width: 250px; /* 固定侧边栏宽度 */
+      max-height: 70vh; /* 最大高度 */
+      overflow-y: auto; /* 内容溢出时滚动 */
+      z-index: 10; /* 确保在其他内容之上 */
+    }
+    
+    /* 当屏幕宽度足够时，为文章内容留出右侧空间 */
+    main#main-content {
+      margin-right: 280px; /* 为侧边栏留出空间 */
+    }
+  }
+  
+  @media (min-width: 1400px) {
+    /* 在更大的屏幕上，文章内容可以真正居中 */
+    main#main-content {
+      margin: 0 auto;
+    }
+    
+    .post-sidebar {
+      right: calc((100vw - 75ch) / 2 - 280px); /* 动态计算右侧位置 */
+    }
+  }
+</style>
+
 <script is:inline data-astro-rerun>
   /** Create a progress indicator
-   *  at the top */
+   * at the top */
   function createProgressBar() {
     // Create the main container div
     const progressContainer = document.createElement("div");
@@ -185,7 +253,7 @@ const nextPost =
   createProgressBar();
 
   /** Update the progress bar
-   *  when user scrolls */
+   * when user scrolls */
   function updateScrollProgress() {
     document.addEventListener("scroll", () => {
       const winScroll =
@@ -205,7 +273,7 @@ const nextPost =
   updateScrollProgress();
 
   /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
+   * allowing sharing of sections easily */
   function addHeadingLinks() {
     const headings = Array.from(
       document.querySelectorAll("h2, h3, h4, h5, h6")
@@ -248,7 +316,7 @@ const nextPost =
       wrapper.appendChild(codeBlock);
 
       copyButton.addEventListener("click", async () => {
-        await copyCode(codeBlock, copyButton);
+        await copyCode(codeBlock, button);
       });
     }
 
