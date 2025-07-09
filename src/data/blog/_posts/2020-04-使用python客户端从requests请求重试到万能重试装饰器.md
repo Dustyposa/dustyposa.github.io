@@ -13,16 +13,6 @@ tags:
 category:
   - Python 进阶
 ---
----
-title: 从requests请求重试到万能重试装饰器
-tags:
-  - python
-  - decorator
-category:
-  - advance
-abbrlink: f03dc1ff
-date: 2020-04-07 10:02:08
----
 
 ## 从requests请求重试到万能重试装饰器
 重试，在编写代码的过程中，是一个很常见的需求。
