@@ -28,6 +28,43 @@ export default defineConfig({
         strategy: "img-svg", 
         dark: true,
         mermaidConfig: {
+          theme: 'dark',
+          themeVariables: {
+            // 流程图颜色配置
+            primaryColor: '#1f2937',
+            primaryTextColor: '#f9fafb',
+            primaryBorderColor: '#6b7280',
+            lineColor: '#9ca3af',
+            sectionBkgColor: '#374151',
+            altSectionBkgColor: '#4b5563',
+            gridColor: '#6b7280',
+            secondaryColor: '#374151',
+            tertiaryColor: '#4b5563',
+            // 节点颜色
+            background: '#1f2937',
+            mainBkg: '#374151',
+            secondBkg: '#4b5563',
+            tertiaryBkg: '#6b7280',
+            // 文字颜色
+            textColor: '#f9fafb',
+            darkTextColor: '#f9fafb',
+            // 边框和线条
+            stroke: '#9ca3af',
+            fill: '#374151',
+            // 特殊节点颜色
+            nodeBkg: '#374151',
+            nodeBorder: '#9ca3af',
+            clusterBkg: '#4b5563',
+            clusterBorder: '#6b7280',
+            defaultLinkColor: '#9ca3af',
+            titleColor: '#f9fafb',
+            edgeLabelBackground: '#1f2937',
+            // 流程图特定配置
+            flowchartNodeBkg: '#374151',
+            flowchartNodeBorder: '#9ca3af',
+            flowchartLinkColor: '#9ca3af',
+            flowchartInvTextColor: '#f9fafb'
+          },
           flowchart: {
             useMaxWidth: false
           },
