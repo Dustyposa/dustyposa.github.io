@@ -1,7 +1,7 @@
 ---
 // src/components/Comments.astro
-// 最终解决方案：在暗黑模式下，为评论区提供一个浅色背景，以确保 Giscus 的可读性。
 ---
+
 <div class="comments-wrapper">
   <section id="giscus-container">
     <h3>评论区</h3>
@@ -11,48 +11,22 @@
   </section>
 </div>
 
-<style>
-  .comments-wrapper {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 100ch;
-    margin-top: 3rem;
-  }
-
-  /* 在暗黑模式下，为评论区容器设置浅色背景 */
-  html.dark .comments-wrapper {
-    background-color: #f8f9fa; /* 一个非常浅的灰色 */
-    border-radius: 12px;
-    padding: 1.5rem 2rem;
-  }
-
-  #giscus-container {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
-  }
-
-  #giscus-container h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
-    color: var(--color-text); /* 默认文字颜色 */
-  }
-
-  /* 在暗黑模式下，强制标题为深色，以在浅色背景上显示 */
-  html.dark #giscus-container h3 {
-    color: #111827; /* 一个深灰色 */
-  }
-</style>
-
 <script>
   // 此脚本会动态加载 Giscus
   const giscusContainer = document.querySelector("#giscus-comments");
-  const GISCUS_THEME = "light"; // 最终修正：始终使用 'light' 主题，因为我们自己控制背景
+  const GISCUS_THEME_LIGHT = "light_tritanopia";
+  const GISCUS_THEME_DARK = "dark_tritanopia";
 
-  function loadGiscus() {
+  function loadGiscus(theme: string) {
     if (!giscusContainer) return;
+
+    // 防止重复加载相同主题
+    const currentScript = giscusContainer.querySelector('script');
+    if (currentScript && currentScript.getAttribute('data-theme') === (theme === 'dark' ? GISCUS_THEME_DARK : GISCUS_THEME_LIGHT)) return;
+
+    // 清空前保存滚动位置（可选）
+    const scrollTop = window.scrollY;
+
     giscusContainer.innerHTML = ''; // 加载前清空容器
 
     const script = document.createElement("script");
@@ -73,17 +47,41 @@
     script.setAttribute("data-emit-metadata", "0");
     script.setAttribute("data-input-position", "bottom");
     script.setAttribute("data-lang", "zh-CN");
-    script.setAttribute("data-theme", GISCUS_THEME);
+    script.setAttribute("data-theme", theme === 'dark' ? GISCUS_THEME_DARK : GISCUS_THEME_LIGHT); // 使用变量
 
     giscusContainer.appendChild(script);
+
+    // 恢复滚动位置（可选）
+    window.scrollTo(0, scrollTop);
+  }
+
+  // 获取当前主题
+  function getCurrentTheme() {
+    return document.documentElement.getAttribute('data-theme') || 'light';
   }
 
   // 首次加载页面时，加载 Giscus
-  loadGiscus();
+  const initialTheme = getCurrentTheme();
+  loadGiscus(initialTheme);
 
   // 当 Astro 的视图过渡（View Transitions）切换页面后，重新加载 Giscus
-  document.addEventListener("astro:after-swap", loadGiscus);
+  document.addEventListener("astro:after-swap", () => {
+    const currentTheme = getCurrentTheme();
+    loadGiscus(currentTheme);
+  });
 
-  // 由于我们现在强制使用 light 主题，不再需要 MutationObserver 来监听主题切换了。
-  // 这简化了代码并避免了之前可能出现的时序问题。
+  // 监听主题变化
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        const newTheme = getCurrentTheme();
+        loadGiscus(newTheme); // 重新加载
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  });
 </script>
