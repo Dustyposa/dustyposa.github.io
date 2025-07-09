@@ -3,6 +3,7 @@ import { ClientRouter } from "astro:transitions";
 import { PUBLIC_GOOGLE_SITE_VERIFICATION } from "astro:env/client";
 import { SITE } from "@/config";
 import "@/styles/global.css";
+import MermaidZoom from "@/components/MermaidZoom.astro";
 
 export interface Props {
   title?: string;
@@ -134,6 +135,7 @@ const structuredData = {
   </head>
   <body>
     <slot />
+    <MermaidZoom />
   </body>
 </html>
 

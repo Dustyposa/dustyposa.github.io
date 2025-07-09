@@ -22,7 +22,63 @@ export default defineConfig({
   ],
   markdown: {
     remarkPlugins: [remarkToc, [remarkCollapse, { test: "Table of contents" }]],
-    rehypePlugins: [[rehypeMermaid, { strategy: "img-svg", dark: true }]],
+    rehypePlugins: [[
+      rehypeMermaid, 
+      { 
+        strategy: "img-svg", 
+        dark: true,
+        mermaidConfig: {
+          flowchart: {
+            useMaxWidth: false
+          },
+          sequence: {
+            useMaxWidth: false
+          },
+          gantt: {
+            useMaxWidth: false
+          },
+          journey: {
+            useMaxWidth: false
+          },
+          timeline: {
+            useMaxWidth: false
+          },
+          class: {
+            useMaxWidth: false
+          },
+          state: {
+            useMaxWidth: false
+          },
+          er: {
+            useMaxWidth: false
+          },
+          pie: {
+            useMaxWidth: false
+          },
+          quadrantChart: {
+            useMaxWidth: false
+          },
+          xyChart: {
+            useMaxWidth: false
+          },
+          requirement: {
+            useMaxWidth: false
+          },
+          mindmap: {
+            useMaxWidth: false
+          },
+          gitGraph: {
+            useMaxWidth: false
+          },
+          c4: {
+            useMaxWidth: false
+          },
+          sankey: {
+            useMaxWidth: false
+          }
+        }
+      }
+    ]],
     syntaxHighlight: {
       type: "shiki",
       excludeLangs: ["mermaid"],

@@ -67,3 +67,45 @@ html[data-theme="dark"] {
 :target {
   scroll-margin-block: 1rem;
 }
+
+/* Mermaid diagram zoom and scroll support */
+.mermaid-container {
+  @apply overflow-auto border border-border rounded-lg p-4 bg-background;
+  max-height: 80vh;
+  position: relative;
+}
+
+.mermaid-container img,
+.mermaid-container svg {
+  @apply max-w-none;
+  cursor: grab;
+  transition: transform 0.2s ease;
+}
+
+.mermaid-container img:active,
+.mermaid-container svg:active {
+  cursor: grabbing;
+}
+
+/* Zoom controls */
+.mermaid-zoom-controls {
+  @apply absolute top-2 right-2 flex gap-1 z-10;
+}
+
+.mermaid-zoom-btn {
+  @apply bg-background border border-border rounded px-2 py-1 text-sm hover:bg-muted transition-colors cursor-pointer;
+}
+
+/* Modal for full-screen view */
+.mermaid-modal {
+  @apply fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+}
+
+.mermaid-modal-content {
+  @apply relative max-w-full max-h-full overflow-auto bg-background border border-border rounded-lg;
+}
+
+.mermaid-modal img,
+.mermaid-modal svg {
+  @apply max-w-none;
+}
