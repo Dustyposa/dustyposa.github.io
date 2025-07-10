@@ -10,18 +10,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Calm Tech -->
-    <!-- Application Structure Plan: The application is designed as a four-tab single-page application (SPA) to guide the user through a logical learning path: 1. **核心概念**: Establishes foundational knowledge of MCP (the "what" and "why"). 2. **快速上手**: Provides a hands-on coding tutorial for FastMCP. 3. **生态系统**: Broadens the user's perspective to the wider ecosystem, including cross-language comparisons and real-world use cases. 4. **参考速查**: Offers a practical cheat sheet for developers. This tabbed structure breaks down complex information into digestible chunks, facilitating a non-linear exploration while maintaining a clear progression from theory to practice. The key interaction is the tab navigation, which swaps content visibility, creating a seamless single-page experience. -->
-    <!-- Visualization & Content Choices:
-        - **MCP Architecture Diagram**: Goal: Inform/Organize. Method: HTML/Tailwind diagram. Interaction: Hover to highlight components and display tooltips. Justification: Visually clarifies the relationship between Host, Server, and Client, which is more intuitive than text alone.
-        - **Cross-Language Comparison**: Goal: Compare. Method: Chart.js Radar Chart and an HTML table. Interaction: The chart visually compares frameworks on key metrics. The table provides detailed, sortable data. Justification: The radar chart offers a high-level, immediate comparison, while the table allows for in-depth analysis.
-        - **Real-World Applications**: Goal: Inform/Organize. Method: Filterable HTML cards. Interaction: Users can click category buttons to filter applications. Justification: This makes the extensive list of examples manageable and allows users to focus on areas relevant to their interests.
-        - **Code Blocks**: Goal: Inform/Provide resource. Method: Styled HTML `<pre><code>` blocks. Interaction: A "copy to clipboard" button for each block. Justification: Improves usability for developers who want to use the example code.
+    <!-- Application Structure Plan: The application is designed as a five-tab single-page application (SPA) to guide the user through a logical learning path: 1. **核心概念**: Establishes foundational knowledge. 2. **快速上手**: Provides a hands-on coding tutorial. 3. **生态系统**: Broadens the user's perspective to the wider ecosystem. 4. **调试与测试**: Offers practical guidance on testing and debugging servers. 5. **参考速查**: Offers a practical cheat sheet. This tabbed structure breaks down complex information into digestible chunks, facilitating a non-linear exploration while maintaining a clear progression from theory to practice. -->
+    <!-- Visualization & Content Choices: 
+        - **MCP Architecture Diagram**: Goal: Inform/Organize. Method: HTML/Tailwind diagram. Interaction: Hover to highlight components and display tooltips. Justification: Visually clarifies the relationship between Host, Server, and Client.
+        - **Cross-Language Comparison**: Goal: Compare. Method: Chart.js Radar Chart. Interaction: The chart visually compares frameworks on key metrics. Justification: Offers a high-level, immediate comparison.
+        - **Real-World Applications**: Goal: Inform/Organize. Method: Filterable HTML cards. Interaction: Users can click category buttons to filter applications. Justification: This makes the extensive list of examples manageable.
+        - **Debug Configuration**: Goal: Instruct. Method: Styled HTML blocks mimicking a UI. Justification: Provides a clear, visual guide for setting up PyCharm without using actual images.
+        - **Code Blocks**: Goal: Inform/Provide resource. Method: Styled HTML `<pre><code>` blocks with a "copy to clipboard" button. Justification: Improves usability for developers.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body { font-family: 'Noto Sans SC', sans-serif; }
-        .tab-active {
-            border-bottom-color: #2563eb;
+        .tab-active { 
+            border-bottom-color: #2563eb; 
             color: #1e3a8a;
             font-weight: 500;
         }
@@ -69,6 +70,27 @@
         .code-block:hover .copy-btn {
             opacity: 1;
         }
+        .pycharm-config {
+            background-color: #2b2b2b;
+            color: #a9b7c6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            border: 1px solid #444;
+        }
+        .pycharm-config .label {
+            color: #cc7832;
+        }
+        .pycharm-config .value {
+            color: #a9b7c6;
+        }
+        .pycharm-config .input {
+            background-color: #3c3f41;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 2px 6px;
+            color: #a9b7c6;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -81,15 +103,16 @@
 
         <div class="sticky top-0 bg-slate-50/80 backdrop-blur-sm z-10 mb-8">
             <div class="border-b border-slate-200">
-                <nav id="tabs" class="-mb-px flex justify-center space-x-6" aria-label="Tabs">
-                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-active" data-target="tab-concepts">核心概念</button>
-                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-inactive" data-target="tab-getting-started">快速上手</button>
-                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-inactive" data-target="tab-ecosystem">生态系统</button>
-                    <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-inactive" data-target="tab-reference">参考速查</button>
+                <nav id="tabs" class="-mb-px flex justify-center flex-wrap" aria-label="Tabs">
+                    <button class="tab-button whitespace-nowrap py-4 px-2 md:px-6 border-b-2 font-medium text-sm tab-active" data-target="tab-concepts">核心概念</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-2 md:px-6 border-b-2 font-medium text-sm tab-inactive" data-target="tab-getting-started">快速上手</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-2 md:px-6 border-b-2 font-medium text-sm tab-inactive" data-target="tab-ecosystem">生态系统</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-2 md:px-6 border-b-2 font-medium text-sm tab-inactive" data-target="tab-debug">调试与测试</button>
+                    <button class="tab-button whitespace-nowrap py-4 px-2 md:px-6 border-b-2 font-medium text-sm tab-inactive" data-target="tab-reference">参考速查</button>
                 </nav>
             </div>
         </div>
-
+        
         <main id="tab-content">
             <!-- Tab 1: 核心概念 -->
             <div id="tab-concepts" class="tab-pane fade-in">
@@ -135,7 +158,7 @@
                         </div>
                     </div>
                 </section>
-
+                
                 <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
                     <h3 class="text-2xl font-semibold mb-4 text-slate-800">1.2 MCP 架构：主机、服务器与客户端</h3>
                     <p class="text-slate-600 mb-6 max-w-3xl mx-auto text-center">整个工作流程确保了功能执行与语言生成之间的清晰分离和高效协作。将鼠标悬停在下面的组件上以了解更多信息。</p>
@@ -169,7 +192,7 @@
                         </div>
                     </div>
                 </section>
-
+                
                 <section class="bg-white p-8 rounded-xl shadow-sm">
                     <h3 class="text-2xl font-semibold mb-4 text-slate-800">1.3 “包含什么”：MCP 的核心要素</h3>
                      <p class="text-slate-600 mb-6 max-w-3xl mx-auto text-center">一个 MCP 服务器可以提供三种主要类型的功能，类似于 REST API 的不同端点。</p>
@@ -302,7 +325,7 @@ def create_user(profile: UserProfile):
                     <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">生态系统：跨语言实现与应用案例</h2>
                     <p class="text-center text-slate-600 max-w-3xl mx-auto">本部分将视野从 Python 扩展开来，展示整个 MCP 生态系统的多样性，包括其他语言的实现、先进架构模式以及广泛的真实世界应用。</p>
                 </section>
-
+                
                 <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
                     <h3 class="text-2xl font-semibold mb-4 text-slate-800">3.1 FastMCP 实现的比较分析</h3>
                     <p class="text-slate-600 mb-6">MCP 协议的价值催生了一个多语言的生态系统。下面的雷达图直观地对比了不同语言实现在设计哲学和特性上的差异。</p>
@@ -348,10 +371,120 @@ def create_user(profile: UserProfile):
                         </div>
                     </div>
                 </section>
-
             </div>
 
-            <!-- Tab 4: 参考速查 -->
+            <!-- Tab 4: 调试与测试 -->
+            <div id="tab-debug" class="tab-pane hidden fade-in">
+                <section class="mb-12">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">调试、测试与运行模式</h2>
+                    <p class="text-center text-slate-600 max-w-3xl mx-auto">本部分将聚焦于开发流程中的关键环节：如何高效地测试、调试你的 MCP 服务器，以及如何处理不同的运行方式。</p>
+                </section>
+
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.1 测试你的 MCP 服务</h3>
+                    <p class="text-slate-600 mb-6">测试是确保服务质量的基石。FastMCP 提供了两种主要的测试方式。</p>
+                    <div class="space-y-8">
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">方法一：交互式测试 (使用 MCP Inspector)</h4>
+                            <p class="text-slate-600 mb-2">这是开发和调试过程中的首选方式。FastMCP 自带了一个名为 MCP Inspector 的强大 Web 调试工具。</p>
+                            <p class="text-slate-600 mb-2">使用 `dev` 命令启动，它会自动打开一个浏览器窗口，你可以在其中直观地看到所有工具和资源，并直接填写参数进行调用。执行结果、日志和错误都会清晰地显示出来。</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code>fastmcp dev your_server_file.py</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold mb-2">方法二：程序化测试 (使用 `fastmcp.Client`)</h4>
+                            <p class="text-slate-600 mb-2">对于自动化测试（如 CI/CD），你可以使用 `fastmcp.Client` 编写测试脚本来调用服务器。</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code># test_client.py
+import asyncio
+from fastmcp import Client
+from fastmcp.transport import StdioTransport
+
+async def main():
+    # 假设服务器文件是 basic_server.py
+    transport = StdioTransport.create_process(["python", "basic_server.py"])
+    client = Client(transport)
+    await client.connect()
+    try:
+        result = await client.tools.greet(name="测试者")
+        assert result == "你好, 测试者! 欢迎使用 MCP。"
+        print("✅ 测试通过")
+    finally:
+        await client.disconnect()
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.2 在 PyCharm 中调试</h3>
+                    <p class="text-slate-600 mb-6">在 PyCharm 中调试 MCP 服务非常直接。关键在于正确设置“运行/调试配置”，而不是依赖 `fastmcp` 命令行工具。</p>
+                    <div class="space-y-6">
+                        <p><span class="font-bold">步骤 1:</span> 在 PyCharm 右上角，点击 "Add Configuration..."。</p>
+                        <p><span class="font-bold">步骤 2:</span> 点击 `+` 号，选择 "Python"。</p>
+                        <p><span class="font-bold">步骤 3:</span> 填写配置，如下图所示：</p>
+                        <div class="pycharm-config">
+                            <div><span class="label">Name:</span> <span class="value">Debug MCP Server</span></div>
+                            <div class="mt-2"><span class="label">Script path:</span> <span class="input">/path/to/your/server.py</span></div>
+                            <div class="mt-2"><span class="label">Parameters:</span> <span class="value">(留空)</span></div>
+                        </div>
+                        <p><span class="font-bold">步骤 4:</span> 在你的代码中（例如工具函数内部）设置断点。</p>
+                        <p><span class="font-bold">步骤 5:</span> 点击 PyCharm 右上角的**绿色小虫子 (Debug) 图标**启动调试会话。</p>
+                        <p><span class="font-bold">步骤 6:</span> 使用任意一种测试方法（如 MCP Inspector 或测试脚本）从外部调用你的工具，即可触发断点并开始调试。</p>
+                    </div>
+                </section>
+
+                <section class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.3 解决模块化项目中的 `fastmcp dev` 路径问题</h3>
+                    <p class="text-slate-600 mb-4">从模块化运行 (`python -m my_package.server`) 切换到脚本化开发 (`fastmcp dev ...`) 是一个常见的痛点，其根源在于 Python 的导入路径机制。</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">问题根源：执行上下文的差异</h4>
+                            <ul class="list-disc list-inside text-slate-700 space-y-2">
+                                <li>当使用 <code class="bg-slate-200 text-sm p-1 rounded">python -m my_package.server</code> 运行时，Python 会将你的**项目根目录**添加到搜索路径中。因此，在 `server.py` 内部的 `from . import utils` 或 `from my_package import models` 这样的导入能够成功。</li>
+                                <li>当直接运行 <code class="bg-slate-200 text-sm p-1 rounded">fastmcp dev my_package/server.py</code> 时，Python 的执行上下文是 `my_package/` 目录。它不知道上层目录的存在，导致所有基于包的导入（无论是相对的还是绝对的）都会因找不到模块而失败 (`ImportError`)。</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">解决方案：创建开发入口文件</h4>
+                            <p class="text-slate-700 mb-2">最佳实践是在你的**项目根目录**下创建一个专门用于开发和调试的入口文件，例如 `dev_server.py`。这个文件不会用于生产环境，只为了给 `fastmcp dev` 提供一个正确的启动点。</p>
+                            
+                            <p class="mb-2"><span class="font-bold">步骤 1:</span> 在你的项目根目录（与 `src` 或你的主包目录同级）下，创建新文件 `dev_server.py`。</p>
+                            
+                            <p class="mb-2"><span class="font-bold">步骤 2:</span> 将以下代码粘贴到 `dev_server.py` 中，并确保导入路径与你的项目结构匹配。</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code># dev_server.py
+# 该文件为 `fastmcp dev` 提供一个正确的项目根入口点。
+
+# 假设你的 mcp 实例在 src/github_stars_mcp/server.py 中定义
+from src.github_stars_mcp.server import mcp
+
+# `fastmcp dev` 会自动发现这个名为 `mcp` 的实例并用它来启动开发服务器。
+# 无需添加 if __name__ == "__main__" 代码块。
+</code></pre>
+                            </div>
+                            
+                            <p class="mt-4 mb-2"><span class="font-bold">步骤 3:</span> 现在，你可以从项目根目录运行以下命令来启动开发服务器：</p>
+                            <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                <pre><code>fastmcp dev dev_server.py</code></pre>
+                            </div>
+                            <p class="mt-2 text-sm text-slate-500">这个方法通过从根目录启动，确保了 Python 的导入系统能够像 `python -m` 那样正常工作，从而解决了所有路径问题，且无需修改任何项目源代码。</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Tab 5: 参考速查 -->
             <div id="tab-reference" class="tab-pane hidden fade-in">
                 <section class="mb-12">
                     <h2 class="text-3xl font-bold text-center mb-2 text-slate-900">总结与快速上手参考</h2>
@@ -359,7 +492,7 @@ def create_user(profile: UserProfile):
                 </section>
 
                 <section class="mb-12 bg-white p-8 rounded-xl shadow-sm">
-                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.1 核心 FastMCP 组件 (Python)</h3>
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">5.1 核心 FastMCP 组件 (Python)</h3>
                      <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
@@ -394,9 +527,9 @@ def create_user(profile: UserProfile):
                         </table>
                     </div>
                 </section>
-
+                
                 <section class="bg-white p-8 rounded-xl shadow-sm">
-                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">4.2 基础服务器模板</h3>
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-800">5.2 基础服务器模板</h3>
                     <p class="text-slate-600 mb-4">这是一个完整的、可直接复制粘贴的“Hello, World”服务器示例，整合了所有基本要素。</p>
                     <div class="code-block bg-slate-800 text-white p-4 rounded-lg font-mono text-sm">
                         <button class="copy-btn" onclick="copyCode(this)">复制</button>
@@ -447,13 +580,15 @@ if __name__ == "__main__":
                     panes.forEach(pane => {
                         if (pane.id === targetId) {
                             pane.classList.remove('hidden');
+                            pane.classList.add('fade-in');
                         } else {
                             pane.classList.add('hidden');
+                            pane.classList.remove('fade-in');
                         }
                     });
                 });
             });
-
+            
             // Initialize Radar Chart
             const ctx = document.getElementById('languageRadarChart');
             if(ctx) {
@@ -540,7 +675,7 @@ if __name__ == "__main__":
                     this.classList.remove('bg-slate-200', 'text-slate-700');
 
                     const filter = this.getAttribute('data-filter');
-
+                    
                     appCards.forEach(card => {
                         if (filter === 'all' || card.getAttribute('data-category') === filter) {
                             card.style.display = 'block';
@@ -551,11 +686,11 @@ if __name__ == "__main__":
                 });
             });
         });
-
+        
         // Copy code function
         function copyCode(button) {
-            const codeBlock = button.parentElement;
-            const code = codeBlock.querySelector('pre code').innerText;
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre code, pre').innerText;
             navigator.clipboard.writeText(code).then(function() {
                 button.innerText = '已复制!';
                 setTimeout(() => {

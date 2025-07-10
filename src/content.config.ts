@@ -18,8 +18,9 @@ const blog = defineCollection({
       ogImage: image().or(z.string()).optional(),
       description: z.string(),
       canonicalURL: z.string().optional(),
-      hideEditPost: z.boolean().optional(),
+      hideEditPost: z.boolean().default(true),
       timezone: z.string().optional(),
+      htmlUrl: z.string().optional(),
     }),
 });
 

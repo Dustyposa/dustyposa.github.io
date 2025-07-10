@@ -16,6 +16,12 @@ const headerProps = {
   style: { viewTransitionName: slugifyStr(title) },
   class: "text-lg font-medium decoration-dashed hover:underline",
 };
+
+// 通用的交互式内容检测
+const isInteractiveContent = data.tags?.includes('交互式') || data.tags?.includes('interactive');
+const htmlUrl = data.htmlUrl;
+// 如果有htmlUrl就认为是HTML版本，或者同时有HTML标签和交互式标签
+const isHtmlVersion = htmlUrl || isInteractiveContent;
 ---
 
 <li class="my-6">
@@ -33,4 +39,22 @@ const headerProps = {
   </a>
   <Datetime {pubDatetime} {modDatetime} {timezone} />
   <p>{description}</p>
+  
+  {isInteractiveContent && (
+      <div class="mt-4 flex flex-wrap gap-2">
+        {(() => {
+          if (isHtmlVersion && htmlUrl) {
+            return (
+              <a
+                href={htmlUrl}
+                target="_blank"
+                class="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-accent-text-over transition-colors hover:bg-accent/80"
+              >
+                🚀 开始交互式学习
+              </a>
+            );
+          }
+        })()}
+      </div>
+    )}
 </li>
