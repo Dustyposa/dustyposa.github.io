@@ -8,15 +8,21 @@ import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
 import Pagination from "@/components/Pagination.astro";
 import getUniqueTags from "@/utils/getUniqueTags";
-import getPostsByTag from "@/utils/getPostsByTag";
+import getPostsByTag, { getContentPostsByTag } from "@/utils/getPostsByTag";
 import { SITE } from "@/config";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const posts = await getCollection("blog");
   const tags = getUniqueTags(posts);
+  
+  // Tags that should show all posts (including filtered ones)
+  const excludedTags = ['deep-research'];
 
   return tags.flatMap(({ tag, tagName }) => {
-    const tagPosts = getPostsByTag(posts, tag);
+    // For excluded tags, show all posts; for others, use content filtering
+    const tagPosts = excludedTags.includes(tag) 
+      ? getPostsByTag(posts, tag)
+      : getContentPostsByTag(posts, tag);
 
     return paginate(tagPosts, {
       params: { tag },

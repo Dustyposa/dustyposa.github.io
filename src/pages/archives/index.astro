@@ -6,6 +6,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Card from "@/components/Card.astro";
 import getPostsByGroupCondition from "@/utils/getPostsByGroupCondition";
+import postFilter from "@/utils/postFilter";
 import { SITE } from "@/config";
 
 // Redirect to 404 page if `showArchives` config is false
@@ -14,6 +15,7 @@ if (!SITE.showArchives) {
 }
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
+const filteredPosts = posts.filter(postFilter);
 
 const months = [
   "January",
@@ -36,7 +38,7 @@ const months = [
   <Main pageTitle="Archives" pageDesc="All the articles I've archived.">
     {
       Object.entries(
-        getPostsByGroupCondition(posts, post =>
+        getPostsByGroupCondition(filteredPosts, post =>
           post.data.pubDatetime.getFullYear()
         )
       )
