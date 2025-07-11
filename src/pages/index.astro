@@ -14,8 +14,14 @@ import { SITE } from "@/config";
 import { SOCIALS } from "@/constants";
 
 const posts = await getCollection("blog");
+// 定义要排除的标签列表
+const excludedTags = ['deep research'];
+// 过滤掉包含任意一个 excludedTags 的文章
+const filteredPosts = posts.filter(({ data }) => 
+  !data.tags?.some((tag: string) => excludedTags.includes(tag))
+);
 
-const sortedPosts = getSortedPosts(posts);
+const sortedPosts = getSortedPosts(filteredPosts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 ---
