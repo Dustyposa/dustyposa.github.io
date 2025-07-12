@@ -34,10 +34,25 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pnpm/v9
+            ~/.local/share/pnpm/store/v3
+            node_modules/.pnpm/playwright
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
       - name: Install dependencies
         run: pnpm install
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/playwright*.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Build with Astro
         run: pnpm build
       - name: Setup Pages
