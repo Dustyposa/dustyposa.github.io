@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生蚝之谜：互动科学报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Scientific Beige & Coral -->
+    <!-- Application Structure Plan: A guided, interactive narrative with a sticky top navigation for non-linear exploration. The core improvement is a multi-stage, animated 'Virtual Experiment' for the oyster opening process, replacing the static button. This directly addresses user feedback by making the key scientific concept highly interactive and visually explanatory. The structure flows from anatomy (the 'what'), to the experiment (the 'how'), to data (the 'proof'), to scenarios (the 'why'), and finally to a practical conclusion, creating a comprehensive learning journey. -->
+    <!-- Visualization & Content Choices:
+        1. Oyster Opener (Virtual Experiment): Goal: Demonstrate protein denaturation. Method: Multi-stage HTML/CSS/JS animation with a temperature slider. Interaction: User controls the "heat" via the slider, observing real-time visual changes in the muscle and shell, with accompanying explanatory text updates. Justification: Transforms a passive animation into an active experiment, dramatically improving engagement and understanding of the core scientific principle.
+        2. Cooking Chart: Goal: Show variability and compare methods. Method: Chart.js bar chart with floating bars representing the reported range for steam cooking. Interaction: Hover for details. Justification: Provides a more nuanced and accurate representation of the source data.
+        3. Diagnostic Scenarios: Goal: Organize diagnostic info. Method: Redesigned HTML/CSS cards with a more polished expand/collapse animation and icons. Interaction: Click to expand. Justification: Improves the UI/UX of the existing successful element with better visual feedback.
+        Library/Method: All interactions use vanilla JavaScript. Visualizations use Chart.js for the canvas-based chart. All diagrams are built with HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: #FDFBF8; color: #4A4A4A; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: auto; height: 350px; max-height: 450px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+
+        .oyster-shell { transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .oyster-muscle { transition: all 0.5s ease-in-out; }
+        .oyster-top.open { transform: rotate(-25deg) translateY(-20px) translateX(-15px); }
+        .oyster-bottom.open { transform: rotate(5deg) translateY(5px); }
+
+        .card-content { transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out, opacity 0.5s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; padding-top: 0; padding-bottom: 0; }
+        .card.active .card-content { max-height: 500px; opacity: 1; padding-top: 1rem; padding-bottom: 1rem; }
+        .card .arrow { transition: transform 0.3s ease; }
+        .card.active .arrow { transform: rotate(180deg); }
+
+        .fade-in-section { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-in-section.is-visible { opacity: 1; transform: translateY(0); }
+
+        #temp-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 25px; height: 25px; background: #f97316; cursor: pointer; border-radius: 50%; }
+        #temp-slider::-moz-range-thumb { width: 25px; height: 25px; background: #f97316; cursor: pointer; border-radius: 50%; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="sticky top-0 bg-white/80 backdrop-blur-sm shadow-md z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <div class="font-bold text-xl text-gray-800">生蚝之谜</div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#anatomy" class="text-gray-600 hover:text-orange-500 transition-colors">结构与原理</a>
+                    <a href="#experiment" class="text-gray-600 hover:text-orange-500 transition-colors">虚拟实验</a>
+                    <a href="#data" class="text-gray-600 hover:text-orange-500 transition-colors">数据对比</a>
+                    <a href="#scenarios" class="text-gray-600 hover:text-orange-500 transition-colors">原因分析</a>
+                    <a href="#conclusion" class="text-gray-600 hover:text-orange-500 transition-colors">最终裁决</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+
+        <header class="text-center max-w-3xl mx-auto my-12 md:my-16">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">生蚝之谜</h1>
+            <p class="text-lg md:text-xl text-gray-600">为什么有些蒸熟的生蚝，就是不开口？一个从厨房迷思到科学真相的深度探索。</p>
+        </header>
+
+        <section id="anatomy" class="fade-in-section mb-20 md:mb-28">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">生蚝的“门锁”</h2>
+             <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">生蚝的开合，由一对作用相反的“零件”控制：一块负责锁门的<strong class="text-rose-600">肌肉</strong>，和一个总想把门推开的<strong class="text-indigo-600">弹簧韧带</strong>。</p>
+            <div class="bg-slate-50 rounded-2xl p-8 grid md:grid-cols-5 gap-8 items-center">
+                <div class="md:col-span-2 relative w-64 h-48 mx-auto flex items-center justify-center">
+                    <div class="oyster-shell absolute w-full h-24 bg-gray-300 rounded-t-full rounded-b-[80px] bottom-0 shadow-lg"></div>
+                    <div class="oyster-shell absolute w-full h-24 bg-gray-300 rounded-t-full rounded-b-[80px] top-0 shadow-lg origin-bottom-left"></div>
+                    <div class="oyster-muscle absolute w-8 h-12 bg-rose-200 rounded-full z-10 opacity-75"></div>
+                    <div class="absolute bottom-1/2 left-0 transform -translate-y-1/2 w-4 h-4 bg-gray-500 rounded-full z-20" title="铰链韧带"></div>
+                </div>
+                <div class="md:col-span-3 text-left">
+                    <ul class="list-none space-y-4">
+                        <li class="flex items-start"><span class="text-rose-500 font-bold mr-3 text-2xl">●</span> <div><strong class="text-xl">闭壳肌 (Adductor Muscle):</strong> 强壮的肌肉，像一把锁，主动收缩将壳紧紧关闭。</div></li>
+                        <li class="flex items-start"><span class="text-indigo-500 font-bold mr-3 text-2xl">●</span> <div><strong class="text-xl">铰链韧带 (Hinge Ligament):</strong> 充满弹性的韧带，像一个弹簧，时刻都想把壳被动推开。</div></li>
+                    </ul>
+                    <p class="mt-6 text-gray-700">在正常情况下，肌肉的力量远大于韧带，所以生蚝保持关闭。要让它开口，就必须先让这块肌肉“失灵”。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="experiment" class="fade-in-section mb-20 md:mb-28">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">虚拟加热实验</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">现在，您可以亲手操作。拖动下面的滑块来模拟加热过程，观察生蚝内部发生了什么神奇的变化。</p>
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div class="relative w-64 h-56 mx-auto flex items-center justify-center">
+                        <div id="exp-oyster-bottom" class="oyster-shell absolute w-full h-24 bg-gray-300 rounded-t-full rounded-b-[80px] bottom-0 shadow-lg"></div>
+                        <div id="exp-oyster-top" class="oyster-shell absolute w-full h-24 bg-gray-300 rounded-t-full rounded-b-[80px] top-0 shadow-lg origin-bottom-left"></div>
+                        <div id="exp-oyster-muscle" class="oyster-muscle absolute w-8 h-12 bg-rose-300 rounded-full z-10"></div>
+                        <div class="absolute bottom-1/2 left-0 transform -translate-y-1/2 w-4 h-4 bg-gray-500 rounded-full z-20"></div>
+                        <div id="status-text" class="absolute -bottom-8 text-center w-full font-semibold text-lg text-gray-700"></div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center">
+                        <label for="temp-slider" class="font-bold text-xl mb-2">温度控制: <span id="temp-value" class="text-orange-600">20°C</span></label>
+                        <input id="temp-slider" type="range" min="20" max="100" value="20" class="w-full max-w-xs h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <p id="exp-explanation" class="mt-4 text-center text-gray-600 h-24">拖动滑块开始加热。观察闭壳肌（粉色部分）的变化。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="data" class="fade-in-section mb-20 md:mb-28">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">数据不会说谎</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">不同的烹饪方式，热量传递效率不同，直接导致了开口率的巨大差异。图表揭示了工业方法与家庭烹饪的差距。</p>
+            <div class="bg-slate-50 p-8 rounded-2xl">
+                <div class="chart-container">
+                    <canvas id="cooking-chart"></canvas>
+                </div>
+                <p class="text-center text-sm text-gray-500 mt-4">家庭常压蒸汽的开口率波动较大，而工业加压蒸汽则稳定高效。</p>
+            </div>
+        </section>
+
+        <section id="scenarios" class="fade-in-section mb-20 md:mb-28">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-800">四大可能的原因</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">一个熟后未开的生蚝，背后可能有多种解释。点击下方卡片，探索每一种可能性。</p>
+            <div id="scenarios-grid" class="grid sm:grid-cols-2 gap-6"></div>
+        </section>
+
+        <section id="conclusion" class="fade-in-section bg-amber-50 border-l-4 border-amber-400 p-8 rounded-r-lg">
+             <h2 class="text-3xl font-bold mb-4 text-gray-800">最终裁决：吃还是不吃？</h2>
+             <p class="text-gray-700 mb-4">科学告诉我们，一个煮熟却未开口的生蚝，**最常见的原因是它的肌肉粘得太牢**，这并不影响食用安全。然而，由于我们无法100%排除它在烹饪前就已死亡的微小可能，最谨慎的选择依然是那条古老的厨房法则：</p>
+             <p class="text-xl font-bold text-amber-800 bg-amber-100 p-4 rounded-lg">“如有疑问，立即丢弃。”</p>
+             <p class="text-gray-600 mt-4">理解背后的科学，能让你做出更明智的判断，但在安全问题上，谨慎永远是上策。</p>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-section').forEach(section => {
+                observer.observe(section);
+            });
+
+            const tempSlider = document.getElementById('temp-slider');
+            const tempValue = document.getElementById('temp-value');
+            const expOysterTop = document.getElementById('exp-oyster-top');
+            const expOysterBottom = document.getElementById('exp-oyster-bottom');
+            const expOysterMuscle = document.getElementById('exp-oyster-muscle');
+            const expExplanation = document.getElementById('exp-explanation');
+            const statusText = document.getElementById('status-text');
+
+            tempSlider.addEventListener('input', () => {
+                const temp = parseInt(tempSlider.value);
+                tempValue.textContent = `${temp}°C`;
+
+                const muscleOpacity = 1 - ((Math.max(0, temp - 40)) / 60) * 0.7;
+                expOysterMuscle.style.opacity = muscleOpacity;
+
+                const muscleColorValue = 200 - Math.floor(((Math.max(0, temp - 40)) / 60) * 100);
+                expOysterMuscle.style.backgroundColor = `rgb(252, ${muscleColorValue}, ${muscleColorValue + 28})`;
+
+                if (temp < 42) {
+                    expExplanation.textContent = '温度上升，肌肉依然强壮，外壳紧闭。';
+                    statusText.textContent = '加热中...';
+                    expOysterTop.classList.remove('open');
+                    expOysterBottom.classList.remove('open');
+                } else if (temp >= 42 && temp < 80) {
+                    expExplanation.textContent = '超过42°C，闭壳肌内的蛋白质开始变性，肌肉力量逐渐减弱！';
+                    statusText.textContent = '蛋白质变性...';
+                    expOysterTop.classList.remove('open');
+                    expOysterBottom.classList.remove('open');
+                } else {
+                    expExplanation.textContent = '肌肉完全“失灵”，无法再抵抗韧带的弹力，生蚝终于开口了！';
+                    statusText.textContent = '开口成功！✅';
+                    expOysterTop.classList.add('open');
+                    expOysterBottom.classList.add('open');
+                }
+            });
+
+            const scenariosData = [
+                { title: '情景一：烹饪前已死亡', icon: '☠️', color: 'bg-red-100', content: '这是最危险的情况。死亡的贝类会迅速滋生细菌。打开后通常有明显的腐败气味，肉质浑浊松散。<strong>建议：立即丢弃，绝对不可食用。</strong>' },
+                { title: '情景二：肌肉牢固粘连', icon: '👍', color: 'bg-green-100', content: '这是最常见、最可能的原因。生蚝已完全熟透，但闭壳肌依然牢牢粘在壳上，韧带的弹力不足以将其扯开。撬开后肉质和气味都正常。<strong>建议：谨慎检查，若一切正常则可食用。</strong>' },
+                { title: '情景三：加热不足或不均', icon: '🔥', color: 'bg-yellow-100', content: '家庭烹饪中常见的问题，如堆叠过密、火力不足。闭壳肌未完全变性。撬开后肉质可能部分呈半透明胶状。<strong>建议：放回锅中继续加热。</strong>' },
+                { title: '情景四：物理阻塞', icon: '⚙️', color: 'bg-blue-100', content: '铰链处被泥沙、碎壳卡住，或外壳畸形，导致无法张开。撬开后肉质和气味都正常。<strong>建议：清理后检查，若肉质正常则可食用。</strong>' }
+            ];
+
+            const scenariosGrid = document.getElementById('scenarios-grid');
+            scenariosData.forEach(scenario => {
+                const card = document.createElement('div');
+                card.className = 'card bg-white rounded-lg shadow-sm cursor-pointer transition-shadow hover:shadow-md';
+                card.innerHTML = `
+                    <div class="p-5 flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-3xl mr-4">${scenario.icon}</span>
+                            <h3 class="font-bold text-lg text-gray-800">${scenario.title}</h3>
+                        </div>
+                        <span class="arrow text-gray-400 text-2xl">▼</span>
+                    </div>
+                    <div class="card-content px-5 text-gray-600">
+                        <p>${scenario.content}</p>
+                    </div>
+                `;
+                scenariosGrid.appendChild(card);
+            });
+
+            scenariosGrid.addEventListener('click', (e) => {
+                const clickedCard = e.target.closest('.card');
+                if (!clickedCard) return;
+
+                const currentlyActive = document.querySelector('.card.active');
+                if (currentlyActive && currentlyActive !== clickedCard) {
+                    currentlyActive.classList.remove('active');
+                }
+
+                clickedCard.classList.toggle('active');
+            });
+
+            const ctx = document.getElementById('cooking-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['家庭常压蒸汽', '工业加压蒸汽'],
+                    datasets: [{
+                        label: '开口率范围 (%)',
+                        data: [[50, 100], [95, 100]],
+                        backgroundColor: 'rgba(251, 146, 60, 0.6)',
+                        borderColor: 'rgba(251, 146, 60, 1)',
+                        borderWidth: 1,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { beginAtZero: true, max: 100, ticks: { callback: value => value + '%' } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.raw;
+                                    return `开口率范围: ${val[0]}% - ${val[1]}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

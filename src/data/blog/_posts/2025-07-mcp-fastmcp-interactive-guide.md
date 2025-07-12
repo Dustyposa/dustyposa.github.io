@@ -24,7 +24,7 @@ htmlUrl: "/interactive-guides/mcp-fastmcp-guide.html"
      target="_blank"
      onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.2)'"
      onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-    🚀 立即开始交互式学习
+    🚀 立即开始懒人版阅读
   </a>
 </div>
 
