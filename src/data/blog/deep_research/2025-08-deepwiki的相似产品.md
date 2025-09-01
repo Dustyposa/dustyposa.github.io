@@ -8,7 +8,8 @@ tags:
   - deepwiki
   - github
 draft: false
-featured: false---
+featured: false
+---
 # Deepwiki 替代品深度分析：面向开发者的 AI 知识库市场综合报告
 
 ## 第一部分：解构 Deepwiki：开发者的 AI 知识伙伴
