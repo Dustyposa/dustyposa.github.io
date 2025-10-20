@@ -30,11 +30,11 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1
       playwright:
-        specifier: ^1.53.2
-        version: 1.53.2
+        specifier: ^1.55.1
+        version: 1.55.1
       rehype-mermaid:
         specifier: ^3.0.0
-        version: 3.0.0(playwright@1.53.2)
+        version: 3.0.0(playwright@1.55.1)
       remark-collapse:
         specifier: ^0.1.2
         version: 0.1.2
@@ -2646,13 +2646,13 @@ packages:
   pkg-types@2.2.0:
     resolution: {integrity: sha512-2SM/GZGAEkPp3KWORxQZns4M+WSeXbC2HEvmOIJe3Cmiv6ieAJvdVhDldtHqM5J1Y7MrR1XhkBT/rMlhh9FdqQ==}
 
-  playwright-core@1.53.2:
-    resolution: {integrity: sha512-ox/OytMy+2w1jcYEYlOo1Hhp8hZkLCximMTUTMBXjGUA1KoFfiSZ+DU+3a739jsPY0yoKH2TFy9S2fsJas8yAw==}
+  playwright-core@1.55.1:
+    resolution: {integrity: sha512-Z6Mh9mkwX+zxSlHqdr5AOcJnfp+xUWLCt9uKV18fhzA8eyxUd8NUWzAjxUh55RZKSYwDGX0cfaySdhZJGMoJ+w==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.53.2:
-    resolution: {integrity: sha512-6K/qQxVFuVQhRQhFsVZ9fGeatxirtrpPgxzBYWyZLEXJzqYwuL4fuNmfOfD5et1tJE4GScKyPNeLhZeRwuTU3A==}
+  playwright@1.55.1:
+    resolution: {integrity: sha512-cJW4Xd/G3v5ovXtJJ52MAOclqeac9S/aGGgRzLabuF8TnIb6xHvMzKIa6JmrRzUkeXJgfL1MhukP0NK6l39h3A==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2944,6 +2944,7 @@ packages:
   sitemap@8.0.0:
     resolution: {integrity: sha512-+AbdxhM9kJsHtruUF39bwS/B0Fytw6Fr1o4ZAIAEqA6cke2xcoO2GleBw9Zw7nRzILVEgz7zBM5GiTJjie1G9A==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    deprecated: 'SECURITY: Multiple vulnerabilities fixed in 8.0.1 (XML injection, path traversal, command injection, protocol injection). Upgrade immediately: npm install sitemap@8.0.1'
     hasBin: true
 
   smol-toml@1.3.1:
@@ -5907,12 +5908,12 @@ snapshots:
 
   merge2@1.4.1: {}
 
-  mermaid-isomorphic@3.0.4(playwright@1.53.2):
+  mermaid-isomorphic@3.0.4(playwright@1.55.1):
     dependencies:
       '@fortawesome/fontawesome-free': 6.7.2
       mermaid: 11.8.1
     optionalDependencies:
-      playwright: 1.53.2
+      playwright: 1.55.1
     transitivePeerDependencies:
       - supports-color
 
@@ -6298,11 +6299,11 @@ snapshots:
       exsolve: 1.0.7
       pathe: 2.0.3
 
-  playwright-core@1.53.2: {}
+  playwright-core@1.55.1: {}
 
-  playwright@1.53.2:
+  playwright@1.55.1:
     dependencies:
-      playwright-core: 1.53.2
+      playwright-core: 1.55.1
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -6387,19 +6388,19 @@ snapshots:
     dependencies:
       regex-utilities: 2.3.0
 
-  rehype-mermaid@3.0.0(playwright@1.53.2):
+  rehype-mermaid@3.0.0(playwright@1.55.1):
     dependencies:
       '@types/hast': 3.0.4
       hast-util-from-html-isomorphic: 2.0.0
       hast-util-to-text: 4.0.2
-      mermaid-isomorphic: 3.0.4(playwright@1.53.2)
+      mermaid-isomorphic: 3.0.4(playwright@1.55.1)
       mini-svg-data-uri: 1.4.4
       space-separated-tokens: 2.0.2
       unified: 11.0.5
       unist-util-visit-parents: 6.0.1
       vfile: 6.0.3
     optionalDependencies:
-      playwright: 1.53.2
+      playwright: 1.55.1
     transitivePeerDependencies:
       - supports-color
 
